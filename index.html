@@ -445,7 +445,7 @@ tr:hover td { background: var(--card2); }
             <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Sudah punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('login')">Masuk</b></p>
           </div>
         </div>
-        <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text3)">© 2026 Lytana — Powered By Skuro Production</p>
+        <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text3)">© 2024 Lytana — Linkage of Your Technical Appointment & Network Assistance</p>
       </div>
     </div>
   </div>
@@ -733,42 +733,43 @@ tr:hover td { background: var(--card2); }
   <div class="modal-overlay" id="modal-slot">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modal-slot-title">Tambah Slot Baru</h3>
+        <h3 id="modal-slot-title">Tambah Sesi Baru</h3>
         <button class="modal-close" onclick="closeModal('modal-slot')">×</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="form-label">Jenis Bimbingan</label>
-            <select id="slot-tipe" class="form-select">
-              <option value="offline">Offline</option>
-              <option value="online">Online</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kuota</label>
-            <input id="slot-kuota" class="form-input" type="number" min="1" max="20" value="5" placeholder="Jumlah mahasiswa"/>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Jenis Bimbingan</label>
+          <select id="slot-tipe" class="form-select">
+            <option value="offline">🏢 Offline — Tatap muka</option>
+            <option value="online">💻 Online — Zoom / Meet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal</label>
+          <input id="slot-tanggal" class="form-input" type="date"/>
         </div>
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label">Tanggal</label>
-            <input id="slot-tanggal" class="form-input" type="date"/>
+            <label class="form-label">Jam Mulai</label>
+            <input id="slot-jam-mulai" class="form-input" type="time"/>
           </div>
           <div class="form-group">
-            <label class="form-label">Jam</label>
-            <input id="slot-jam" class="form-input" type="time"/>
+            <label class="form-label">Jam Selesai</label>
+            <input id="slot-jam-selesai" class="form-input" type="time"/>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Catatan / Link Meeting</label>
-          <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang, link Zoom, dsb."/>
+          <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang 301, https://zoom.us/..., dsb."/>
         </div>
         <input type="hidden" id="slot-edit-id"/>
+        <div style="background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+          💡 Setiap sesi hanya bisa dipesan oleh <b style="color:var(--text)">1 mahasiswa</b>. Buat sesi terpisah untuk setiap slot waktu.
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button>
-        <button class="btn btn-primary" id="slot-save-btn" onclick="saveSlot()">Simpan Slot</button>
+        <button class="btn btn-primary" id="slot-save-btn" onclick="saveSlot()">Simpan Sesi</button>
       </div>
     </div>
   </div>
@@ -986,6 +987,17 @@ function doLogout() {
 })();
 
 // ============================================================
+// DATE HELPER — "YYYY-MM-DD" → formatted Indonesian
+// ============================================================
+function fmtTgl(tglStr, opts) {
+  if (!tglStr || tglStr.length < 8) return '—';
+  // Force local parse: append T00:00:00 so no timezone shift
+  const d = new Date(tglStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return tglStr;
+  return d.toLocaleDateString('id-ID', opts || { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+// ============================================================
 // SLOT SELECTION (Mahasiswa)
 // ============================================================
 function selectType(type) {
@@ -999,7 +1011,7 @@ function selectType(type) {
 
 async function loadSlots(tipe) {
   const c = document.getElementById('slots-container');
-  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat slot...</div>';
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat sesi...</div>';
   const res = await api('getSlots', { tipe, token: state.token });
   if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.slots = res.slots;
@@ -1009,38 +1021,65 @@ async function loadSlots(tipe) {
 function renderSlots(slots) {
   const c = document.getElementById('slots-container');
   if (!slots.length) {
-    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada slot tersedia untuk jenis bimbingan ini</p></div>';
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia untuk jenis bimbingan ini</p></div>';
     return;
   }
-  c.innerHTML = `<div class="slot-grid">${slots.map(renderSlotCard).join('')}</div>`;
+
+  // Group by date
+  const byDate = {};
+  slots.forEach(s => {
+    const k = s.tanggal || 'lainnya';
+    if (!byDate[k]) byDate[k] = [];
+    byDate[k].push(s);
+  });
+
+  let html = '';
+  Object.keys(byDate).sort().forEach(tgl => {
+    html += `<div style="margin-bottom:24px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;padding-left:2px">
+        📅 ${fmtTgl(tgl, { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
+      </div>
+      <div class="slot-grid">${byDate[tgl].map(renderSlotCard).join('')}</div>
+    </div>`;
+  });
+  c.innerHTML = html;
 }
 
 function renderSlotCard(s) {
-  const pct    = Math.round((s.booked / s.kuota) * 100);
-  const barCls = pct >= 90 ? 'high' : pct >= 60 ? 'medium' : 'low';
-  const full   = s.booked >= s.kuota;
-  const d      = new Date(s.tanggal + 'T00:00:00');
-  const tgl    = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const taken = s.bookedBy && s.bookedBy !== '';
+  const isMe  = taken && s.bookedBy === state.user?.kode;
+
+  let statusBadge, actionBtn;
+  if (isMe) {
+    statusBadge = `<span class="badge badge-blue">✓ Kamu</span>`;
+    actionBtn   = `<span style="font-size:0.78rem;color:var(--blue2)">Sudah dipesan</span>`;
+  } else if (taken) {
+    statusBadge = `<span class="badge badge-rose">Terisi</span>`;
+    actionBtn   = `<span class="badge badge-slate">Tidak tersedia</span>`;
+  } else {
+    statusBadge = `<span class="badge badge-green">Tersedia</span>`;
+    actionBtn   = `<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s)})'>Reservasi</button>`;
+  }
+
   return `
-  <div class="slot-card ${full ? 'full' : ''}">
+  <div class="slot-card ${taken && !isMe ? 'full' : ''}" style="${isMe ? 'border-color:var(--blue);background:rgba(37,99,235,0.07)' : ''}">
     <div class="slot-card-header">
       <div>
         <div class="slot-type-badge ${s.tipe}">${s.tipe.toUpperCase()}</div>
-        <div style="margin-top:8px;font-weight:700;font-size:1rem">${tgl}</div>
-        <div style="color:var(--text2);font-size:0.88rem;margin-top:2px">⏰ ${s.jam}</div>
+        <div style="margin-top:10px;font-size:1.35rem;font-weight:700;font-family:var(--font2);color:var(--text);line-height:1">
+          ${s.jamMulai} <span style="font-size:0.9rem;color:var(--text2);font-weight:400">–</span> ${s.jamSelesai}
+        </div>
+        <div style="font-size:0.78rem;color:var(--text3);margin-top:3px">${Math.round((parseInt(s.jamSelesai)-parseInt(s.jamMulai))||0)} menit</div>
       </div>
-      <div style="text-align:right">
-        <div style="font-size:1.3rem;font-weight:700;color:${full?'var(--rose)':'var(--green)'}">${s.booked}/${s.kuota}</div>
-        <div style="font-size:0.75rem;color:var(--text3)">terisi</div>
+      <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        ${statusBadge}
+        ${taken && !isMe ? `<div style="font-size:0.72rem;color:var(--text3)">1/1 terisi</div>` : `<div style="font-size:0.72rem;color:var(--green)">0/1 terisi</div>`}
       </div>
     </div>
-    <div class="slot-quota-bar"><div class="slot-quota-fill ${barCls}" style="width:${pct}%"></div></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <span style="font-size:0.78rem;color:var(--text3)">${s.catatan || ''}</span>
-      ${full
-        ? `<span class="badge badge-rose">Penuh</span>`
-        : `<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s)})'>Reservasi</button>`
-      }
+    <div class="slot-quota-bar" style="margin:12px 0 10px"><div class="slot-quota-fill ${taken?'high':'low'}" style="width:${taken?'100':'0'}%"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:0.78rem;color:var(--text3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.catatan || ''}</span>
+      ${actionBtn}
     </div>
   </div>`;
 }
@@ -1050,19 +1089,27 @@ function renderSlotCard(s) {
 // ============================================================
 function openBookingModal(slot) {
   state.pendingSlot = slot;
-  const d = new Date(slot.tanggal + 'T00:00:00');
-  const tgl = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   document.getElementById('modal-booking-content').innerHTML = `
     <div class="card" style="margin-bottom:0;background:var(--card2)">
-      <div style="display:grid;gap:10px">
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span> <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe}</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span> <b>${tgl}</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jam</span> <b>${slot.jam}</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sisa Slot</span> <b style="color:var(--green)">${slot.kuota - slot.booked} tersisa</b></div>
-        ${slot.catatan ? `<div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Catatan</span> <span>${slot.catatan}</span></div>` : ''}
+      <div style="display:grid;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--text2)">Jenis</span>
+          <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe.toUpperCase()}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--text2)">Tanggal</span>
+          <b>${fmtTgl(slot.tanggal, {weekday:'long',day:'numeric',month:'long',year:'numeric'})}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--text2)">Sesi</span>
+          <b style="font-family:var(--font2)">${slot.jamMulai} – ${slot.jamSelesai}</b>
+        </div>
+        ${slot.catatan ? `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Lokasi / Link</span><span style="color:var(--text)">${slot.catatan}</span></div>` : ''}
       </div>
     </div>
-    <p style="margin-top:14px;font-size:0.88rem">Apakah kamu yakin ingin mereservasi slot ini?</p>
+    <div style="margin-top:14px;padding:10px 12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:0.85rem;color:var(--text2)">
+      ✅ Sesi ini masih <b style="color:var(--green)">tersedia</b>. Setelah kamu reservasi, sesi ini akan terkunci untukmu.
+    </div>
   `;
   openModal('modal-booking');
 }
@@ -1095,7 +1142,7 @@ async function loadMyHistory() {
   const all = [
     ...(res.history || []).map(h => ({ ...h, _type: 'history' })),
     ...(bookRes.bookings || []).map(b => ({ ...b, _type: 'booking' })),
-  ].sort((a, b) => new Date(b.createdAt || b.tanggal) - new Date(a.createdAt || a.tanggal));
+  ].sort((a, b) => (b.createdAt || b.tanggal || '').localeCompare(a.createdAt || a.tanggal || ''));
 
   if (!all.length) {
     c.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada riwayat bimbingan</p></div>';
@@ -1103,23 +1150,25 @@ async function loadMyHistory() {
   }
 
   const statusMap = {
-    menunggu: { cls: 'amber', icon: '⏳', label: 'Menunggu' },
+    menunggu: { cls: 'amber', icon: '⏳', label: 'Menunggu konfirmasi' },
     terselenggara: { cls: 'green', icon: '✓', label: 'Terselenggara' },
-    tidak_terselenggara: { cls: 'rose', icon: '✕', label: 'Tidak Terjadi' },
+    tidak_terselenggara: { cls: 'rose', icon: '✕', label: 'Tidak terjadi' },
     dibatalkan: { cls: 'slate', icon: '–', label: 'Dibatalkan' },
   };
 
   c.innerHTML = `<div class="timeline">${all.map(item => {
     const s    = statusMap[item.status] || { cls: 'slate', icon: '?', label: item.status };
     const slot = item.slot || {};
-    const tgl  = slot.tanggal ? new Date(slot.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    const tgl  = fmtTgl(slot.tanggal, { day:'numeric', month:'long', year:'numeric' });
+    const sesi = slot.jamMulai ? `${slot.jamMulai}–${slot.jamSelesai}` : (slot.jam || '');
     return `<div class="timeline-item">
       <div class="timeline-dot ${s.cls}">${s.icon}</div>
       <div class="timeline-body">
-        <div style="font-weight:600">${slot.tipe ? slot.tipe.charAt(0).toUpperCase() + slot.tipe.slice(1) : 'Bimbingan'} — ${tgl} ${slot.jam || ''}</div>
+        <div style="font-weight:600">${slot.tipe ? slot.tipe.charAt(0).toUpperCase()+slot.tipe.slice(1) : 'Bimbingan'} — ${tgl}</div>
+        <div style="font-size:0.85rem;color:var(--text2);margin-top:1px">⏰ ${sesi}</div>
         <div class="meta">${s.label}${item.catatan ? ' · ' + item.catatan : ''}</div>
         ${item._type === 'booking' && item.status === 'menunggu'
-          ? `<button class="btn btn-rose btn-sm" style="margin-top:6px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`
+          ? `<button class="btn btn-rose btn-sm" style="margin-top:8px" onclick="cancelMyBooking('${item.id}')">Batalkan Reservasi</button>`
           : ''}
       </div>
     </div>`;
@@ -1294,21 +1343,25 @@ async function loadAdminSlots() {
 function renderAdminSlots(slots) {
   const c = document.getElementById('admin-slots-container');
   if (!slots.length) {
-    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada slot. Tambahkan slot bimbingan.</p></div>';
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi. Tambahkan sesi bimbingan baru.</p></div>';
     return;
   }
   c.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Jenis</th><th>Tanggal</th><th>Jam</th><th>Kuota</th><th>Terisi</th><th>Catatan</th><th>Aksi</th></tr></thead>
+    <thead><tr><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th><th>Aksi</th></tr></thead>
     <tbody>${slots.map(s => {
-      const d   = new Date(s.tanggal + 'T00:00:00');
-      const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      const tgl    = fmtTgl(s.tanggal, { day:'numeric', month:'short', year:'numeric' });
+      const terisi = s.bookedBy && s.bookedBy !== '';
       return `<tr>
         <td><span class="badge badge-${s.tipe==='offline'?'blue':'teal'}">${s.tipe}</span></td>
         <td>${tgl}</td>
-        <td>${s.jam}</td>
-        <td>${s.kuota}</td>
-        <td>${s.booked}</td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${s.catatan || '—'}</td>
+        <td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td>
+        <td>${terisi
+          ? `<span class="badge badge-rose">Terisi</span>`
+          : `<span class="badge badge-green">Tersedia</span>`}</td>
+        <td style="font-size:0.82rem;color:${terisi?'var(--text)':'var(--text3)'}">
+          ${terisi ? `<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>` : '—'}
+        </td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan || '—'}</td>
         <td style="display:flex;gap:6px">
           <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s)})'>Edit</button>
           <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>
@@ -1319,54 +1372,57 @@ function renderAdminSlots(slots) {
 }
 
 function filterAdminSlots(tipe, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#a-slots .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filtered = tipe === 'all' ? state.allSlots : state.allSlots.filter(s => s.tipe === tipe);
   renderAdminSlots(filtered);
 }
 
 function openSlotModal() {
-  document.getElementById('modal-slot-title').textContent = 'Tambah Slot Baru';
-  document.getElementById('slot-edit-id').value  = '';
-  document.getElementById('slot-tipe').value     = 'offline';
-  document.getElementById('slot-tanggal').value  = '';
-  document.getElementById('slot-jam').value      = '';
-  document.getElementById('slot-kuota').value    = '5';
-  document.getElementById('slot-catatan').value  = '';
-  document.getElementById('slot-save-btn').textContent = 'Simpan Slot';
+  document.getElementById('modal-slot-title').textContent = 'Tambah Sesi Baru';
+  document.getElementById('slot-edit-id').value      = '';
+  document.getElementById('slot-tipe').value         = 'offline';
+  document.getElementById('slot-tanggal').value      = '';
+  document.getElementById('slot-jam-mulai').value    = '';
+  document.getElementById('slot-jam-selesai').value  = '';
+  document.getElementById('slot-catatan').value      = '';
+  document.getElementById('slot-save-btn').textContent = 'Simpan Sesi';
   openModal('modal-slot');
 }
 
 function editSlot(s) {
-  document.getElementById('modal-slot-title').textContent = 'Edit Slot';
-  document.getElementById('slot-edit-id').value  = s.id;
-  document.getElementById('slot-tipe').value     = s.tipe;
-  document.getElementById('slot-tanggal').value  = s.tanggal;
-  document.getElementById('slot-jam').value      = s.jam;
-  document.getElementById('slot-kuota').value    = s.kuota;
-  document.getElementById('slot-catatan').value  = s.catatan || '';
-  document.getElementById('slot-save-btn').textContent = 'Update Slot';
+  document.getElementById('modal-slot-title').textContent = 'Edit Sesi';
+  document.getElementById('slot-edit-id').value      = s.id;
+  document.getElementById('slot-tipe').value         = s.tipe;
+  document.getElementById('slot-tanggal').value      = s.tanggal;
+  document.getElementById('slot-jam-mulai').value    = s.jamMulai || '';
+  document.getElementById('slot-jam-selesai').value  = s.jamSelesai || '';
+  document.getElementById('slot-catatan').value      = s.catatan || '';
+  document.getElementById('slot-save-btn').textContent = 'Update Sesi';
   openModal('modal-slot');
 }
 
 async function saveSlot() {
-  const id      = document.getElementById('slot-edit-id').value;
-  const tipe    = document.getElementById('slot-tipe').value;
-  const tanggal = document.getElementById('slot-tanggal').value;
-  const jam     = document.getElementById('slot-jam').value;
-  const kuota   = document.getElementById('slot-kuota').value;
-  const catatan = document.getElementById('slot-catatan').value;
+  const id         = document.getElementById('slot-edit-id').value;
+  const tipe       = document.getElementById('slot-tipe').value;
+  const tanggal    = document.getElementById('slot-tanggal').value;
+  const jamMulai   = document.getElementById('slot-jam-mulai').value;
+  const jamSelesai = document.getElementById('slot-jam-selesai').value;
+  const catatan    = document.getElementById('slot-catatan').value;
 
-  if (!tanggal || !jam) return toast('Tanggal dan jam wajib diisi', 'error');
+  if (!tanggal || !jamMulai || !jamSelesai) return toast('Tanggal, jam mulai & selesai wajib diisi', 'error');
+  if (jamSelesai <= jamMulai) return toast('Jam selesai harus setelah jam mulai', 'error');
 
   const action = id ? 'updateSlot' : 'createSlot';
-  const params = { tipe, tanggal, jam, kuota, catatan, token: state.token };
+  const params = { tipe, tanggal, jamMulai, jamSelesai, catatan, token: state.token };
   if (id) params.id = id;
 
   const btn = document.getElementById('slot-save-btn');
   btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
   const res = await api(action, params, 'POST');
   btn.disabled = false;
+  btn.textContent = id ? 'Update Sesi' : 'Simpan Sesi';
 
   if (!res.success) return toast(res.message, 'error');
   toast(id ? 'Slot diperbarui!' : 'Slot ditambahkan!', 'success');
@@ -1430,7 +1486,7 @@ function bookingRow(b, withFoto = false) {
     ${fotoCell}
     <td>
       <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span>
-      <div style="font-size:0.82rem">${d} ${slot.jam||''}</div>
+      <div style="font-size:0.82rem">${fmtTgl(slot.tanggal,{day:'numeric',month:'short'})} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div>
     </td>
     <td><span class="badge ${statusMap[b.status]||'badge-slate'}">${statusLabel[b.status]||b.status}</span></td>
     <td>
@@ -1452,7 +1508,8 @@ function openValidasi(b) {
   state.pendingValidateId = b.id;
   const slot = b.slot || {};
   const mhs  = b.mahasiswa || {};
-  const d    = slot.tanggal ? new Date(slot.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) : '—';
+  const tgl  = fmtTgl(slot.tanggal, { weekday:'long', day:'numeric', month:'long' });
+  const sesi = slot.jamMulai ? `${slot.jamMulai} – ${slot.jamSelesai}` : (slot.jam || '—');
   document.getElementById('validasi-content').innerHTML = `
     <div class="card" style="background:var(--card2);margin-bottom:0">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
@@ -1464,8 +1521,8 @@ function openValidasi(b) {
       </div>
       <div style="display:grid;gap:8px">
         <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe||'—'}</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span><b>${d}</b></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jam</span><b>${slot.jam||'—'}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span><b>${tgl}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sesi</span><b style="font-family:var(--font2)">${sesi}</b></div>
       </div>
     </div>`;
   document.getElementById('validasi-catatan').value = '';
