@@ -745,7 +745,7 @@ let state = {
 function renderAvatar(foto, nama, size=28) {
   const letter = (nama||'?').charAt(0).toUpperCase();
   const fz = size * 0.4;
-  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}rem;flex-shrink:0">${letter}</div>`;
+  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}px;flex-shrink:0">${letter}</div>`;
   if (!foto || foto.trim()==='') return fallback;
   return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${fallback.replace(/'/g, "\\'")}'"/>`;
 }
