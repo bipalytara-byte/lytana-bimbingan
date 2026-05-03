@@ -38,8 +38,7 @@ p{color:var(--text2)}
 .logo{font-family:var(--font2);font-weight:700;font-size:1.25rem;color:var(--sky);letter-spacing:-0.02em}
 .topbar-right{display:flex;align-items:center;gap:10px}
 .user-chip{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border2);border-radius:40px;padding:5px 12px 5px 5px;font-size:0.82rem;color:var(--text2)}
-.user-chip img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)}
-.avatar-ph{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;flex-shrink:0}
+.avatar-ph{border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;color:white;flex-shrink:0}
 .role-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.04em}
 .role-badge.dosen{background:rgba(249,115,22,0.15);color:var(--orange)}
 .role-badge.admin{background:rgba(245,158,11,0.15);color:var(--amber)}
@@ -291,7 +290,7 @@ tr:hover td{background:var(--card2)}
       <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
     </div>
     <div class="topbar-right">
-      <div class="user-chip"><div id="m-avatar" class="avatar-ph"></div><span id="m-nama-chip">—</span></div>
+      <div class="user-chip"><div id="m-avatar-wrap"></div><span id="m-nama-chip">—</span></div>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
     </div>
   </div></div>
@@ -348,7 +347,7 @@ tr:hover td{background:var(--card2)}
         <div class="card">
           <h3 style="margin-bottom:16px">Foto Profil</h3>
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-            <div id="profil-foto-wrap"><div class="avatar-ph" id="profil-avatar" style="width:80px;height:80px;border-radius:50%;font-size:1.5rem"></div></div>
+            <div id="profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
               <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="previewFoto(event)"/></label>
             <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
@@ -376,7 +375,7 @@ tr:hover td{background:var(--card2)}
     </div>
     <div class="topbar-right">
       <div class="user-chip">
-        <div id="d-avatar" class="avatar-ph" style="background:linear-gradient(135deg,var(--orange),var(--amber))"></div>
+        <div id="d-avatar-wrap"></div>
         <span id="d-nama-chip">—</span>
         <span class="role-badge dosen">DOSEN</span>
       </div>
@@ -469,7 +468,7 @@ tr:hover td{background:var(--card2)}
         <div class="card">
           <h3 style="margin-bottom:16px">Foto Profil</h3>
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-            <div id="d-profil-foto-wrap"><div class="avatar-ph" id="d-profil-avatar" style="width:80px;height:80px;border-radius:50%;font-size:1.5rem;background:linear-gradient(135deg,var(--orange),var(--amber))"></div></div>
+            <div id="d-profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
               <input type="file" id="d-foto-input" accept="image/*" style="display:none" onchange="previewDosenFoto(event)"/></label>
             <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
@@ -741,6 +740,17 @@ let state = {
 };
 
 // ============================================================
+// AVATAR FALLBACK HELPER (Anti Broken Image)
+// ============================================================
+function renderAvatar(foto, nama, size=28) {
+  const letter = (nama||'?').charAt(0).toUpperCase();
+  const fz = size * 0.4;
+  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}rem;flex-shrink:0">${letter}</div>`;
+  if (!foto || foto.trim()==='') return fallback;
+  return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${fallback.replace(/'/g, "\\'")}'"/>`;
+}
+
+// ============================================================
 // API
 // ============================================================
 async function api(action, params={}, method='GET') {
@@ -912,18 +922,14 @@ function onLogin(token, user) {
 function updateMhsChip() {
   const u=state.user;
   document.getElementById('m-nama-chip').textContent=u.nama;
-  const av=document.getElementById('m-avatar');
-  if (u.foto) av.outerHTML=`<img id="m-avatar" src="${u.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)">`;
-  else av.textContent=u.nama.charAt(0).toUpperCase();
+  document.getElementById('m-avatar-wrap').innerHTML=renderAvatar(u.foto, u.nama, 28);
 }
 
 function updateDosenChip() {
   const u=state.user;
   document.getElementById('d-nama-chip').textContent=u.nama;
   document.getElementById('d-prodi-label').textContent=u.prodi||'Program Studi';
-  const av=document.getElementById('d-avatar');
-  if (u.foto) av.outerHTML=`<img id="d-avatar" src="${u.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)">`;
-  else av.textContent=u.nama.charAt(0).toUpperCase();
+  document.getElementById('d-avatar-wrap').innerHTML=renderAvatar(u.foto, u.nama, 28);
 }
 
 function doLogout() {
@@ -951,14 +957,13 @@ function selectType(type) {
 
 async function loadSlots(tipe) {
   const c=document.getElementById('slots-container');
-  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat sesi...</div>';
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat sesi dari dosen pembimbing...</div>';
   const params={tipe, token:state.token};
   const res=await api('getSlots',params);
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.slots=res.slots;
   renderSlots(res.slots);
   
-  // Update label dosen untuk 2 pembimbing
   if (state.user?.dosenKode1 || state.user?.dosenKode2) {
     const dr=await api('getDosenList');
     const d1=(dr.dosen||[]).find(x=>x.kode===state.user.dosenKode1);
@@ -970,7 +975,7 @@ async function loadSlots(tipe) {
 
 function renderSlots(slots) {
   const c=document.getElementById('slots-container');
-  if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia</p></div>'; return; }
+  if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia dari dosen pembimbingmu</p></div>'; return; }
   const byDate={};
   slots.forEach(s=>{ const k=s.tanggal||'lainnya'; if(!byDate[k]) byDate[k]=[]; byDate[k].push(s); });
   let html='';
@@ -988,12 +993,13 @@ function renderSlotCard(s) {
   let badge, btn;
   if (isMe) { badge=`<span class="badge badge-blue">✓ Kamu</span>`; btn=`<span style="font-size:0.78rem;color:var(--blue2)">Sudah dipesan</span>`; }
   else if (taken) { badge=`<span class="badge badge-rose">Terisi</span>`; btn=`<span class="badge badge-slate">Tidak tersedia</span>`; }
-  else { badge=`<span class="badge badge-green">Tersedia</span>`; btn=`<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s)})'>Reservasi</button>`; }
+  else { badge=`<span class="badge badge-green">Tersedia</span>`; btn=`<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s).replace(/'/g,"\\'")})'>Reservasi</button>`; }
   return `<div class="slot-card ${taken&&!isMe?'full':''}" style="${isMe?'border-color:var(--blue);background:rgba(37,99,235,0.07)':''}">
     <div class="slot-card-header">
       <div>
         <div class="slot-type-badge ${s.tipe}">${s.tipe.toUpperCase()}</div>
         <div style="margin-top:10px;font-size:1.35rem;font-weight:700;font-family:var(--font2);line-height:1">${s.jamMulai} <span style="font-size:0.9rem;color:var(--text2);font-weight:400">–</span> ${s.jamSelesai}</div>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:4px">👨‍🏫 ${s.dosenNama||s.dosenKode}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${badge}</div>
     </div>
@@ -1010,6 +1016,7 @@ function openBookingModal(slot) {
   document.getElementById('modal-booking-content').innerHTML=`
     <div class="card" style="margin-bottom:0;background:var(--card2)">
       <div style="display:grid;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Dosen</span><span style="font-weight:600;font-size:0.85rem">${slot.dosenNama||slot.dosenKode}</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe.toUpperCase()}</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Tanggal</span><b>${fmtTgl(slot.tanggal,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</b></div>
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Sesi</span><b style="font-family:var(--font2)">${slot.jamMulai} – ${slot.jamSelesai}</b></div>
@@ -1127,7 +1134,8 @@ async function fillProfil() {
   document.getElementById('profil-kode').value=u.kode||'';
   document.getElementById('profil-nama').value=u.nama||'';
   document.getElementById('profil-email').value=u.email||'';
-  if (u.foto) document.getElementById('profil-foto-wrap').innerHTML=`<img src="${u.foto}" class="photo-preview" style="margin-bottom:8px"/>`;
+  
+  document.getElementById('profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
   
   if (u.dosenKode1 || u.dosenKode2) {
     const dr=await api('getDosenList');
@@ -1144,7 +1152,7 @@ async function fillProfil() {
 function previewFoto(event) {
   const file=event.target.files[0]; if(!file) return;
   if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; }; r.readAsDataURL(file);
+  const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; document.getElementById('profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
 }
 
 async function uploadFoto() {
@@ -1155,7 +1163,8 @@ async function uploadFoto() {
     if (!res.success) return toast(res.message,'error');
     toast('Foto berhasil diupload!','success');
     state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    fillProfil(); updateMhsChip(); document.getElementById('foto-preview-wrap').style.display='none';
+    document.getElementById('foto-preview-wrap').style.display='none'; document.getElementById('profil-foto-wrap').style.display='flex';
+    fillProfil(); updateMhsChip(); 
   }; r.readAsDataURL(file);
 }
 
@@ -1187,7 +1196,7 @@ function openSetStatus(kode, nama, currentStatus) {
   state.pendingSetStatus = kode;
   document.getElementById('modal-set-status-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px">
-      <div class="avatar-ph" style="width:44px;height:44px;border-radius:50%;font-size:1rem;flex-shrink:0">${nama.charAt(0)}</div>
+      ${renderAvatar('', nama, 44)}
       <div>
         <div style="font-weight:700">${nama}</div>
         <div style="font-size:0.85rem;color:var(--text2);margin-top:4px">Status saat ini: ${statusBadge(currentStatus)}</div>
@@ -1261,7 +1270,7 @@ function renderDosenSlots(slots) {
         <td style="font-size:0.82rem">${terisi?`<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>`:'—'}</td>
         <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan||'—'}</td>
         <td style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s)})'>Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button>
           <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>
         </td></tr>`;
     }).join('')}</tbody></table></div>`;
@@ -1371,8 +1380,7 @@ function renderDosenStudents(students) {
     const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
     return `<div class="student-card" style="position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        ${s.foto?`<img src="${s.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-          :`<div class="avatar-ph" style="width:48px;height:48px;border-radius:50%;font-size:1.1rem;flex-shrink:0">${(s.nama||'?').charAt(0)}</div>`}
+        ${renderAvatar(s.foto, s.nama, 48)}
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
           <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
@@ -1391,7 +1399,7 @@ function renderDosenStudents(students) {
         ✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s)})'>Detail</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\\'")})'>Detail</button>
         <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
       </div>
     </div>`;
@@ -1409,8 +1417,7 @@ function openStudentDetail(s) {
   const pm={}; (s.progress||[]).forEach(p=>pm[p.bab]=p);
   document.getElementById('modal-student-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-      ${s.foto?`<img src="${s.foto}" style="width:64px;height:64px;border-radius:50%;object-fit:cover"/>`
-        :`<div class="avatar-ph" style="width:64px;height:64px;border-radius:50%;font-size:1.4rem;flex-shrink:0">${(s.nama||'?').charAt(0)}</div>`}
+      ${renderAvatar(s.foto, s.nama, 64)}
       <div>
         <div style="font-weight:700;font-size:1.1rem">${s.nama}</div>
         <div style="color:var(--text2);font-size:0.85rem">${s.email}</div>
@@ -1442,13 +1449,13 @@ function fillDosenProfil() {
   document.getElementById('d-profil-nama').value=u.nama||'';
   document.getElementById('d-profil-email').value=u.email||'';
   document.getElementById('d-profil-prodi').value=u.prodi||'';
-  if (u.foto) document.getElementById('d-profil-foto-wrap').innerHTML=`<img src="${u.foto}" class="photo-preview" style="margin-bottom:8px"/>`;
+  document.getElementById('d-profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
 }
 
 function previewDosenFoto(event) {
   const file=event.target.files[0]; if(!file) return;
   if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; }; r.readAsDataURL(file);
+  const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; document.getElementById('d-profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
 }
 
 async function uploadDosenFoto() {
@@ -1459,7 +1466,8 @@ async function uploadDosenFoto() {
     if (!res.success) return toast(res.message,'error');
     toast('Foto berhasil diupload!','success');
     state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    fillDosenProfil(); updateDosenChip(); document.getElementById('d-foto-preview-wrap').style.display='none';
+    document.getElementById('d-foto-preview-wrap').style.display='none'; document.getElementById('d-profil-foto-wrap').style.display='flex';
+    fillDosenProfil(); updateDosenChip(); 
   }; r.readAsDataURL(file);
 }
 
@@ -1474,8 +1482,7 @@ function bookingTable(bookings, withFoto=false) {
     <tbody>${bookings.map(b=>{
       const slot=b.slot||{}; const mhs=b.mahasiswa||{};
       const tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'short'});
-      const fotoCell=withFoto?`<td>${mhs.foto?`<img src="${mhs.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-        :`<div class="avatar-ph" style="width:36px;height:36px;border-radius:50%;font-size:0.8rem">${(mhs.nama||'?').charAt(0)}</div>`}</td>`:'';
+      const fotoCell=withFoto?`<td>${renderAvatar(mhs.foto, mhs.nama, 36)}</td>`:'';
       return `<tr>
         <td><div style="font-weight:600">${mhs.nama||b.kode}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>
         ${fotoCell}
@@ -1483,7 +1490,7 @@ function bookingTable(bookings, withFoto=false) {
           <div style="font-size:0.82rem">${tgl} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td>
         <td><span class="badge ${sl[b.status]||'badge-slate'}">${ll[b.status]||b.status}</span></td>
         <td>${b.status==='menunggu'
-          ?`<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b)})'>Validasi</button>`
+          ?`<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Validasi</button>`
           :`<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
@@ -1497,8 +1504,7 @@ function openValidasi(b) {
   document.getElementById('validasi-content').innerHTML=`
     <div class="card" style="background:var(--card2);margin-bottom:0">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-        ${mhs.foto?`<img src="${mhs.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover"/>`
-          :`<div class="avatar-ph" style="width:48px;height:48px;border-radius:50%;font-size:1.2rem;flex-shrink:0">${(mhs.nama||'?').charAt(0)}</div>`}
+        ${renderAvatar(mhs.foto, mhs.nama, 48)}
         <div><div style="font-weight:700">${mhs.nama||b.kode}</div><div style="font-size:0.82rem;color:var(--text2)">${b.kode}</div></div>
       </div>
       <div style="display:grid;gap:8px">
@@ -1562,14 +1568,13 @@ async function loadAdminDosen() {
   c.innerHTML=`<div class="table-wrap"><table>
     <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Prodi</th><th>Email</th><th>Terdaftar</th><th>Aksi</th></tr></thead>
     <tbody>${state.allDosen.map(d=>`<tr>
-      <td>${d.foto?`<img src="${d.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-        :`<div class="avatar-ph" style="width:36px;height:36px;border-radius:50%;font-size:0.8rem;background:linear-gradient(135deg,var(--orange),var(--amber))">${(d.nama||'?').charAt(0)}</div>`}</td>
+      <td>${renderAvatar(d.foto, d.nama, 36)}</td>
       <td style="font-weight:600">${d.nama}</td>
       <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${d.kode}</code></td>
       <td style="color:var(--text2)">${d.prodi||'—'}</td>
       <td style="color:var(--text2)">${d.email}</td>
       <td style="color:var(--text3);font-size:0.8rem">${d.createdAt?new Date(d.createdAt).toLocaleDateString('id-ID'):'—'}</td>
-      <td><button class="btn btn-rose btn-sm" onclick="deleteDosenConfirm('${d.kode}','${d.nama}')">Hapus</button></td>
+      <td><button class="btn btn-rose btn-sm" onclick="deleteDosenConfirm('${d.kode}','${d.nama.replace(/'/g,"\\'")}')">Hapus</button></td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -1598,8 +1603,7 @@ function renderAdminUsers(users) {
   c.innerHTML=`<div class="table-wrap"><table>
     <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Status Skripsi</th><th>Pembimbing 1 & 2</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
     <tbody>${users.map(u=>`<tr>
-      <td>${u.foto?`<img src="${u.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-        :`<div class="avatar-ph" style="width:36px;height:36px;border-radius:50%;font-size:0.8rem">${(u.nama||'?').charAt(0)}</div>`}</td>
+      <td>${renderAvatar(u.foto, u.nama, 36)}</td>
       <td style="font-weight:600">${u.nama}</td>
       <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${u.kode}</code></td>
       <td>${statusBadge(u.statusSkripsi)}</td>
@@ -1788,8 +1792,7 @@ function renderAkademikTable(perDosen, filterStatus) {
           return `<tr>
             <td>
               <div style="display:flex;align-items:center;gap:8px">
-                ${m.foto?`<img src="${m.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover"/>`:
-                  `<div class="avatar-ph" style="width:28px;height:28px;border-radius:50%;font-size:0.7rem">${(m.nama||'?').charAt(0)}</div>`}
+                ${renderAvatar(m.foto, m.nama, 28)}
                 <span style="font-weight:600">${m.nama}</span>
               </div>
             </td>
@@ -1819,7 +1822,6 @@ async function exportAkademikCSV() {
   const dosenMap={};
   dosenList.forEach(d=>{ d.mhs.forEach(m=>dosenMap[m.kode]={dosenNama:d.nama,prodi:d.prodi}); });
   
-  // Mengambil nama dosen sebenarnya dari getAllDosen call
   const dr = await api('getAllDosen', {token:state.token});
   const dNameMap = {};
   if(dr.success) { dr.dosen.forEach(d => dNameMap[d.kode] = d.nama); }
