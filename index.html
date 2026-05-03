@@ -252,11 +252,19 @@ tr:hover td{background:var(--card2)}
 
         <button class="btn btn-primary btn-full" onclick="doRegister()"><span id="reg-btn-text">Buat Akun Mahasiswa</span></button>
       </div>
+      
       <!-- Form Dosen -->
       <div id="reg-dosen-form" style="display:none;flex-direction:column;gap:12px">
         <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
           👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
         </div>
+        
+        <!-- KOLOM TOKEN KEAMANAN -->
+        <div class="form-group">
+          <label class="form-label" style="color:var(--orange)">🔑 Token Keamanan</label>
+          <input id="dreg-token" class="form-input" type="password" placeholder="Masukkan token dari Admin" style="border-color:var(--orange)"/>
+        </div>
+        
         <div class="form-group"><label class="form-label">Kode Dosen (NIK)</label>
           <input id="dreg-kode" class="form-input" type="text" placeholder="Masukkan NIK (Nomor Induk Karyawan)"/></div>
         <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
@@ -895,17 +903,32 @@ async function doRegister() {
 }
 
 async function doRegisterDosen() {
-  const kode=document.getElementById('dreg-kode').value.trim();
-  const nama=document.getElementById('dreg-nama').value.trim();
-  const email=document.getElementById('dreg-email').value.trim();
-  const prodi=document.getElementById('dreg-prodi').value;
-  if (!kode||!nama||!email) return toast('Semua field wajib diisi','error');
-  const btn=document.getElementById('dreg-btn-text');
-  btn.innerHTML='<div class="spinner"></div>';
-  const res=await api('registerDosen',{kode,nama,email,prodi},'POST');
-  btn.textContent='Buat Akun Dosen';
-  if (!res.success) return toast(res.message,'error');
-  toast('Akun dosen berhasil dibuat!','success');
+  const kode = document.getElementById('dreg-kode').value.trim();
+  const nama = document.getElementById('dreg-nama').value.trim();
+  const email = document.getElementById('dreg-email').value.trim();
+  const prodi = document.getElementById('dreg-prodi').value;
+  const token = document.getElementById('dreg-token').value.trim(); // Ambil input token
+  
+  // 1. Cek apakah ada field yang kosong
+  if (!kode || !nama || !email || !token) {
+    return toast('Semua field wajib diisi, termasuk Token!', 'error');
+  }
+
+  const btn = document.getElementById('dreg-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
+  
+  // 2. Kirim semua data beserta Token ke backend
+  const res = await api('registerDosen', {kode, nama, email, prodi, token}, 'POST');
+  
+  btn.textContent = 'Buat Akun Dosen';
+  
+  // 3. Jika ditolak oleh backend (misal: token salah)
+  if (!res.success) {
+    document.getElementById('dreg-token').value = ''; // Kosongkan field token jika salah
+    return toast(res.message, 'error');
+  }
+  
+  toast('Akun dosen berhasil dibuat!', 'success');
   onLogin(res.token, res.user);
 }
 
