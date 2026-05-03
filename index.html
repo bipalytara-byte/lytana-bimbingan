@@ -220,11 +220,12 @@ tr:hover td{background:var(--card2)}
     <!-- LOGIN -->
     <div id="login-form" class="login-form-section active">
       <div class="form-group">
-        <label class="form-label">Kode Unik</label>
-        <input id="login-kode" class="form-input" type="text" placeholder="Masukkan kode unikmu" autocomplete="off"/>
+        <label class="form-label">NIM / Kode Unik</label>
+        <input id="login-kode" class="form-input" type="text" inputmode="numeric" placeholder="Masukkan NIM kamu" autocomplete="off"/>
       </div>
       <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()"><span id="login-btn-text">Masuk</span></button>
       <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Belum punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('register')">Daftar Baru</b></p>
+      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:4px">Lupa kode? Hubungi <b>BAAK</b> untuk reset akun.</p>
     </div>
 
     <!-- REGISTER -->
@@ -235,19 +236,28 @@ tr:hover td{background:var(--card2)}
       </div>
       <!-- Form Mahasiswa -->
       <div id="reg-mhs-form" style="display:flex;flex-direction:column;gap:12px">
-        <div class="form-group"><label class="form-label">Buat Kode Unik</label>
-          <input id="reg-kode" class="form-input" type="text" placeholder="Min. 4 karakter, misal: nim2024"/></div>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+          🎓 Gunakan <b>NIM</b> sebagai kode unik login. Setiap mahasiswa hanya dapat memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b> untuk reset akun.
+        </div>
+        <div class="form-group">
+          <label class="form-label">NIM <span style="color:var(--text3);font-size:0.75rem;text-transform:none;letter-spacing:0">(Nomor Induk Mahasiswa — digunakan sebagai kode login)</span></label>
+          <input id="reg-kode" class="form-input" type="text" inputmode="numeric" placeholder="Contoh: 20210001" maxlength="12" oninput="validateNIMInput(this)"/>
+          <div id="warn-nim" style="display:none;font-size:0.78rem;color:var(--rose);margin-top:4px">⚠️ NIM harus berupa angka, 8–12 digit</div>
+        </div>
         <div class="form-group"><label class="form-label">Nama Lengkap</label>
           <input id="reg-nama" class="form-input" type="text" placeholder="Sesuai KTM"/></div>
         <div class="form-group"><label class="form-label">Email</label>
-          <input id="reg-email" class="form-input" type="email" placeholder="email@mahasiswa.ac.id"/></div>
-        
+          <input id="reg-email" class="form-input" type="email" placeholder="email aktif kamu"/></div>
+
         <!-- DROPDOWN DUAL PEMBIMBING -->
         <div class="grid-2">
           <div class="form-group"><label class="form-label">Pembimbing 1</label>
-            <select id="reg-dosen1" class="form-select"><option value="">Memuat...</option></select></div>
+            <select id="reg-dosen1" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
           <div class="form-group"><label class="form-label">Pembimbing 2</label>
-            <select id="reg-dosen2" class="form-select"><option value="">Memuat...</option></select></div>
+            <select id="reg-dosen2" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
+        </div>
+        <div id="warn-pembimbing" style="display:none;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:8px;padding:8px 12px;font-size:0.82rem;color:var(--rose)">
+          ⚠️ Pembimbing 1 dan Pembimbing 2 tidak boleh dosen yang sama
         </div>
 
         <button class="btn btn-primary btn-full" onclick="doRegister()"><span id="reg-btn-text">Buat Akun Mahasiswa</span></button>
@@ -870,6 +880,18 @@ async function loadDosenDropdown() {
   
   sel1.innerHTML = optionsHTML1;
   sel2.innerHTML = optionsHTML2;
+
+  // Pasang validasi real-time setelah dropdown terisi
+  sel1.addEventListener('change', validatePembimbing);
+  sel2.addEventListener('change', validatePembimbing);
+}
+
+function validatePembimbing() {
+  const kode1 = document.getElementById('reg-dosen1').value;
+  const kode2 = document.getElementById('reg-dosen2').value;
+  const warn  = document.getElementById('warn-pembimbing');
+  if (!warn) return;
+  warn.style.display = (kode1 && kode2 && kode1 === kode2) ? 'block' : 'none';
 }
 
 async function doLogin() {
@@ -883,22 +905,38 @@ async function doLogin() {
   onLogin(res.token, res.user);
 }
 
+// ── Helper validasi NIM ───────────────────────────────────────
+function validateNIMInput(input) {
+  // Hanya izinkan angka
+  input.value = input.value.replace(/[^0-9]/g, '');
+  const warn = document.getElementById('warn-nim');
+  if (!warn) return;
+  const valid = /^\d{8,12}$/.test(input.value);
+  warn.style.display = (input.value.length > 0 && !valid) ? 'block' : 'none';
+}
+// ─────────────────────────────────────────────────────────────
+
 async function doRegister() {
-  const kode=document.getElementById('reg-kode').value.trim();
-  const nama=document.getElementById('reg-nama').value.trim();
-  const email=document.getElementById('reg-email').value.trim();
-  const dosenKode1=document.getElementById('reg-dosen1').value;
-  const dosenKode2=document.getElementById('reg-dosen2').value;
-  
-  if (!kode||!nama||!email) return toast('Semua field wajib diisi','error');
-  if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama','error');
-  
-  const btn=document.getElementById('reg-btn-text');
-  btn.innerHTML='<div class="spinner"></div>';
-  const res=await api('register',{kode,nama,email,dosenKode1,dosenKode2},'POST');
-  btn.textContent='Buat Akun Mahasiswa';
-  if (!res.success) return toast(res.message,'error');
-  toast('Akun mahasiswa berhasil dibuat!','success');
+  const kode       = document.getElementById('reg-kode').value.trim();
+  const nama       = document.getElementById('reg-nama').value.trim();
+  const email      = document.getElementById('reg-email').value.trim();
+  const dosenKode1 = document.getElementById('reg-dosen1').value;
+  const dosenKode2 = document.getElementById('reg-dosen2').value;
+
+  if (!kode || !nama || !email) return toast('Semua field wajib diisi', 'error');
+
+  // Validasi format NIM di frontend
+  if (!/^\d{8,12}$/.test(kode)) return toast('NIM harus berupa angka 8–12 digit. Contoh: 20210001', 'error');
+
+  // Validasi pembimbing tidak boleh sama
+  if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama', 'error');
+
+  const btn = document.getElementById('reg-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
+  const res = await api('register', {kode, nama, email, dosenKode1, dosenKode2}, 'POST');
+  btn.textContent = 'Buat Akun Mahasiswa';
+  if (!res.success) return toast(res.message, 'error');
+  toast('Akun mahasiswa berhasil dibuat!', 'success');
   onLogin(res.token, res.user);
 }
 
