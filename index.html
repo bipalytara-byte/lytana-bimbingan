@@ -220,12 +220,12 @@ tr:hover td{background:var(--card2)}
     <!-- LOGIN -->
     <div id="login-form" class="login-form-section active">
       <div class="form-group">
-        <label class="form-label">NIM / Kode Unik</label>
-        <input id="login-kode" class="form-input" type="text" inputmode="numeric" placeholder="Masukkan NIM kamu" autocomplete="off"/>
+        <label class="form-label">Kode Login <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">(kode unik + NIM, contoh: budi2311033)</span></label>
+        <input id="login-kode" class="form-input" type="text" placeholder="Contoh: budi2311033" autocomplete="off"/>
       </div>
       <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()"><span id="login-btn-text">Masuk</span></button>
       <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Belum punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('register')">Daftar Baru</b></p>
-      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:4px">Lupa kode? Hubungi <b>BAAK</b> untuk reset akun.</p>
+      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:4px">Lupa kode login? Hubungi <b>BAAK</b> untuk reset akun.</p>
     </div>
 
     <!-- REGISTER -->
@@ -237,13 +237,29 @@ tr:hover td{background:var(--card2)}
       <!-- Form Mahasiswa -->
       <div id="reg-mhs-form" style="display:flex;flex-direction:column;gap:12px">
         <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
-          🎓 Gunakan <b>NIM</b> sebagai kode unik login. Setiap mahasiswa hanya dapat memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b> untuk reset akun.
+          🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b>.
         </div>
-        <div class="form-group">
-          <label class="form-label">NIM <span style="color:var(--text3);font-size:0.75rem;text-transform:none;letter-spacing:0">(Nomor Induk Mahasiswa — digunakan sebagai kode login)</span></label>
-          <input id="reg-kode" class="form-input" type="text" inputmode="numeric" placeholder="Contoh: 20210001" maxlength="12" oninput="validateNIMInput(this)"/>
-          <div id="warn-nim" style="display:none;font-size:0.78rem;color:var(--rose);margin-top:4px">⚠️ NIM harus berupa angka, 8–12 digit</div>
+
+        <!-- Input kode unik dan NIM terpisah, digabung otomatis -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Kode Unik <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">min. 4 karakter</span></label>
+            <input id="reg-kode-unik" class="form-input" type="text" placeholder="Contoh: budi" maxlength="20" oninput="previewKodeLogin()"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NIM <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">7 digit angka</span></label>
+            <input id="reg-nim" class="form-input" type="text" inputmode="numeric" placeholder="Contoh: 2311033" maxlength="7" oninput="previewKodeLogin()"/>
+          </div>
         </div>
+
+        <!-- Preview kode login gabungan -->
+        <div id="kode-login-preview" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem">
+          <span style="color:var(--text2)">Kode login kamu: </span>
+          <b id="kode-login-gabungan" style="color:var(--blue2);font-family:monospace;font-size:1rem;letter-spacing:0.02em"></b>
+          <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">⚠️ Simpan kode ini baik-baik. Jika lupa, hubungi BAAK.</div>
+        </div>
+        <div id="warn-kode-login" style="display:none;font-size:0.78rem;color:var(--rose);margin-top:-6px"></div>
+
         <div class="form-group"><label class="form-label">Nama Lengkap</label>
           <input id="reg-nama" class="form-input" type="text" placeholder="Sesuai KTM"/></div>
         <div class="form-group"><label class="form-label">Email</label>
@@ -905,38 +921,70 @@ async function doLogin() {
   onLogin(res.token, res.user);
 }
 
-// ── Helper validasi NIM ───────────────────────────────────────
-function validateNIMInput(input) {
-  // Hanya izinkan angka
-  input.value = input.value.replace(/[^0-9]/g, '');
-  const warn = document.getElementById('warn-nim');
-  if (!warn) return;
-  const valid = /^\d{8,12}$/.test(input.value);
-  warn.style.display = (input.value.length > 0 && !valid) ? 'block' : 'none';
+// ── Helper kode login = kode unik + NIM ──────────────────────
+const NIM_LENGTH   = 7;   // harus sama dengan CONFIG.NIM_LENGTH di backend
+const KODE_MIN_LEN = 4;   // harus sama dengan CONFIG.KODE_MIN_LENGTH di backend
+
+function previewKodeLogin() {
+  const kodeUnik = document.getElementById('reg-kode-unik').value.trim();
+  const nim      = document.getElementById('reg-nim').value.trim();
+  const preview  = document.getElementById('kode-login-preview');
+  const gabungan = document.getElementById('kode-login-gabungan');
+  const warn     = document.getElementById('warn-kode-login');
+
+  // Hanya angka untuk NIM
+  document.getElementById('reg-nim').value = nim.replace(/[^0-9]/g, '');
+  const nimClean = document.getElementById('reg-nim').value;
+
+  const kodeGabung = kodeUnik + nimClean;
+  warn.style.display = 'none';
+  warn.textContent   = '';
+
+  if (!kodeUnik && !nimClean) { preview.style.display = 'none'; return; }
+
+  if (kodeUnik && kodeUnik.length < KODE_MIN_LEN) {
+    warn.textContent   = '⚠️ Kode unik minimal ' + KODE_MIN_LEN + ' karakter';
+    warn.style.display = 'block';
+  }
+  if (nimClean && nimClean.length !== NIM_LENGTH) {
+    warn.textContent   = '⚠️ NIM harus tepat ' + NIM_LENGTH + ' digit angka';
+    warn.style.display = 'block';
+  }
+
+  if (kodeUnik && nimClean) {
+    gabungan.textContent  = kodeGabung;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
 }
 // ─────────────────────────────────────────────────────────────
 
 async function doRegister() {
-  const kode       = document.getElementById('reg-kode').value.trim();
+  const kodeUnik   = document.getElementById('reg-kode-unik').value.trim();
+  const nim        = document.getElementById('reg-nim').value.trim();
   const nama       = document.getElementById('reg-nama').value.trim();
   const email      = document.getElementById('reg-email').value.trim();
   const dosenKode1 = document.getElementById('reg-dosen1').value;
   const dosenKode2 = document.getElementById('reg-dosen2').value;
 
-  if (!kode || !nama || !email) return toast('Semua field wajib diisi', 'error');
-
-  // Validasi format NIM di frontend
-  if (!/^\d{8,12}$/.test(kode)) return toast('NIM harus berupa angka 8–12 digit. Contoh: 20210001', 'error');
+  // Validasi input terpisah
+  if (!kodeUnik || !nim || !nama || !email) return toast('Semua field wajib diisi', 'error');
+  if (kodeUnik.length < KODE_MIN_LEN) return toast('Kode unik minimal ' + KODE_MIN_LEN + ' karakter', 'error');
+  if (!/^\d{7}$/.test(nim)) return toast('NIM harus tepat 7 digit angka. Contoh: 2311033', 'error');
 
   // Validasi pembimbing tidak boleh sama
   if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama', 'error');
+
+  // Gabungkan kode unik + NIM sebagai kode login
+  const kode = kodeUnik + nim;
 
   const btn = document.getElementById('reg-btn-text');
   btn.innerHTML = '<div class="spinner"></div>';
   const res = await api('register', {kode, nama, email, dosenKode1, dosenKode2}, 'POST');
   btn.textContent = 'Buat Akun Mahasiswa';
   if (!res.success) return toast(res.message, 'error');
-  toast('Akun mahasiswa berhasil dibuat!', 'success');
+  toast('Akun berhasil dibuat! Kode login kamu: ' + kode, 'success');
   onLogin(res.token, res.user);
 }
 
