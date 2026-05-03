@@ -167,7 +167,7 @@ tr:hover td{background:var(--card2)}
 /* Timeline */
 .timeline{display:flex;flex-direction:column;gap:0}
 .timeline-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
-.timeline-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
+.timeline-item:not(:last-child)::before{content:'absolute';left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
 .timeline-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700}
 .timeline-dot.green{background:rgba(16,185,129,0.2);color:var(--green);border:2px solid var(--green)}
 .timeline-dot.rose{background:rgba(244,63,94,0.2);color:var(--rose);border:2px solid var(--rose)}
@@ -242,8 +242,15 @@ tr:hover td{background:var(--card2)}
           <input id="reg-nama" class="form-input" type="text" placeholder="Sesuai KTM"/></div>
         <div class="form-group"><label class="form-label">Email</label>
           <input id="reg-email" class="form-input" type="email" placeholder="email@mahasiswa.ac.id"/></div>
-        <div class="form-group"><label class="form-label">Dosen Pembimbing</label>
-          <select id="reg-dosen" class="form-select"><option value="">Memuat daftar dosen...</option></select></div>
+        
+        <!-- DROPDOWN DUAL PEMBIMBING -->
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">Pembimbing 1</label>
+            <select id="reg-dosen1" class="form-select"><option value="">Memuat...</option></select></div>
+          <div class="form-group"><label class="form-label">Pembimbing 2</label>
+            <select id="reg-dosen2" class="form-select"><option value="">Memuat...</option></select></div>
+        </div>
+
         <button class="btn btn-primary btn-full" onclick="doRegister()"><span id="reg-btn-text">Buat Akun Mahasiswa</span></button>
       </div>
       <!-- Form Dosen -->
@@ -252,9 +259,9 @@ tr:hover td{background:var(--card2)}
           👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
         </div>
         <div class="form-group"><label class="form-label">Buat Kode Dosen</label>
-          <input id="dreg-kode" class="form-input" type="text" placeholder="Nomor Induk Karryawan"/></div>
+          <input id="dreg-kode" class="form-input" type="text" placeholder="Contoh: dr_budi atau NIDN"/></div>
         <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
-          <input id="dreg-nama" class="form-input" type="text" placeholder="Fauzi Anggi, S.Kom, M.Kom"/></div>
+          <input id="dreg-nama" class="form-input" type="text" placeholder="Dr. Budi Santoso, M.Kom"/></div>
         <div class="form-group"><label class="form-label">Email</label>
           <input id="dreg-email" class="form-input" type="email" placeholder="dosen@kampus.ac.id"/></div>
         <div class="form-group"><label class="form-label">Program Studi</label>
@@ -330,7 +337,12 @@ tr:hover td{background:var(--card2)}
             <div class="form-group"><label class="form-label">Kode Unik</label><input id="profil-kode" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="profil-nama" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Email</label><input id="profil-email" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Dosen Pembimbing</label><input id="profil-dosen" class="form-input" readonly style="opacity:.7"/></div>
+            
+            <div class="grid-2">
+              <div class="form-group"><label class="form-label">Pembimbing 1</label><input id="profil-dosen1" class="form-input" readonly style="opacity:.7"/></div>
+              <div class="form-group"><label class="form-label">Pembimbing 2</label><input id="profil-dosen2" class="form-input" readonly style="opacity:.7"/></div>
+            </div>
+
           </div>
         </div>
         <div class="card">
@@ -530,7 +542,7 @@ tr:hover td{background:var(--card2)}
 
     <div id="a-mahasiswa" class="page-section">
       <div class="section-header">
-        <div class="section-title"><h2>Data Mahasiswa</h2><p>Semua mahasiswa + info dosen pembimbing</p></div>
+        <div class="section-title"><h2>Data Mahasiswa</h2><p>Semua mahasiswa beserta info pembimbing</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadAdminUsers()">↻ Refresh</button>
       </div>
       <div class="search-wrap" style="margin-bottom:16px;max-width:320px">
@@ -716,6 +728,8 @@ tr:hover td{background:var(--card2)}
 </div><!-- /#app -->
 <script>
 // ============================================================
+// GANTI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT-MU
+// ============================================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6pBW3mvuDY045_aq86yuSoXaSZuW33DnZQAPnkpvSC6-G4U724Ys8RQiizNz4rwZVLg/exec';
 // ============================================================
 
@@ -723,7 +737,7 @@ let state = {
   user:null, token:null, selectedType:null,
   slots:[], allBookings:[], allSlots:[], allUsers:[], allDosen:[],
   dosenSlots:[], dosenBookings:[], dosenStudents:[],
-  pendingSlot:null, pendingValidateId:null, pendingResetKode:null,
+  pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null
 };
 
 // ============================================================
@@ -797,16 +811,17 @@ function dSwitch(s) {
 function aSwitch(s) {
   document.querySelectorAll('#page-admin .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('a-'+s).classList.add('active');
-  document.querySelectorAll('#page-admin .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','dosen','mahasiswa','bookings','slots'][i]===s));
+  document.querySelectorAll('#page-admin .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','dosen','mahasiswa','bookings','slots','rekap'][i]===s));
   if(s==='dashboard') loadAdminDashboard();
   if(s==='dosen')     loadAdminDosen();
   if(s==='mahasiswa') loadAdminUsers();
   if(s==='bookings')  loadAdminBookings();
   if(s==='slots')     loadAdminSlots();
+  if(s==='rekap')     loadAkademikRekap();
 }
 
 // ============================================================
-// AUTH
+// AUTH & REGISTRASI DUAL PEMBIMBING
 // ============================================================
 function switchLoginTab(tab) {
   document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['login','register'][i]===tab));
@@ -820,13 +835,25 @@ function switchRegisterRole(role) {
   document.getElementById('reg-mhs-form').style.display = role==='mahasiswa'?'flex':'none';
   document.getElementById('reg-dosen-form').style.display = role==='dosen'?'flex':'none';
 }
+
 async function loadDosenDropdown() {
   const res = await api('getDosenList');
-  const sel = document.getElementById('reg-dosen');
-  if (!res.success||!res.dosen.length) { sel.innerHTML='<option value="">Belum ada dosen terdaftar</option>'; return; }
-  sel.innerHTML='<option value="">-- Pilih Dosen Pembimbing --</option>'+
+  const sel1 = document.getElementById('reg-dosen1');
+  const sel2 = document.getElementById('reg-dosen2');
+  if (!res.success||!res.dosen.length) { 
+    sel1.innerHTML='<option value="">Belum ada dosen terdaftar</option>'; 
+    sel2.innerHTML='<option value="">Belum ada dosen terdaftar</option>'; 
+    return; 
+  }
+  const optionsHTML1 = '<option value="">-- Pilih Pembimbing 1 --</option>' + 
     res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
+  const optionsHTML2 = '<option value="">-- Pilih Pembimbing 2 (Opsional) --</option>' + 
+    res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
+  
+  sel1.innerHTML = optionsHTML1;
+  sel2.innerHTML = optionsHTML2;
 }
+
 async function doLogin() {
   const kode = document.getElementById('login-kode').value.trim();
   if (!kode) return toast('Masukkan kode unikmu','error');
@@ -837,20 +864,26 @@ async function doLogin() {
   if (!res.success) return toast(res.message,'error');
   onLogin(res.token, res.user);
 }
+
 async function doRegister() {
   const kode=document.getElementById('reg-kode').value.trim();
   const nama=document.getElementById('reg-nama').value.trim();
   const email=document.getElementById('reg-email').value.trim();
-  const dosenKode=document.getElementById('reg-dosen').value;
+  const dosenKode1=document.getElementById('reg-dosen1').value;
+  const dosenKode2=document.getElementById('reg-dosen2').value;
+  
   if (!kode||!nama||!email) return toast('Semua field wajib diisi','error');
+  if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama','error');
+  
   const btn=document.getElementById('reg-btn-text');
   btn.innerHTML='<div class="spinner"></div>';
-  const res=await api('register',{kode,nama,email,dosenKode},'POST');
+  const res=await api('register',{kode,nama,email,dosenKode1,dosenKode2},'POST');
   btn.textContent='Buat Akun Mahasiswa';
   if (!res.success) return toast(res.message,'error');
   toast('Akun mahasiswa berhasil dibuat!','success');
   onLogin(res.token, res.user);
 }
+
 async function doRegisterDosen() {
   const kode=document.getElementById('dreg-kode').value.trim();
   const nama=document.getElementById('dreg-nama').value.trim();
@@ -865,6 +898,7 @@ async function doRegisterDosen() {
   toast('Akun dosen berhasil dibuat!','success');
   onLogin(res.token, res.user);
 }
+
 function onLogin(token, user) {
   state.token=token; state.user=user;
   localStorage.setItem('lytana_token', token);
@@ -874,6 +908,7 @@ function onLogin(token, user) {
   else { updateMhsChip(); showPage('mahasiswa'); }
   toast('Selamat datang, '+user.nama+'!','success');
 }
+
 function updateMhsChip() {
   const u=state.user;
   document.getElementById('m-nama-chip').textContent=u.nama;
@@ -881,6 +916,7 @@ function updateMhsChip() {
   if (u.foto) av.outerHTML=`<img id="m-avatar" src="${u.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)">`;
   else av.textContent=u.nama.charAt(0).toUpperCase();
 }
+
 function updateDosenChip() {
   const u=state.user;
   document.getElementById('d-nama-chip').textContent=u.nama;
@@ -889,11 +925,13 @@ function updateDosenChip() {
   if (u.foto) av.outerHTML=`<img id="d-avatar" src="${u.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)">`;
   else av.textContent=u.nama.charAt(0).toUpperCase();
 }
+
 function doLogout() {
-  state={user:null,token:null,selectedType:null,slots:[],allBookings:[],allSlots:[],allUsers:[],allDosen:[],dosenSlots:[],dosenBookings:[],dosenStudents:[],pendingSlot:null,pendingValidateId:null,pendingResetKode:null};
+  state={user:null,token:null,selectedType:null,slots:[],allBookings:[],allSlots:[],allUsers:[],allDosen:[],dosenSlots:[],dosenBookings:[],dosenStudents:[],pendingSlot:null,pendingValidateId:null,pendingResetKode:null, pendingSetStatus:null};
   localStorage.removeItem('lytana_token'); localStorage.removeItem('lytana_user');
   showPage('login'); toast('Kamu telah keluar','info');
 }
+
 (function(){
   const t=localStorage.getItem('lytana_token'), u=localStorage.getItem('lytana_user');
   if(t&&u) try{ onLogin(t,JSON.parse(u)); }catch(e){}
@@ -910,22 +948,26 @@ function selectType(type) {
   });
   loadSlots(type);
 }
+
 async function loadSlots(tipe) {
   const c=document.getElementById('slots-container');
   c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat sesi...</div>';
   const params={tipe, token:state.token};
-  if (state.user?.dosenKode) params.dosenKode=state.user.dosenKode;
   const res=await api('getSlots',params);
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.slots=res.slots;
   renderSlots(res.slots);
-  // Update label dosen
-  if (state.user?.dosenKode) {
+  
+  // Update label dosen untuk 2 pembimbing
+  if (state.user?.dosenKode1 || state.user?.dosenKode2) {
     const dr=await api('getDosenList');
-    const d=(dr.dosen||[]).find(x=>x.kode===state.user.dosenKode);
-    if (d) document.getElementById('m-dosen-label').textContent='Sesi dari '+d.nama;
+    const d1=(dr.dosen||[]).find(x=>x.kode===state.user.dosenKode1);
+    const d2=(dr.dosen||[]).find(x=>x.kode===state.user.dosenKode2);
+    const names = [d1?.nama, d2?.nama].filter(Boolean).join(' & ');
+    if(names) document.getElementById('m-dosen-label').textContent='Sesi dari '+names;
   }
 }
+
 function renderSlots(slots) {
   const c=document.getElementById('slots-container');
   if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia</p></div>'; return; }
@@ -939,6 +981,7 @@ function renderSlots(slots) {
   });
   c.innerHTML=html;
 }
+
 function renderSlotCard(s) {
   const taken=s.bookedBy&&s.bookedBy!=='';
   const isMe=taken&&s.bookedBy===state.user?.kode;
@@ -961,6 +1004,7 @@ function renderSlotCard(s) {
     </div>
   </div>`;
 }
+
 function openBookingModal(slot) {
   state.pendingSlot=slot;
   document.getElementById('modal-booking-content').innerHTML=`
@@ -977,6 +1021,7 @@ function openBookingModal(slot) {
     </div>`;
   openModal('modal-booking');
 }
+
 async function confirmBooking() {
   if (!state.pendingSlot) return;
   const btn=document.getElementById('modal-booking-btn');
@@ -1017,6 +1062,7 @@ async function loadMyHistory() {
       </div></div>`;
   }).join('')}</div>`;
 }
+
 async function cancelMyBooking(bookId) {
   if (!confirm('Batalkan reservasi ini?')) return;
   const res=await api('cancelBooking',{bookId,token:state.token},'POST');
@@ -1055,6 +1101,7 @@ async function loadMyProgress() {
     </div>`;
   }).join('')}</div>`;
 }
+
 function openProgresModal(bab='',pct=50,catatan='') {
   if (bab) { const s=document.getElementById('prog-bab'); for(let i=0;i<s.options.length;i++) if(s.options[i].value===bab) s.selectedIndex=i; }
   document.getElementById('prog-pct').value=pct;
@@ -1062,6 +1109,7 @@ function openProgresModal(bab='',pct=50,catatan='') {
   document.getElementById('prog-catatan').value=catatan;
   openModal('modal-progres');
 }
+
 async function saveProgress() {
   const bab=document.getElementById('prog-bab').value;
   const persentase=document.getElementById('prog-pct').value;
@@ -1080,18 +1128,25 @@ async function fillProfil() {
   document.getElementById('profil-nama').value=u.nama||'';
   document.getElementById('profil-email').value=u.email||'';
   if (u.foto) document.getElementById('profil-foto-wrap').innerHTML=`<img src="${u.foto}" class="photo-preview" style="margin-bottom:8px"/>`;
-  // Tampilkan nama dosen
-  if (u.dosenKode) {
+  
+  if (u.dosenKode1 || u.dosenKode2) {
     const dr=await api('getDosenList');
-    const d=(dr.dosen||[]).find(x=>x.kode===u.dosenKode);
-    document.getElementById('profil-dosen').value=d?d.nama:'—';
-  } else { document.getElementById('profil-dosen').value='Belum dipilih'; }
+    const d1=(dr.dosen||[]).find(x=>x.kode===u.dosenKode1);
+    const d2=(dr.dosen||[]).find(x=>x.kode===u.dosenKode2);
+    document.getElementById('profil-dosen1').value=d1?d1.nama:'—';
+    document.getElementById('profil-dosen2').value=d2?d2.nama:'—';
+  } else { 
+    document.getElementById('profil-dosen1').value='Belum dipilih'; 
+    document.getElementById('profil-dosen2').value='Belum dipilih'; 
+  }
 }
+
 function previewFoto(event) {
   const file=event.target.files[0]; if(!file) return;
   if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
   const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; }; r.readAsDataURL(file);
 }
+
 async function uploadFoto() {
   const file=document.getElementById('foto-input').files[0]; if(!file) return;
   const r=new FileReader(); r.onload=async e=>{
@@ -1102,6 +1157,53 @@ async function uploadFoto() {
     state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
     fillProfil(); updateMhsChip(); document.getElementById('foto-preview-wrap').style.display='none';
   }; r.readAsDataURL(file);
+}
+
+// ============================================================
+// STATUS SKRIPSI HELPERS
+// ============================================================
+const STATUS_CONFIG = {
+  aktif_bimbingan : { label:'Aktif Bimbingan', emoji:'✅', cls:'aktif_bimbingan' },
+  tidak_aktif     : { label:'Tidak Aktif',     emoji:'⏸', cls:'tidak_aktif'     },
+  revisi          : { label:'Revisi',          emoji:'✏️', cls:'revisi'          },
+  menunggu_sidang : { label:'Menunggu Sidang', emoji:'🏛', cls:'menunggu_sidang' },
+  lulus           : { label:'Lulus / Wisuda',  emoji:'🎓', cls:'lulus'           },
+};
+
+function statusBadge(status) {
+  const c = STATUS_CONFIG[status] || { label: status||'—', emoji:'?', cls:'tidak_aktif' };
+  return `<span class="status-badge status-${c.cls}">${c.emoji} ${c.label}</span>`;
+}
+
+function daysSinceStr(isoStr) {
+  if (!isoStr) return 'Belum ada aktivitas';
+  const d = Math.floor((Date.now() - new Date(isoStr).getTime()) / 86400000);
+  if (d === 0) return 'Hari ini';
+  if (d === 1) return 'Kemarin';
+  return d + ' hari yang lalu';
+}
+
+function openSetStatus(kode, nama, currentStatus) {
+  state.pendingSetStatus = kode;
+  document.getElementById('modal-set-status-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="avatar-ph" style="width:44px;height:44px;border-radius:50%;font-size:1rem;flex-shrink:0">${nama.charAt(0)}</div>
+      <div>
+        <div style="font-weight:700">${nama}</div>
+        <div style="font-size:0.85rem;color:var(--text2);margin-top:4px">Status saat ini: ${statusBadge(currentStatus)}</div>
+      </div>
+    </div>`;
+  openModal('modal-set-status');
+}
+
+async function confirmSetStatus(status) {
+  if (!state.pendingSetStatus) return;
+  const res=await api('setStudentStatus',{kode:state.pendingSetStatus,status,token:state.token},'POST');
+  if (!res.success) return toast(res.message,'error');
+  toast('Status diperbarui: '+STATUS_CONFIG[status].label,'success');
+  closeModal('modal-set-status');
+  state.pendingSetStatus=null;
+  loadDosenStudents();
 }
 
 // ============================================================
@@ -1117,12 +1219,19 @@ async function loadDosenDashboard() {
     document.getElementById('d-stat-tersedia').textContent=s.sesiTersedia;
     document.getElementById('d-stat-terisi').textContent=s.sesiTerisi;
     document.getElementById('d-stat-done').textContent=s.terselenggaraCount;
+    if (s.statusCount) {
+      document.getElementById('d-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
+      document.getElementById('d-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
+      document.getElementById('d-s-revisi').textContent=s.statusCount.revisi||0;
+      document.getElementById('d-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
+      document.getElementById('d-s-lulus').textContent=s.statusCount.lulus||0;
+    }
   }
   const bRes=await api('getMyBookingsAll',{token:state.token});
   const c=document.getElementById('d-recent-bookings');
   const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
   if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu konfirmasi</p></div>'; return; }
-  c.innerHTML=bookingTable(pending, false);
+  c.innerHTML=bookingTable(pending,false);
 }
 
 // ============================================================
@@ -1136,6 +1245,7 @@ async function loadDosenSlots() {
   state.dosenSlots=res.slots;
   renderDosenSlots(state.dosenSlots);
 }
+
 function renderDosenSlots(slots) {
   const c=document.getElementById('d-slots-container');
   if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi. Klik "+ Tambah Sesi".</p></div>'; return; }
@@ -1156,6 +1266,7 @@ function renderDosenSlots(slots) {
         </td></tr>`;
     }).join('')}</tbody></table></div>`;
 }
+
 function filterDosenSlots(f, btn) {
   document.querySelectorAll('#d-sesi .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -1166,6 +1277,7 @@ function filterDosenSlots(f, btn) {
   else if (f==='terisi') filtered=filtered.filter(s=>s.bookedBy&&s.bookedBy!=='');
   renderDosenSlots(filtered);
 }
+
 function openSlotModal() {
   document.getElementById('modal-slot-title').textContent='Tambah Sesi Baru';
   ['slot-edit-id','slot-tanggal','slot-jam-mulai','slot-jam-selesai','slot-catatan'].forEach(id=>document.getElementById(id).value='');
@@ -1173,6 +1285,7 @@ function openSlotModal() {
   document.getElementById('slot-save-btn').textContent='Simpan Sesi';
   openModal('modal-slot');
 }
+
 function editSlot(s) {
   document.getElementById('modal-slot-title').textContent='Edit Sesi';
   document.getElementById('slot-edit-id').value=s.id;
@@ -1184,6 +1297,7 @@ function editSlot(s) {
   document.getElementById('slot-save-btn').textContent='Update Sesi';
   openModal('modal-slot');
 }
+
 async function saveSlot() {
   const id=document.getElementById('slot-edit-id').value;
   const tipe=document.getElementById('slot-tipe').value;
@@ -1204,6 +1318,7 @@ async function saveSlot() {
   toast(id?'Sesi diperbarui!':'Sesi ditambahkan!','success');
   closeModal('modal-slot'); loadDosenSlots();
 }
+
 async function deleteSlotConfirm(id) {
   if (!confirm('Hapus sesi ini?')) return;
   const res=await api('deleteSlot',{id,token:state.token},'POST');
@@ -1222,11 +1337,13 @@ async function loadDosenBookings() {
   state.dosenBookings=res.bookings;
   renderDosenBookings(state.dosenBookings);
 }
+
 function renderDosenBookings(bookings) {
   const c=document.getElementById('d-bookings-container');
   if (!bookings.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada reservasi</p></div>'; return; }
   c.innerHTML=bookingTable(bookings, true);
 }
+
 function filterDosenBookings(status, btn) {
   document.querySelectorAll('#d-reservasi .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -1245,36 +1362,47 @@ async function loadDosenStudents() {
   state.dosenStudents=res.students;
   renderDosenStudents(state.dosenStudents);
 }
+
 function renderDosenStudents(students) {
   const c=document.getElementById('d-students-container');
-  if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa yang memilih kamu sebagai pembimbing</p></div>'; return; }
-  c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>`
-    <div class="student-card" onclick='openStudentDetail(${JSON.stringify(s)})'>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+  if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa bimbingan</p></div>'; return; }
+  c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
+    const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
+    const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
+    return `<div class="student-card" style="position:relative">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
         ${s.foto?`<img src="${s.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
           :`<div class="avatar-ph" style="width:48px;height:48px;border-radius:50%;font-size:1.1rem;flex-shrink:0">${(s.nama||'?').charAt(0)}</div>`}
-        <div>
-          <div style="font-weight:700">${s.nama}</div>
-          <code style="font-size:0.78rem;color:var(--text3);background:var(--card2);padding:2px 6px;border-radius:4px">${s.kode}</code>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
+          <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
         </div>
       </div>
+      <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
+      ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
       <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
-          <span style="color:var(--text2)">Progress Keseluruhan</span>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
+          <span style="color:var(--text2)">Progress</span>
           <span style="font-weight:700;color:${s.avgProgress>=75?'var(--green)':s.avgProgress>=40?'var(--amber)':'var(--rose)'}">${s.avgProgress}%</span>
         </div>
         <div class="prog-bar"><div class="prog-fill" style="width:${s.avgProgress}%"></div></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text2)">
-        <span>✓ ${s.bimbinganCount}x bimbingan</span>
-        <span style="color:var(--blue2)">Lihat Detail →</span>
+      <div style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">
+        ✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}
       </div>
-    </div>`).join('')}`;
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s)})'>Detail</button>
+        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
+
 function filterDosenStudents(q) {
   const f=state.dosenStudents.filter(s=>s.nama.toLowerCase().includes(q.toLowerCase())||s.kode.toLowerCase().includes(q.toLowerCase()));
   renderDosenStudents(f);
 }
+
 function openStudentDetail(s) {
   document.getElementById('modal-student-title').textContent='Detail — '+s.nama;
   const babs=['Bab 1','Bab 2','Bab 3','Bab 4','Bab 5','Revisi'];
@@ -1316,11 +1444,13 @@ function fillDosenProfil() {
   document.getElementById('d-profil-prodi').value=u.prodi||'';
   if (u.foto) document.getElementById('d-profil-foto-wrap').innerHTML=`<img src="${u.foto}" class="photo-preview" style="margin-bottom:8px"/>`;
 }
+
 function previewDosenFoto(event) {
   const file=event.target.files[0]; if(!file) return;
   if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
   const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; }; r.readAsDataURL(file);
 }
+
 async function uploadDosenFoto() {
   const file=document.getElementById('d-foto-input').files[0]; if(!file) return;
   const r=new FileReader(); r.onload=async e=>{
@@ -1358,6 +1488,7 @@ function bookingTable(bookings, withFoto=false) {
       </tr>`;
     }).join('')}</tbody></table></div>`;
 }
+
 function openValidasi(b) {
   state.pendingValidateId=b.id;
   const slot=b.slot||{}; const mhs=b.mahasiswa||{};
@@ -1379,13 +1510,13 @@ function openValidasi(b) {
   document.getElementById('validasi-catatan').value='';
   openModal('modal-validasi');
 }
+
 async function doValidate(status) {
   const catatan=document.getElementById('validasi-catatan').value;
   const res=await api('validateBooking',{bookId:state.pendingValidateId,status,catatan,token:state.token},'POST');
   if (!res.success) return toast(res.message,'error');
   toast('Reservasi divalidasi: '+status.replace('_',' '),'success');
   closeModal('modal-validasi'); state.pendingValidateId=null;
-  // Reload sesuai role
   if (state.user?.role==='dosen') { loadDosenBookings(); loadDosenDashboard(); }
   else { loadAdminBookings(); loadAdminDashboard(); }
 }
@@ -1403,6 +1534,13 @@ async function loadAdminDashboard() {
     document.getElementById('a-stat-book').textContent=s.totalBookings;
     document.getElementById('a-stat-pending').textContent=s.pendingCount;
     document.getElementById('a-stat-done').textContent=s.confirmedCount;
+    if (s.statusCount) {
+      document.getElementById('a-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
+      document.getElementById('a-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
+      document.getElementById('a-s-revisi').textContent=s.statusCount.revisi||0;
+      document.getElementById('a-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
+      document.getElementById('a-s-lulus').textContent=s.statusCount.lulus||0;
+    }
   }
   const bRes=await api('getAllBookings',{token:state.token});
   const c=document.getElementById('a-recent-bookings');
@@ -1434,6 +1572,7 @@ async function loadAdminDosen() {
       <td><button class="btn btn-rose btn-sm" onclick="deleteDosenConfirm('${d.kode}','${d.nama}')">Hapus</button></td>
     </tr>`).join('')}</tbody></table></div>`;
 }
+
 async function deleteDosenConfirm(kode, nama) {
   if (!confirm(`Hapus dosen "${nama}" (${kode})?\n\nSemua slot dan datanya tetap ada di spreadsheet.`)) return;
   const res=await api('deleteDosen',{kode,token:state.token},'POST');
@@ -1452,40 +1591,54 @@ async function loadAdminUsers() {
   state.allUsers=res.users;
   renderAdminUsers(state.allUsers);
 }
+
 function renderAdminUsers(users) {
   const c=document.getElementById('a-users-container');
   if (!users.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa</p></div>'; return; }
   c.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Dosen Pembimbing</th><th>Email</th><th>Aksi</th></tr></thead>
+    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Status Skripsi</th><th>Pembimbing 1 & 2</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
     <tbody>${users.map(u=>`<tr>
       <td>${u.foto?`<img src="${u.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
         :`<div class="avatar-ph" style="width:36px;height:36px;border-radius:50%;font-size:0.8rem">${(u.nama||'?').charAt(0)}</div>`}</td>
       <td style="font-weight:600">${u.nama}</td>
       <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${u.kode}</code></td>
-      <td style="font-size:0.85rem;color:var(--text2)">${u.dosenNama||'<span style="color:var(--text3)">Belum dipilih</span>'}</td>
-      <td style="color:var(--text2)">${u.email}</td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
+      <td>${statusBadge(u.statusSkripsi)}</td>
+      <td style="font-size:0.85rem;color:var(--text2)">
+        <div style="margin-bottom:2px"><span style="color:var(--text3)">1:</span> ${u.dosenNama1||'<span style="color:var(--text3)">Belum dipilih</span>'}</div>
+        <div><span style="color:var(--text3)">2:</span> ${u.dosenNama2||'<span style="color:var(--text3)">Belum dipilih</span>'}</div>
+      </td>
+      <td style="font-size:0.78rem;color:var(--text3)">${daysSinceStr(u.lastActivity)}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn btn-amber btn-sm" onclick="openResetKode('${u.kode}')">Reset Kode</button>
-        <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}','${u.nama}')">Hapus</button>
+        <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}','${u.nama.replace(/'/g,"\\'")}')">Hapus</button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
+
 function filterAdminUsers(q) {
-  const f=state.allUsers.filter(u=>u.nama.toLowerCase().includes(q.toLowerCase())||u.kode.toLowerCase().includes(q.toLowerCase())||(u.dosenNama||'').toLowerCase().includes(q.toLowerCase()));
+  const f=state.allUsers.filter(u=>
+    u.nama.toLowerCase().includes(q.toLowerCase()) || 
+    u.kode.toLowerCase().includes(q.toLowerCase()) ||
+    (u.dosenNama1||'').toLowerCase().includes(q.toLowerCase()) ||
+    (u.dosenNama2||'').toLowerCase().includes(q.toLowerCase())
+  );
   renderAdminUsers(f);
 }
+
 async function deleteUserConfirm(kode, nama) {
   if (!confirm(`Hapus mahasiswa "${nama}" (${kode})? Tindakan tidak dapat dibatalkan.`)) return;
   const res=await api('deleteUser',{kode,token:state.token},'POST');
   if (!res.success) return toast(res.message,'error');
   toast('Mahasiswa dihapus','info'); loadAdminUsers();
 }
+
 function openResetKode(kode) {
   state.pendingResetKode=kode;
   document.getElementById('reset-kode-lama').value=kode;
   document.getElementById('reset-kode-baru').value='';
   openModal('modal-reset-kode');
 }
+
 async function doResetKode() {
   const newKode=document.getElementById('reset-kode-baru').value.trim();
   if (!newKode) return toast('Masukkan kode baru','error');
@@ -1496,7 +1649,7 @@ async function doResetKode() {
 }
 
 // ============================================================
-// ADMIN — BOOKINGS & SLOTS (semua dosen)
+// ADMIN — BOOKINGS & SLOTS
 // ============================================================
 async function loadAdminBookings() {
   const c=document.getElementById('a-bookings-container');
@@ -1506,17 +1659,20 @@ async function loadAdminBookings() {
   state.allBookings=res.bookings;
   renderAdminBookings(state.allBookings);
 }
+
 function renderAdminBookings(bookings) {
   const c=document.getElementById('a-bookings-container');
   if (!bookings.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada reservasi</p></div>'; return; }
   c.innerHTML=bookingTable(bookings,true);
 }
+
 function filterAdminBookings(status, btn) {
   document.querySelectorAll('#a-bookings .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const f=status==='all'?state.allBookings:state.allBookings.filter(b=>b.status===status);
   renderAdminBookings(f);
 }
+
 async function loadAdminSlots() {
   const c=document.getElementById('a-slots-container');
   c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
@@ -1524,9 +1680,10 @@ async function loadAdminSlots() {
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.allSlots=res.slots;
   if (!state.allSlots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi</p></div>'; return; }
-  // Build dosen map from allDosen or fetch
+  
   const dr=await api('getAllDosen',{token:state.token});
   const dm={}; (dr.dosen||[]).forEach(d=>dm[d.kode]=d.nama);
+  
   c.innerHTML=`<div class="table-wrap"><table>
     <thead><tr><th>Dosen</th><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th></tr></thead>
     <tbody>${state.allSlots.map(s=>{
@@ -1544,208 +1701,6 @@ async function loadAdminSlots() {
 }
 
 // ============================================================
-// STATUS SKRIPSI HELPERS
-// ============================================================
-const STATUS_CONFIG = {
-  aktif_bimbingan : { label:'Aktif Bimbingan', emoji:'✅', cls:'aktif_bimbingan' },
-  tidak_aktif     : { label:'Tidak Aktif',     emoji:'⏸', cls:'tidak_aktif'     },
-  revisi          : { label:'Revisi',          emoji:'✏️', cls:'revisi'          },
-  menunggu_sidang : { label:'Menunggu Sidang',   emoji:'🏛', cls:'menunggu_sidang' },
-  lulus           : { label:'Lulus / Wisuda',    emoji:'🎓', cls:'lulus'           },
-};
-function statusBadge(status) {
-  const c = STATUS_CONFIG[status] || { label: status||'—', emoji:'?', cls:'tidak_aktif' };
-  return `<span class="status-badge status-${c.cls}">${c.emoji} ${c.label}</span>`;
-}
-function daysSinceStr(isoStr) {
-  if (!isoStr) return 'Belum ada aktivitas';
-  const d = Math.floor((Date.now() - new Date(isoStr).getTime()) / 86400000);
-  if (d === 0) return 'Hari ini';
-  if (d === 1) return 'Kemarin';
-  return d + ' hari yang lalu';
-}
-
-// Mahasiswa: tampilkan status di profil
-function fillMhsStatusBadge() {
-  const u = state.user;
-  const el = document.getElementById('profil-status-badge');
-  if (el && u?.statusSkripsi) {
-    el.innerHTML = statusBadge(u.statusSkripsi);
-    const warn = document.getElementById('profil-inaktif-warn');
-    if (warn) {
-      const days = u.lastActivity ? Math.floor((Date.now()-new Date(u.lastActivity).getTime())/86400000) : 999;
-      warn.style.display = days >= 10 ? 'block' : 'none';
-      if (days >= 10) warn.textContent = `⚠️ Kamu tidak ada aktivitas selama ${days} hari. Lakukan bimbingan atau update progres agar status tetap aktif.`;
-    }
-  }
-}
-
-// ============================================================
-// ASWITCH override — tambah rekap
-// ============================================================
-const _origASwitch = aSwitch;
-function aSwitch(s) {
-  document.querySelectorAll('#page-admin .page-section').forEach(x=>x.classList.remove('active'));
-  const el = document.getElementById('a-'+s);
-  if (el) el.classList.add('active');
-  document.querySelectorAll('#page-admin .nav-tab').forEach((t,i)=>
-    t.classList.toggle('active',['dashboard','dosen','mahasiswa','bookings','slots','rekap'][i]===s));
-  if(s==='dashboard') loadAdminDashboard();
-  if(s==='dosen')     loadAdminDosen();
-  if(s==='mahasiswa') loadAdminUsers();
-  if(s==='bookings')  loadAdminBookings();
-  if(s==='slots')     loadAdminSlots();
-  if(s==='rekap')     loadAkademikRekap();
-}
-
-// ============================================================
-// DOSEN DASHBOARD — update statusCount display
-// ============================================================
-const _origLoadDosenDashboard = loadDosenDashboard;
-async function loadDosenDashboard() {
-  const res=await api('getDosenDashboard',{token:state.token});
-  if (res.success) {
-    const s=res.stats;
-    document.getElementById('d-stat-mhs').textContent=s.totalMahasiswa;
-    document.getElementById('d-stat-sesi').textContent=s.totalSesi;
-    document.getElementById('d-stat-pending').textContent=s.pendingCount;
-    document.getElementById('d-stat-tersedia').textContent=s.sesiTersedia;
-    document.getElementById('d-stat-terisi').textContent=s.sesiTerisi;
-    document.getElementById('d-stat-done').textContent=s.terselenggaraCount;
-    if (s.statusCount) {
-      document.getElementById('d-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
-      document.getElementById('d-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
-      document.getElementById('d-s-revisi').textContent=s.statusCount.revisi||0;
-      document.getElementById('d-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
-      document.getElementById('d-s-lulus').textContent=s.statusCount.lulus||0;
-    }
-  }
-  const bRes=await api('getMyBookingsAll',{token:state.token});
-  const c=document.getElementById('d-recent-bookings');
-  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
-  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu konfirmasi</p></div>'; return; }
-  c.innerHTML=bookingTable(pending,false);
-}
-
-// ============================================================
-// ADMIN DASHBOARD — update statusCount display
-// ============================================================
-const _origLoadAdminDashboard = loadAdminDashboard;
-async function loadAdminDashboard() {
-  const res=await api('getDashboardStats',{token:state.token});
-  if (res.success) {
-    const s=res.stats;
-    document.getElementById('a-stat-dosen').textContent=s.totalDosen;
-    document.getElementById('a-stat-mhs').textContent=s.totalMahasiswa;
-    document.getElementById('a-stat-sesi').textContent=s.totalSlots;
-    document.getElementById('a-stat-book').textContent=s.totalBookings;
-    document.getElementById('a-stat-pending').textContent=s.pendingCount;
-    document.getElementById('a-stat-done').textContent=s.confirmedCount;
-    if (s.statusCount) {
-      document.getElementById('a-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
-      document.getElementById('a-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
-      document.getElementById('a-s-revisi').textContent=s.statusCount.revisi||0;
-      document.getElementById('a-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
-      document.getElementById('a-s-lulus').textContent=s.statusCount.lulus||0;
-    }
-  }
-  const bRes=await api('getAllBookings',{token:state.token});
-  const c=document.getElementById('a-recent-bookings');
-  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
-  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu</p></div>'; return; }
-  c.innerHTML=bookingTable(pending,true);
-}
-
-// ============================================================
-// SET STATUS MAHASISWA (Dosen)
-// ============================================================
-function openSetStatus(kode, nama, currentStatus) {
-  state.pendingSetStatus = kode;
-  document.getElementById('modal-set-status-content').innerHTML=`
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="avatar-ph" style="width:44px;height:44px;border-radius:50%;font-size:1rem;flex-shrink:0">${nama.charAt(0)}</div>
-      <div>
-        <div style="font-weight:700">${nama}</div>
-        <div style="font-size:0.85rem;color:var(--text2);margin-top:4px">Status saat ini: ${statusBadge(currentStatus)}</div>
-      </div>
-    </div>`;
-  openModal('modal-set-status');
-}
-async function confirmSetStatus(status) {
-  if (!state.pendingSetStatus) return;
-  const res=await api('setStudentStatus',{kode:state.pendingSetStatus,status,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error');
-  toast('Status diperbarui: '+STATUS_CONFIG[status].label,'success');
-  closeModal('modal-set-status');
-  state.pendingSetStatus=null;
-  loadDosenStudents();
-}
-
-// ============================================================
-// DOSEN — renderDosenStudents dengan status badge + set status
-// ============================================================
-const _origRenderDosenStudents = renderDosenStudents;
-function renderDosenStudents(students) {
-  const c=document.getElementById('d-students-container');
-  if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa yang memilih kamu sebagai pembimbing</p></div>'; return; }
-  c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
-    const sc=STATUS_CONFIG[s.statusSkripsi]||STATUS_CONFIG.tidak_aktif;
-    const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
-    const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
-    return `<div class="student-card" style="position:relative">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        ${s.foto?`<img src="${s.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-          :`<div class="avatar-ph" style="width:48px;height:48px;border-radius:50%;font-size:1.1rem;flex-shrink:0">${(s.nama||'?').charAt(0)}</div>`}
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
-          <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
-        </div>
-      </div>
-      <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
-      ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
-      <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
-          <span style="color:var(--text2)">Progress</span>
-          <span style="font-weight:700;color:${s.avgProgress>=75?'var(--green)':s.avgProgress>=40?'var(--amber)':'var(--rose)'}">${s.avgProgress}%</span>
-        </div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${s.avgProgress}%"></div></div>
-      </div>
-      <div style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">
-        ✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}
-      </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s)})'>Detail</button>
-        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
-      </div>
-    </div>`;
-  }).join('')}`;
-}
-
-// ============================================================
-// ADMIN — renderAdminUsers dengan status badge + set status
-// ============================================================
-const _origRenderAdminUsers = renderAdminUsers;
-function renderAdminUsers(users) {
-  const c=document.getElementById('a-users-container');
-  if (!users.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa</p></div>'; return; }
-  c.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Status Skripsi</th><th>Dosen Pembimbing</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
-    <tbody>${users.map(u=>`<tr>
-      <td>${u.foto?`<img src="${u.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>`
-        :`<div class="avatar-ph" style="width:36px;height:36px;border-radius:50%;font-size:0.8rem">${(u.nama||'?').charAt(0)}</div>`}</td>
-      <td style="font-weight:600">${u.nama}</td>
-      <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${u.kode}</code></td>
-      <td>${statusBadge(u.statusSkripsi)}</td>
-      <td style="font-size:0.85rem;color:var(--text2)">${u.dosenNama||'<span style="color:var(--text3)">Belum dipilih</span>'}</td>
-      <td style="font-size:0.78rem;color:var(--text3)">${daysSinceStr(u.lastActivity)}</td>
-      <td style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="btn btn-amber btn-sm" onclick="openResetKode('${u.kode}')">Reset Kode</button>
-        <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}','${u.nama.replace(/'/g,"\\'")}')">Hapus</button>
-      </td>
-    </tr>`).join('')}</tbody></table></div>`;
-}
-
-// ============================================================
 // EXPORT REKAP (Dosen)
 // ============================================================
 async function doExportRekap() {
@@ -1757,13 +1712,13 @@ async function doExportRekap() {
     ['Rekap Bimbingan Skripsi — Lytana'],
     ['Dicetak:',new Date(res.generatedAt).toLocaleString('id-ID')],
     [],
-    ['Kode','Nama','Email','Dosen Pembimbing','Prodi','Status Skripsi','Progress (%)','Bimbingan Terselenggara','Bimbingan Dibatalkan','Terakhir Bimbingan','Hari Sejak Bimbingan','Terakhir Aktif','Terdaftar'],
+    ['Kode','Nama','Email','Pembimbing 1','Pembimbing 2','Prodi Dosen','Status Skripsi','Progress (%)','Bimbingan Terselenggara','Bimbingan Dibatalkan','Terakhir Bimbingan','Hari Sejak Bimbingan','Terakhir Aktif','Terdaftar'],
     ...data.map(m=>[
-      m.kode,m.nama,m.email,m.dosenNama,m.dosenProdi,
+      m.kode,m.nama,m.email,m.dosenNama1,m.dosenNama2,m.dosenProdi,
       STATUS_CONFIG[m.statusSkripsi]?.label||m.statusSkripsi,
       m.avgProgress,m.bimbinganTerselenggara,m.bimbinganDibatalkan,
       m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
-      m.daysSinceLastBimbingan!==null?m.daysSinceLastBimbingan+'hari':'—',
+      m.daysSinceLastBimbingan!==null?m.daysSinceLastBimbingan+' hari':'—',
       m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
       m.createdAt?new Date(m.createdAt).toLocaleDateString('id-ID'):'—',
     ])
@@ -1791,6 +1746,7 @@ async function loadAkademikRekap() {
   renderAkademikSummary(res.summary);
   renderAkademikTable(res.perDosen, 'semua');
 }
+
 function renderAkademikSummary(sum) {
   const s=document.getElementById('a-rekap-summary');
   const items=[
@@ -1803,6 +1759,7 @@ function renderAkademikSummary(sum) {
   ];
   s.innerHTML=items.map(i=>`<div class="rekap-stat"><div class="num" style="color:${i.c}">${i.n||0}</div><div class="lbl">${i.l}</div></div>`).join('');
 }
+
 function renderAkademikTable(perDosen, filterStatus) {
   const c=document.getElementById('a-rekap-container');
   if (!perDosen||!perDosen.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada data</p></div>'; return; }
@@ -1815,7 +1772,7 @@ function renderAkademikTable(perDosen, filterStatus) {
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
         <div>
           <div style="font-weight:700;font-size:1rem">${d.nama||d.kode}</div>
-          <div style="font-size:0.82rem;color:var(--text2)">${d.prodi||''} · ${mhsList.length} mahasiswa ditampilkan</div>
+          <div style="font-size:0.82rem;color:var(--text2)">${d.prodi||''} · ${mhsList.length} mahasiswa (P1 / P2)</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${['aktif_bimbingan','tidak_aktif','revisi','menunggu_sidang','lulus'].map(st=>{
@@ -1848,17 +1805,25 @@ function renderAkademikTable(perDosen, filterStatus) {
   });
   c.innerHTML=html||'<div class="empty-state"><div class="empty-icon">🔍</div><p>Tidak ada mahasiswa dengan filter ini</p></div>';
 }
+
 function filterRekap(status, btn) {
   document.querySelectorAll('#a-rekap-filter .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if (rekapData) renderAkademikTable(rekapData.perDosen, status);
 }
+
 async function exportAkademikCSV() {
   if (!rekapData) { toast('Muat data rekap dulu','error'); return; }
   const allMhs=rekapData.mahasiswa;
   const dosenList=rekapData.perDosen;
   const dosenMap={};
   dosenList.forEach(d=>{ d.mhs.forEach(m=>dosenMap[m.kode]={dosenNama:d.nama,prodi:d.prodi}); });
+  
+  // Mengambil nama dosen sebenarnya dari getAllDosen call
+  const dr = await api('getAllDosen', {token:state.token});
+  const dNameMap = {};
+  if(dr.success) { dr.dosen.forEach(d => dNameMap[d.kode] = d.nama); }
+
   const rows=[
     ['REKAP AKADEMIK BIMBINGAN SKRIPSI — LYTANA'],
     ['Dicetak:',new Date(rekapData.generatedAt).toLocaleString('id-ID')],
@@ -1872,16 +1837,15 @@ async function exportAkademikCSV() {
     ['Lulus / Wisuda',rekapData.summary.lulus],
     [],
     ['DETAIL MAHASISWA'],
-    ['No','Nama','Kode','Email','Dosen Pembimbing','Prodi','Status Skripsi','Jumlah Bimbingan','Terakhir Bimbingan','Terakhir Aktif','Terdaftar'],
+    ['No','Nama','Kode','Pembimbing 1','Pembimbing 2','Status Skripsi','Jumlah Bimbingan','Terakhir Bimbingan','Terakhir Aktif'],
     ...allMhs.map((m,i)=>[
-      i+1, m.nama, m.kode, '',
-      (dosenMap[m.kode]||{}).dosenNama||m.dosenKode,
-      (dosenMap[m.kode]||{}).prodi||'',
+      i+1, m.nama, m.kode,
+      dNameMap[m.dosenKode1] || m.dosenKode1 || '—',
+      dNameMap[m.dosenKode2] || m.dosenKode2 || '—',
       STATUS_CONFIG[m.status]?.label||m.status,
       m.bimbinganOk,
       m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
       m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
-      m.createdAt?new Date(m.createdAt).toLocaleDateString('id-ID'):'—',
     ])
   ];
   const csv=rows.map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
