@@ -260,43 +260,9 @@ tr:hover td{background:var(--card2)}
         <div class="form-group"><label class="form-label">Program Studi</label>
           <select id="dreg-prodi" class="form-select">
             <option value="">-- Pilih Program Studi --</option>
-            <optgroup label="Fakultas Teknik & Sains">
-              <option>Teknik Informatika</option>
-              <option>Sistem Informasi</option>
-              <option>Teknik Komputer</option>
-              <option>Teknik Elektro</option>
-              <option>Teknik Mesin</option>
-              <option>Teknik Sipil</option>
-              <option>Teknik Industri</option>
-              <option>Matematika</option>
-              <option>Fisika</option>
-              <option>Kimia</option>
-            </optgroup>
-            <optgroup label="Fakultas Ekonomi & Bisnis">
-              <option>Manajemen</option>
-              <option>Akuntansi</option>
-              <option>Ekonomi Pembangunan</option>
-              <option>Bisnis Digital</option>
-            </optgroup>
-            <optgroup label="Fakultas Ilmu Sosial & Humaniora">
-              <option>Ilmu Komunikasi</option>
-              <option>Administrasi Publik</option>
-              <option>Hubungan Internasional</option>
-              <option>Psikologi</option>
-            </optgroup>
-            <optgroup label="Fakultas Pendidikan">
-              <option>Pendidikan Matematika</option>
-              <option>Pendidikan Bahasa Indonesia</option>
-              <option>Pendidikan Bahasa Inggris</option>
-              <option>Pendidikan IPA</option>
-            </optgroup>
-            <optgroup label="Lainnya">
-              <option>Hukum</option>
-              <option>Kedokteran</option>
-              <option>Keperawatan</option>
-              <option>Farmasi</option>
-              <option>Arsitektur</option>
-            </optgroup>
+            <option value="S1 Teknik Informatika">S1 Teknik Informatika</option>
+            <option value="S1 Sistem Informasi">S1 Sistem Informasi</option>
+            <option value="D3 Manajemen Informatika">D3 Manajemen Informatika</option>
           </select></div>
         <button class="btn btn-orange btn-full" onclick="doRegisterDosen()"><span id="dreg-btn-text">Buat Akun Dosen</span></button>
       </div>
@@ -558,7 +524,6 @@ tr:hover td{background:var(--card2)}
       <div class="section-header">
         <div class="section-title"><h2>Data Dosen</h2><p>Semua dosen yang terdaftar di Lytana</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadAdminDosen()">↻ Refresh</button>
-      </div>
       </div>
       <div id="a-dosen-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
@@ -1583,8 +1548,8 @@ async function loadAdminSlots() {
 // ============================================================
 const STATUS_CONFIG = {
   aktif_bimbingan : { label:'Aktif Bimbingan', emoji:'✅', cls:'aktif_bimbingan' },
-  tidak_aktif     : { label:'Tidak Aktif',      emoji:'⏸', cls:'tidak_aktif'     },
-  revisi          : { label:'Revisi',            emoji:'✏️', cls:'revisi'          },
+  tidak_aktif     : { label:'Tidak Aktif',     emoji:'⏸', cls:'tidak_aktif'     },
+  revisi          : { label:'Revisi',          emoji:'✏️', cls:'revisi'          },
   menunggu_sidang : { label:'Menunggu Sidang',   emoji:'🏛', cls:'menunggu_sidang' },
   lulus           : { label:'Lulus / Wisuda',    emoji:'🎓', cls:'lulus'           },
 };
