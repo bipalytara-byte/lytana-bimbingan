@@ -266,9 +266,9 @@ tr:hover td{background:var(--card2)}
         </div>
         
         <div class="form-group"><label class="form-label">Kode Unik</label>
-          <input id="dreg-kode" class="form-input" type="text" placeholder="Min 4 karakter misal:2026dosen"/></div>
+          <input id="dreg-kode" class="form-input" type="text" placeholder="Buat Kode Unik Untuk Login"/></div>
         <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
-          <input id="dreg-nama" class="form-input" type="text" placeholder="Fauzi Anggi, S.Kom, M.Kom"/></div>
+          <input id="dreg-nama" class="form-input" type="text" placeholder="Dr. Budi Santoso, M.Kom"/></div>
         <div class="form-group"><label class="form-label">Email</label>
           <input id="dreg-email" class="form-input" type="email" placeholder="dosen@kampus.ac.id"/></div>
         <div class="form-group"><label class="form-label">Program Studi</label>
@@ -1088,16 +1088,40 @@ async function loadMyHistory() {
         <div style="font-weight:600">${slot.tipe?slot.tipe.charAt(0).toUpperCase()+slot.tipe.slice(1):'Bimbingan'} — ${tgl}</div>
         <div style="font-size:0.85rem;color:var(--text2)">⏰ ${sesi}${dosen.nama?' · '+dosen.nama:''}</div>
         <div class="meta">${s.label}${item.catatan?' · '+item.catatan:''}</div>
-        ${item._type==='booking'&&item.status==='menunggu'?`<button class="btn btn-rose btn-sm" style="margin-top:8px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`:''}
+        ${item._type==='booking'&&item.status==='menunggu'?(()=>{
+          const sisa = sisaJamBimbingan(slot.tanggal, slot.jamMulai);
+          const bisaBatal = sisa >= 24;
+          const warnaInfo = sisa < 24 ? 'var(--rose)' : sisa < 48 ? 'var(--amber)' : 'var(--slate)';
+          return `<div style="font-size:0.78rem;color:${warnaInfo};margin-top:4px">${labelSisaWaktu(sisa)}</div>
+            ${bisaBatal
+              ? `<button class="btn btn-rose btn-sm" style="margin-top:8px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`
+              : `<button class="btn btn-rose btn-sm" style="margin-top:8px;opacity:0.4;cursor:not-allowed" disabled title="Pembatalan harus dilakukan minimal 24 jam sebelum bimbingan">Tidak bisa dibatalkan</button>`
+            }`;
+        })():''}
       </div></div>`;
   }).join('')}</div>`;
 }
 
+// ── Helper batas batal ────────────────────────────────────────
+function sisaJamBimbingan(tanggal, jamMulai) {
+  if (!tanggal || !jamMulai) return 9999;
+  return (new Date(tanggal + 'T' + jamMulai + ':00').getTime() - Date.now()) / 3600000;
+}
+
+function labelSisaWaktu(jam) {
+  if (jam <= 0)  return '⏱ Sudah lewat';
+  if (jam < 1)   return '⏱ Kurang dari 1 jam lagi';
+  if (jam < 24)  return '⏱ ' + Math.floor(jam) + ' jam lagi';
+  return '⏱ ' + Math.floor(jam / 24) + ' hari lagi';
+}
+// ─────────────────────────────────────────────────────────────
+
 async function cancelMyBooking(bookId) {
   if (!confirm('Batalkan reservasi ini?')) return;
-  const res=await api('cancelBooking',{bookId,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error');
-  toast('Reservasi dibatalkan','info'); loadMyHistory();
+  const res = await api('cancelBooking', {bookId, token: state.token}, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi berhasil dibatalkan', 'info');
+  loadMyHistory();
 }
 
 // ============================================================
