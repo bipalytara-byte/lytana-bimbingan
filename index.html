@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lytana — Linkage of Your Technical Appointment & Network Assistance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & TOKENS
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:    #0f1c2e;
+  --navy2:   #162336;
+  --navy3:   #1e3050;
+  --blue:    #2563eb;
+  --blue2:   #3b82f6;
+  --sky:     #38bdf8;
+  --teal:    #0d9488;
+  --teal2:   #14b8a6;
+  --green:   #10b981;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --purple:  #8b5cf6;
+  --slate:   #94a3b8;
+  --slate2:  #cbd5e1;
+  --white:   #ffffff;
+  --card:    rgba(255,255,255,0.04);
+  --card2:   rgba(255,255,255,0.07);
+  --border:  rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #64748b;
+  --radius:  14px;
+  --radius2: 10px;
+  --shadow:  0 4px 24px rgba(0,0,0,0.35);
+  --font:    'Plus Jakarta Sans', sans-serif;
+  --font2:   'Sora', sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Background grid pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app { position: relative; z-index: 1; }
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1, h2, h3 { font-family: var(--font2); font-weight: 700; line-height: 1.25; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+p  { color: var(--text2); }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+@media(max-width:700px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,28,46,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+}
+.topbar-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.logo { font-family: var(--font2); font-weight: 700; font-size: 1.25rem; color: var(--sky); letter-spacing: -0.02em; }
+.logo span { color: var(--sky); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 40px; padding: 5px 12px 5px 5px;
+  font-size: 0.82rem; color: var(--text2);
+}
+.user-chip img {
+  width: 28px; height: 28px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--border2);
+}
+.user-chip .avatar-placeholder {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: white;
+}
+.nav-tabs {
+  display: flex; gap: 4px; background: var(--card); border-radius: 10px; padding: 4px;
+}
+.nav-tab {
+  padding: 6px 14px; border-radius: 7px; cursor: pointer;
+  font-size: 0.82rem; font-weight: 500; color: var(--text2);
+  transition: all .2s; border: none; background: none;
+}
+.nav-tab.active { background: var(--blue); color: white; }
+.nav-tab:hover:not(.active) { color: var(--text); background: var(--card2); }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+}
+.card-sm { padding: 16px; border-radius: var(--radius2); }
+.card-hover { transition: all .2s; cursor: pointer; }
+.card-hover:hover { border-color: var(--border2); background: var(--card2); transform: translateY(-2px); box-shadow: var(--shadow); }
+
+/* ============================================================
+   FORMS & INPUTS
+   ============================================================ */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 0.82rem; font-weight: 600; color: var(--text2); letter-spacing: 0.04em; text-transform: uppercase; }
+.form-input, .form-select, .form-textarea {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border2);
+  border-radius: var(--radius2); padding: 11px 14px;
+  color: var(--text); font-family: var(--font); font-size: 0.92rem;
+  outline: none; transition: border-color .2s, box-shadow .2s; width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+.form-select option { background: var(--navy2); }
+.form-textarea { resize: vertical; min-height: 80px; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; border-radius: var(--radius2); font-family: var(--font);
+  font-size: 0.88rem; font-weight: 600; cursor: pointer; border: none;
+  transition: all .2s; letter-spacing: 0.02em; white-space: nowrap;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--blue2); box-shadow: 0 4px 16px rgba(37,99,235,0.4); }
+.btn-teal    { background: var(--teal); color: white; }
+.btn-teal:hover:not(:disabled) { background: var(--teal2); box-shadow: 0 4px 16px rgba(13,148,136,0.4); }
+.btn-rose    { background: rgba(244,63,94,0.15); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
+.btn-rose:hover:not(:disabled) { background: rgba(244,63,94,0.25); }
+.btn-ghost   { background: var(--card2); color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--border); }
+.btn-amber   { background: var(--amber); color: var(--navy); }
+.btn-amber:hover:not(:disabled) { filter: brightness(1.1); }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-lg { padding: 14px 28px; font-size: 0.95rem; }
+.btn-full { width: 100%; }
+
+/* ============================================================
+   BADGES & CHIPS
+   ============================================================ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+}
+.badge-green  { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-amber  { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-rose   { background: rgba(244,63,94,0.15);  color: var(--rose);  }
+.badge-blue   { background: rgba(37,99,235,0.15);  color: var(--blue2); }
+.badge-slate  { background: rgba(148,163,184,0.15);color: var(--slate); }
+.badge-teal   { background: rgba(20,184,166,0.15); color: var(--teal2); }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast-container {
+  position: fixed; top: 80px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.toast {
+  background: var(--navy2); border: 1px solid var(--border2);
+  border-radius: var(--radius2); padding: 12px 16px;
+  font-size: 0.88rem; color: var(--text);
+  box-shadow: var(--shadow); animation: slideIn .3s ease;
+  pointer-events: all; min-width: 260px; max-width: 340px;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--rose);  }
+.toast.info    { border-left: 3px solid var(--blue2); }
+@keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 500; display: none; align-items: center; justify-content: center;
+  padding: 20px; backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--navy2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 28px; width: 100%; max-width: 460px;
+  animation: fadeUp .25s ease;
+}
+.modal-lg { max-width: 640px; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 1.4rem; line-height: 1; padding: 4px; }
+.modal-close:hover { color: var(--text); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ============================================================
+   SLOT CARDS
+   ============================================================ */
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; }
+.slot-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; position: relative; transition: all .2s;
+}
+.slot-card:hover { border-color: var(--border2); background: var(--card2); }
+.slot-card.full { opacity: 0.65; }
+.slot-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.slot-type-badge {
+  padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.slot-type-badge.offline { background: rgba(139,92,246,0.2); color: var(--purple); }
+.slot-type-badge.online  { background: rgba(56,189,248,0.2); color: var(--sky); }
+.slot-quota-bar { height: 4px; background: var(--border); border-radius: 4px; margin: 12px 0 8px; overflow: hidden; }
+.slot-quota-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+.slot-quota-fill.low    { background: var(--green); }
+.slot-quota-fill.medium { background: var(--amber); }
+.slot-quota-fill.high   { background: var(--rose); }
+
+/* ============================================================
+   PROGRESS BARS
+   ============================================================ */
+.prog-bar { height: 8px; background: var(--border); border-radius: 8px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--blue), var(--teal2)); transition: width .5s; }
+.prog-bab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:500px){ .prog-bab-grid{ grid-template-columns:1fr; } }
+.prog-bab-item {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius2);
+  padding: 14px; display: flex; flex-direction: column; gap: 8px;
+}
+.prog-bab-title { font-weight: 600; font-size: 0.88rem; }
+.prog-bab-pct   { font-size: 1.2rem; font-weight: 700; color: var(--text2); }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+th { padding: 12px 14px; text-align: left; font-size: 0.78rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; background: var(--card); border-bottom: 1px solid var(--border); }
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--card2); }
+
+/* ============================================================
+   STAT CARDS
+   ============================================================ */
+.stat-card { text-align: center; padding: 20px; }
+.stat-number { font-size: 2.2rem; font-weight: 700; font-family: var(--font2); line-height: 1; margin: 8px 0 4px; }
+.stat-label  { font-size: 0.82rem; color: var(--text2); }
+
+/* ============================================================
+   PHOTO UPLOAD
+   ============================================================ */
+.photo-upload-area {
+  border: 2px dashed var(--border2); border-radius: var(--radius2);
+  padding: 30px; text-align: center; cursor: pointer; transition: all .2s;
+}
+.photo-upload-area:hover { border-color: var(--blue2); background: rgba(37,99,235,0.05); }
+.photo-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border2); }
+
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+.login-page {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px;
+}
+.login-box { width: 100%; max-width: 420px; }
+.login-logo { text-align: center; margin-bottom: 40px; }
+.login-logo h1 { font-size: 2.8rem; background: linear-gradient(135deg, var(--sky), var(--teal2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.03em; }
+.login-logo h1 span { background: inherit; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.login-logo h1 span { color: var(--sky); }
+.login-logo p  { color: var(--text2); font-size: 0.8rem; margin-top: 8px; line-height: 1.5; max-width: 320px; margin-left: auto; margin-right: auto; }
+.login-tabs { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius2); padding: 4px; margin-bottom: 24px; }
+.login-tab { flex: 1; padding: 8px; border-radius: 7px; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text2); border: none; background: none; transition: all .2s; }
+.login-tab.active { background: var(--blue); color: white; }
+.login-form-section { display: none; }
+.login-form-section.active { display: flex; flex-direction: column; gap: 16px; }
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.section-title h2 { font-size: 1.25rem; }
+.section-title p  { font-size: 0.85rem; color: var(--text2); margin-top: 2px; }
+
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
+.main-content { padding: 28px 20px; max-width: 1100px; margin: 0 auto; }
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* ============================================================
+   TYPE SELECTOR (Offline/Online)
+   ============================================================ */
+.type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.type-card {
+  padding: 20px; border-radius: var(--radius); border: 2px solid var(--border);
+  cursor: pointer; text-align: center; transition: all .2s; background: var(--card);
+}
+.type-card:hover { border-color: var(--border2); }
+.type-card.selected.offline { border-color: var(--purple); background: rgba(139,92,246,0.1); }
+.type-card.selected.online  { border-color: var(--sky);    background: rgba(56,189,248,0.1); }
+.type-card .type-icon { font-size: 2rem; margin-bottom: 8px; }
+.type-card .type-name { font-weight: 700; font-size: 1rem; }
+.type-card .type-desc { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state { text-align: center; padding: 48px 24px; }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+.empty-state p { color: var(--text2); }
+
+/* ============================================================
+   SPINNER
+   ============================================================ */
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay { display: flex; align-items: center; justify-content: center; padding: 40px; gap: 12px; color: var(--text2); }
+
+/* ============================================================
+   FILTER ROW
+   ============================================================ */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-btn { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--card); color: var(--text2); transition: all .2s; }
+.filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+/* Timeline History */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.timeline-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+.timeline-item:not(:last-child)::before {
+  content: ''; position: absolute; left: 15px; top: 32px;
+  bottom: 0; width: 1px; background: var(--border);
+}
+.timeline-dot { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.timeline-dot.green  { background: rgba(16,185,129,0.2); color: var(--green); border: 2px solid var(--green); }
+.timeline-dot.rose   { background: rgba(244,63,94,0.2);  color: var(--rose);  border: 2px solid var(--rose); }
+.timeline-dot.amber  { background: rgba(245,158,11,0.2); color: var(--amber); border: 2px solid var(--amber); }
+.timeline-dot.slate  { background: rgba(148,163,184,0.15);color: var(--slate); border: 2px solid var(--slate); }
+.timeline-body { flex: 1; padding-top: 4px; }
+.timeline-body .meta { font-size: 0.78rem; color: var(--text3); margin-top: 4px; }
+
+/* search input */
+.search-input-wrap { position: relative; }
+.search-input-wrap .form-input { padding-left: 36px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="toast-container"></div>
+
+  <!-- ==================== LOGIN PAGE ==================== -->
+  <div id="page-login" class="page active">
+    <div class="login-page">
+      <div class="login-box">
+        <div class="login-logo">
+          <h1><span>Lytana</span></h1>
+          <p>Linkage of Your Technical Appointment & Network Assistance</p>
+        </div>
+        <div class="card">
+          <div class="login-tabs">
+            <button class="login-tab active" onclick="switchLoginTab('login')">Masuk</button>
+            <button class="login-tab" onclick="switchLoginTab('register')">Daftar Baru</button>
+          </div>
+
+          <!-- Login Form -->
+          <div id="login-form" class="login-form-section active">
+            <div class="form-group">
+              <label class="form-label">Kode Unik / Kode Admin</label>
+              <input id="login-kode" class="form-input" type="text" placeholder="Masukkan kode unik kamu" autocomplete="off"/>
+            </div>
+            <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">
+              <span id="login-btn-text">Masuk</span>
+            </button>
+            <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Belum punya akun? Klik <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('register')">Daftar Baru</b></p>
+          </div>
+
+          <!-- Register Form -->
+          <div id="register-form" class="login-form-section">
+            <div class="form-group">
+              <label class="form-label">Buat Kode Unik</label>
+              <input id="reg-kode" class="form-input" type="text" placeholder="Contoh: andi2024 atau NIM kamu" autocomplete="off"/>
+              <small style="color:var(--text3);font-size:0.78rem">Kode ini digunakan untuk login. Minimal 4 karakter.</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input id="reg-nama" class="form-input" type="text" placeholder="Nama sesuai KTM"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input id="reg-email" class="form-input" type="email" placeholder="email@mahasiswa.ac.id"/>
+            </div>
+            <button class="btn btn-teal btn-full btn-lg" onclick="doRegister()">
+              <span id="reg-btn-text">Buat Akun</span>
+            </button>
+            <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Sudah punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('login')">Masuk</b></p>
+          </div>
+        </div>
+        <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text3)">© 2024 Lytana — Linkage of Your Technical Appointment & Network Assistance</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAHASISWA PAGE ==================== -->
+  <div id="page-mahasiswa" class="page">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="logo"><span>Lytana</span></div>
+        <div class="nav-tabs">
+          <button class="nav-tab active" onclick="mSwitch('reservasi')">Reservasi</button>
+          <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
+          <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
+          <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
+        </div>
+        <div class="topbar-right">
+          <div class="user-chip">
+            <div id="m-avatar" class="avatar-placeholder"></div>
+            <span id="m-nama-chip">—</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <!-- RESERVASI -->
+      <div id="m-reservasi" class="page-section active">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Reservasi Bimbingan</h2>
+            <p>Pilih jenis bimbingan dan slot yang tersedia</p>
+          </div>
+        </div>
+
+        <div class="type-selector">
+          <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
+            <div class="type-icon">🏢</div>
+            <div class="type-name">Offline</div>
+            <div class="type-desc">Tatap muka di kampus</div>
+          </div>
+          <div class="type-card online" id="type-online" onclick="selectType('online')">
+            <div class="type-icon">💻</div>
+            <div class="type-name">Online</div>
+            <div class="type-desc">Via Zoom / Google Meet</div>
+          </div>
+        </div>
+
+        <div id="slots-container">
+          <div class="empty-state">
+            <div class="empty-icon">👆</div>
+            <p>Pilih jenis bimbingan di atas untuk melihat slot tersedia</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIWAYAT -->
+      <div id="m-riwayat" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Riwayat Bimbingan</h2>
+            <p>Rekap semua aktivitas bimbingan kamu</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadMyHistory()">↻ Refresh</button>
+        </div>
+        <div id="history-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+
+      <!-- PROGRES -->
+      <div id="m-progres" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Progres Skripsi</h2>
+            <p>Update dan pantau kemajuan pengerjaan skripsimu</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openProgresModal()">+ Update Progres</button>
+        </div>
+        <div id="progres-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+
+      <!-- PROFIL -->
+      <div id="m-profil" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Profil Saya</h2>
+            <p>Informasi akun dan foto profil</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="margin-bottom:16px">Informasi Akun</h3>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Kode Unik</label>
+                <input id="profil-kode" class="form-input" type="text" readonly style="opacity:.7"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nama Lengkap</label>
+                <input id="profil-nama" class="form-input" type="text" readonly style="opacity:.7"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input id="profil-email" class="form-input" type="text" readonly style="opacity:.7"/>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom:16px">Foto Profil</h3>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+              <div id="profil-foto-wrap">
+                <div class="avatar-placeholder" id="profil-avatar" style="width:80px;height:80px;border-radius:50%;font-size:1.5rem;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue),var(--purple))"></div>
+              </div>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+                📷 Pilih Foto
+                <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="previewFoto(event)"/>
+              </label>
+              <div id="foto-preview-wrap" style="display:none">
+                <img id="foto-preview" src="" class="photo-preview" style="margin-bottom:8px"/>
+                <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
+              </div>
+              <small style="color:var(--text3);text-align:center">Foto maks. 2MB. Foto akan dilihat oleh dosen pembimbing.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /page-mahasiswa -->
+
+  <!-- ==================== ADMIN PAGE ==================== -->
+  <div id="page-admin" class="page">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="logo"><span>Lytana</span> <span style="font-size:0.7rem;color:var(--amber);margin-left:4px;font-weight:600;background:rgba(245,158,11,0.15);padding:2px 8px;border-radius:20px">ADMIN</span></div>
+        <div class="nav-tabs">
+          <button class="nav-tab active" onclick="aSwitch('dashboard')">Dashboard</button>
+          <button class="nav-tab" onclick="aSwitch('slots')">Slot</button>
+          <button class="nav-tab" onclick="aSwitch('bookings')">Reservasi</button>
+          <button class="nav-tab" onclick="aSwitch('mahasiswa')">Mahasiswa</button>
+        </div>
+        <div class="topbar-right">
+          <div class="user-chip">
+            <div class="avatar-placeholder" style="background:linear-gradient(135deg,var(--amber),var(--rose))">A</div>
+            <span id="admin-nama-chip">Admin</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div id="a-dashboard" class="page-section active">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Dashboard</h2>
+            <p>Ringkasan aktivitas bimbingan</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadAdminDashboard()">↻ Refresh</button>
+        </div>
+        <div class="grid-3" id="stat-cards">
+          <div class="card stat-card"><div class="stat-label">Total Mahasiswa</div><div class="stat-number" id="stat-mhs" style="color:var(--blue2)">—</div></div>
+          <div class="card stat-card"><div class="stat-label">Slot Aktif</div><div class="stat-number" id="stat-slots" style="color:var(--teal2)">—</div></div>
+          <div class="card stat-card"><div class="stat-label">Total Reservasi</div><div class="stat-number" id="stat-book" style="color:var(--purple)">—</div></div>
+          <div class="card stat-card"><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-number" id="stat-pending" style="color:var(--amber)">—</div></div>
+          <div class="card stat-card"><div class="stat-label">Terselenggara</div><div class="stat-number" id="stat-done" style="color:var(--green)">—</div></div>
+        </div>
+        <div style="margin-top:24px">
+          <h3 style="margin-bottom:14px">Reservasi Terbaru</h3>
+          <div id="recent-bookings-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+        </div>
+      </div>
+
+      <!-- SLOTS -->
+      <div id="a-slots" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Manajemen Slot</h2>
+            <p>CRUD slot bimbingan offline & online</p>
+          </div>
+          <button class="btn btn-primary" onclick="openSlotModal()">+ Tambah Slot</button>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterAdminSlots('all', this)">Semua</button>
+          <button class="filter-btn" onclick="filterAdminSlots('offline', this)">Offline</button>
+          <button class="filter-btn" onclick="filterAdminSlots('online', this)">Online</button>
+        </div>
+        <div id="admin-slots-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+
+      <!-- BOOKINGS / RESERVASI -->
+      <div id="a-bookings" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Daftar Reservasi</h2>
+            <p>Validasi dan kelola reservasi mahasiswa</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadAdminBookings()">↻ Refresh</button>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterBookings('all', this)">Semua</button>
+          <button class="filter-btn" onclick="filterBookings('menunggu', this)">Menunggu</button>
+          <button class="filter-btn" onclick="filterBookings('terselenggara', this)">Terselenggara</button>
+          <button class="filter-btn" onclick="filterBookings('tidak_terselenggara', this)">Tidak Terjadi</button>
+          <button class="filter-btn" onclick="filterBookings('dibatalkan', this)">Dibatalkan</button>
+        </div>
+        <div id="admin-bookings-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+
+      <!-- MAHASISWA -->
+      <div id="a-mahasiswa" class="page-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Data Mahasiswa</h2>
+            <p>Daftar mahasiswa yang terdaftar</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadAdminUsers()">↻ Refresh</button>
+        </div>
+        <div class="search-input-wrap" style="margin-bottom:16px;max-width:320px">
+          <span class="search-icon">🔍</span>
+          <input class="form-input" id="search-mhs" type="text" placeholder="Cari nama atau kode..." oninput="filterUsers(this.value)"/>
+        </div>
+        <div id="admin-users-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /page-admin -->
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal: Konfirmasi Booking -->
+  <div class="modal-overlay" id="modal-booking">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Konfirmasi Reservasi</h3>
+        <button class="modal-close" onclick="closeModal('modal-booking')">×</button>
+      </div>
+      <div id="modal-booking-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Batal</button>
+        <button class="btn btn-primary" id="modal-booking-btn" onclick="confirmBooking()">Konfirmasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Update Progres -->
+  <div class="modal-overlay" id="modal-progres">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Update Progres Skripsi</h3>
+        <button class="modal-close" onclick="closeModal('modal-progres')">×</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label class="form-label">Bab / Bagian</label>
+          <select id="prog-bab" class="form-select">
+            <option value="Bab 1">Bab 1 — Pendahuluan</option>
+            <option value="Bab 2">Bab 2 — Tinjauan Pustaka</option>
+            <option value="Bab 3">Bab 3 — Metodologi</option>
+            <option value="Bab 4">Bab 4 — Hasil & Pembahasan</option>
+            <option value="Bab 5">Bab 5 — Kesimpulan</option>
+            <option value="Revisi">Revisi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Persentase Selesai: <span id="prog-pct-label" style="color:var(--blue2)">50%</span></label>
+          <input type="range" id="prog-pct" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('prog-pct-label').textContent=this.value+'%'"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan</label>
+          <textarea id="prog-catatan" class="form-textarea" placeholder="Progres yang dicapai, kendala, dsb."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-progres')">Batal</button>
+        <button class="btn btn-teal" onclick="saveProgress()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Slot (Admin) -->
+  <div class="modal-overlay" id="modal-slot">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-slot-title">Tambah Slot Baru</h3>
+        <button class="modal-close" onclick="closeModal('modal-slot')">×</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Jenis Bimbingan</label>
+            <select id="slot-tipe" class="form-select">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kuota</label>
+            <input id="slot-kuota" class="form-input" type="number" min="1" max="20" value="5" placeholder="Jumlah mahasiswa"/>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Tanggal</label>
+            <input id="slot-tanggal" class="form-input" type="date"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jam</label>
+            <input id="slot-jam" class="form-input" type="time"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan / Link Meeting</label>
+          <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang, link Zoom, dsb."/>
+        </div>
+        <input type="hidden" id="slot-edit-id"/>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button>
+        <button class="btn btn-primary" id="slot-save-btn" onclick="saveSlot()">Simpan Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Validasi Booking (Admin) -->
+  <div class="modal-overlay" id="modal-validasi">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Validasi Reservasi</h3>
+        <button class="modal-close" onclick="closeModal('modal-validasi')">×</button>
+      </div>
+      <div id="validasi-content"></div>
+      <div style="margin-top:16px">
+        <div class="form-group">
+          <label class="form-label">Catatan (opsional)</label>
+          <textarea id="validasi-catatan" class="form-textarea" placeholder="Catatan untuk mahasiswa..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-validasi')">Batal</button>
+        <button class="btn btn-rose" onclick="doValidate('tidak_terselenggara')">Tidak Terjadi</button>
+        <button class="btn btn-teal" onclick="doValidate('terselenggara')">Terselenggara ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Detail Mahasiswa (Admin) -->
+  <div class="modal-overlay" id="modal-detail-mhs">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="detail-mhs-title">Detail Mahasiswa</h3>
+        <button class="modal-close" onclick="closeModal('modal-detail-mhs')">×</button>
+      </div>
+      <div id="detail-mhs-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-detail-mhs')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<script>
+// ============================================================
+// CONFIG — Ganti dengan URL Web App GAS kamu setelah deploy
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6pBW3mvuDY045_aq86yuSoXaSZuW33DnZQAPnkpvSC6-G4U724Ys8RQiizNz4rwZVLg/exec';
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  user: null,
+  token: null,
+  selectedType: null,
+  slots: [],
+  allBookings: [],
+  allSlots: [],
+  allUsers: [],
+  pendingSlot: null,
+  pendingValidateId: null,
+};
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function api(action, params = {}, method = 'GET') {
+  try {
+    let url, options;
+    if (method === 'GET') {
+      const q = new URLSearchParams({ action, ...params }).toString();
+      url = GAS_URL + '?' + q;
+      options = { method: 'GET' };
+    } else {
+      url = GAS_URL;
+      options = {
+        method: 'POST',
+        body: JSON.stringify({ action, token: state.token, ...params }),
+      };
+    }
+    const res  = await fetch(url, options);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    return { success: false, message: 'Koneksi gagal: ' + err.message };
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type = 'info') {
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+}
+
+function mSwitch(section) {
+  document.querySelectorAll('#page-mahasiswa .page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('m-' + section).classList.add('active');
+  document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['reservasi','riwayat','progres','profil'][i] === section);
+  });
+  if (section === 'riwayat') loadMyHistory();
+  if (section === 'progres') loadMyProgress();
+  if (section === 'profil')  fillProfil();
+}
+
+function aSwitch(section) {
+  document.querySelectorAll('#page-admin .page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('a-' + section).classList.add('active');
+  document.querySelectorAll('#page-admin .nav-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['dashboard','slots','bookings','mahasiswa'][i] === section);
+  });
+  if (section === 'dashboard') loadAdminDashboard();
+  if (section === 'slots')     loadAdminSlots();
+  if (section === 'bookings')  loadAdminBookings();
+  if (section === 'mahasiswa') loadAdminUsers();
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchLoginTab(tab) {
+  document.querySelectorAll('.login-tab').forEach((t,i) => t.classList.toggle('active', ['login','register'][i] === tab));
+  document.getElementById('login-form').classList.toggle('active', tab === 'login');
+  document.getElementById('register-form').classList.toggle('active', tab === 'register');
+}
+
+async function doLogin() {
+  const kode = document.getElementById('login-kode').value.trim();
+  if (!kode) return toast('Masukkan kode unikmu', 'error');
+  const btn = document.getElementById('login-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
+  const res = await api('login', { kode }, 'POST');
+  btn.textContent = 'Masuk';
+  if (!res.success) return toast(res.message, 'error');
+  onLogin(res.token, res.user);
+}
+
+async function doRegister() {
+  const kode  = document.getElementById('reg-kode').value.trim();
+  const nama  = document.getElementById('reg-nama').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  if (!kode || !nama || !email) return toast('Semua field wajib diisi', 'error');
+  const btn = document.getElementById('reg-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
+  const res = await api('register', { kode, nama, email }, 'POST');
+  btn.textContent = 'Buat Akun';
+  if (!res.success) return toast(res.message, 'error');
+  toast('Akun berhasil dibuat!', 'success');
+  onLogin(res.token, res.user);
+}
+
+function onLogin(token, user) {
+  state.token = token;
+  state.user  = user;
+  localStorage.setItem('sibim_token', token);
+  localStorage.setItem('sibim_user', JSON.stringify(user));
+
+  if (user.role === 'admin') {
+    document.getElementById('admin-nama-chip').textContent = user.nama;
+    showPage('admin');
+    loadAdminDashboard();
+  } else {
+    updateMhsChip();
+    showPage('mahasiswa');
+  }
+  toast('Selamat datang, ' + user.nama + '!', 'success');
+}
+
+function updateMhsChip() {
+  const u = state.user;
+  document.getElementById('m-nama-chip').textContent = u.nama;
+  const av = document.getElementById('m-avatar');
+  if (u.foto) {
+    av.outerHTML = `<img id="m-avatar" src="${u.foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)">`;
+  } else {
+    av.textContent = u.nama.charAt(0).toUpperCase();
+  }
+}
+
+function doLogout() {
+  state = { user: null, token: null, selectedType: null, slots: [], allBookings: [], allSlots: [], allUsers: [], pendingSlot: null, pendingValidateId: null };
+  localStorage.removeItem('sibim_token');
+  localStorage.removeItem('sibim_user');
+  showPage('login');
+  toast('Kamu telah keluar', 'info');
+}
+
+// Auto-login dari localStorage
+(function() {
+  const token = localStorage.getItem('sibim_token');
+  const user  = localStorage.getItem('sibim_user');
+  if (token && user) {
+    try { onLogin(token, JSON.parse(user)); } catch(e) {}
+  }
+})();
+
+// ============================================================
+// SLOT SELECTION (Mahasiswa)
+// ============================================================
+function selectType(type) {
+  state.selectedType = type;
+  document.getElementById('type-offline').classList.toggle('selected', type === 'offline');
+  document.getElementById('type-offline').classList.toggle('offline', true);
+  document.getElementById('type-online').classList.toggle('selected', type === 'online');
+  document.getElementById('type-online').classList.toggle('online', true);
+  loadSlots(type);
+}
+
+async function loadSlots(tipe) {
+  const c = document.getElementById('slots-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat slot...</div>';
+  const res = await api('getSlots', { tipe, token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+  state.slots = res.slots;
+  renderSlots(res.slots);
+}
+
+function renderSlots(slots) {
+  const c = document.getElementById('slots-container');
+  if (!slots.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada slot tersedia untuk jenis bimbingan ini</p></div>';
+    return;
+  }
+  c.innerHTML = `<div class="slot-grid">${slots.map(renderSlotCard).join('')}</div>`;
+}
+
+function renderSlotCard(s) {
+  const pct    = Math.round((s.booked / s.kuota) * 100);
+  const barCls = pct >= 90 ? 'high' : pct >= 60 ? 'medium' : 'low';
+  const full   = s.booked >= s.kuota;
+  const d      = new Date(s.tanggal + 'T00:00:00');
+  const tgl    = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return `
+  <div class="slot-card ${full ? 'full' : ''}">
+    <div class="slot-card-header">
+      <div>
+        <div class="slot-type-badge ${s.tipe}">${s.tipe.toUpperCase()}</div>
+        <div style="margin-top:8px;font-weight:700;font-size:1rem">${tgl}</div>
+        <div style="color:var(--text2);font-size:0.88rem;margin-top:2px">⏰ ${s.jam}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:1.3rem;font-weight:700;color:${full?'var(--rose)':'var(--green)'}">${s.booked}/${s.kuota}</div>
+        <div style="font-size:0.75rem;color:var(--text3)">terisi</div>
+      </div>
+    </div>
+    <div class="slot-quota-bar"><div class="slot-quota-fill ${barCls}" style="width:${pct}%"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span style="font-size:0.78rem;color:var(--text3)">${s.catatan || ''}</span>
+      ${full
+        ? `<span class="badge badge-rose">Penuh</span>`
+        : `<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s)})'>Reservasi</button>`
+      }
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// BOOKING (Mahasiswa)
+// ============================================================
+function openBookingModal(slot) {
+  state.pendingSlot = slot;
+  const d = new Date(slot.tanggal + 'T00:00:00');
+  const tgl = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('modal-booking-content').innerHTML = `
+    <div class="card" style="margin-bottom:0;background:var(--card2)">
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span> <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span> <b>${tgl}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jam</span> <b>${slot.jam}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sisa Slot</span> <b style="color:var(--green)">${slot.kuota - slot.booked} tersisa</b></div>
+        ${slot.catatan ? `<div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Catatan</span> <span>${slot.catatan}</span></div>` : ''}
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:0.88rem">Apakah kamu yakin ingin mereservasi slot ini?</p>
+  `;
+  openModal('modal-booking');
+}
+
+async function confirmBooking() {
+  if (!state.pendingSlot) return;
+  const btn = document.getElementById('modal-booking-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+  const res = await api('bookSlot', { slotId: state.pendingSlot.id, token: state.token }, 'POST');
+  btn.disabled = false;
+  btn.textContent = 'Konfirmasi';
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi berhasil! 🎉', 'success');
+  closeModal('modal-booking');
+  state.pendingSlot = null;
+  loadSlots(state.selectedType);
+}
+
+// ============================================================
+// RIWAYAT (Mahasiswa)
+// ============================================================
+async function loadMyHistory() {
+  const c = document.getElementById('history-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat riwayat...</div>';
+  const res = await api('getMyHistory', { token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+
+  const bookRes = await api('getMyBookings', { token: state.token });
+  const all = [
+    ...(res.history || []).map(h => ({ ...h, _type: 'history' })),
+    ...(bookRes.bookings || []).map(b => ({ ...b, _type: 'booking' })),
+  ].sort((a, b) => new Date(b.createdAt || b.tanggal) - new Date(a.createdAt || a.tanggal));
+
+  if (!all.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada riwayat bimbingan</p></div>';
+    return;
+  }
+
+  const statusMap = {
+    menunggu: { cls: 'amber', icon: '⏳', label: 'Menunggu' },
+    terselenggara: { cls: 'green', icon: '✓', label: 'Terselenggara' },
+    tidak_terselenggara: { cls: 'rose', icon: '✕', label: 'Tidak Terjadi' },
+    dibatalkan: { cls: 'slate', icon: '–', label: 'Dibatalkan' },
+  };
+
+  c.innerHTML = `<div class="timeline">${all.map(item => {
+    const s    = statusMap[item.status] || { cls: 'slate', icon: '?', label: item.status };
+    const slot = item.slot || {};
+    const tgl  = slot.tanggal ? new Date(slot.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    return `<div class="timeline-item">
+      <div class="timeline-dot ${s.cls}">${s.icon}</div>
+      <div class="timeline-body">
+        <div style="font-weight:600">${slot.tipe ? slot.tipe.charAt(0).toUpperCase() + slot.tipe.slice(1) : 'Bimbingan'} — ${tgl} ${slot.jam || ''}</div>
+        <div class="meta">${s.label}${item.catatan ? ' · ' + item.catatan : ''}</div>
+        ${item._type === 'booking' && item.status === 'menunggu'
+          ? `<button class="btn btn-rose btn-sm" style="margin-top:6px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`
+          : ''}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+async function cancelMyBooking(bookId) {
+  if (!confirm('Batalkan reservasi ini?')) return;
+  const res = await api('cancelBooking', { bookId, token: state.token }, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi dibatalkan', 'info');
+  loadMyHistory();
+}
+
+// ============================================================
+// PROGRES (Mahasiswa)
+// ============================================================
+async function loadMyProgress() {
+  const c = document.getElementById('progres-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
+  const res = await api('getMyProgress', { token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+
+  const babs = ['Bab 1', 'Bab 2', 'Bab 3', 'Bab 4', 'Bab 5', 'Revisi'];
+  const progMap = {};
+  (res.progress || []).forEach(p => progMap[p.bab] = p);
+
+  const totalPct = babs.reduce((sum, b) => sum + (progMap[b]?.persentase || 0), 0);
+  const avgPct   = Math.round(totalPct / babs.length);
+
+  c.innerHTML = `
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div style="font-size:0.85rem;color:var(--text2)">Keseluruhan Progress</div>
+          <div style="font-size:2rem;font-weight:700;font-family:var(--font2);color:var(--blue2)">${avgPct}%</div>
+        </div>
+        <div style="text-align:right;color:var(--text2);font-size:0.85rem">${babs.filter(b => (progMap[b]?.persentase||0) >= 100).length}/${babs.length} bab selesai</div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${avgPct}%"></div></div>
+    </div>
+    <div class="prog-bab-grid">
+      ${babs.map(bab => {
+        const p = progMap[bab];
+        const pct = p?.persentase || 0;
+        const done = pct >= 100;
+        return `<div class="prog-bab-item">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="prog-bab-title">${bab}</div>
+            ${done ? '<span class="badge badge-green">✓ Selesai</span>' : ''}
+          </div>
+          <div class="prog-bab-pct" style="color:${pct>=100?'var(--green)':pct>=50?'var(--blue2)':'var(--text2)'}">${pct}%</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+          ${p?.catatan ? `<div style="font-size:0.78rem;color:var(--text3);margin-top:4px">${p.catatan}</div>` : ''}
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%" onclick="openProgresModal('${bab}','${pct}','${p?.catatan||''}')">Edit</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function openProgresModal(bab = '', pct = 50, catatan = '') {
+  if (bab) {
+    const sel = document.getElementById('prog-bab');
+    for (let i = 0; i < sel.options.length; i++) if (sel.options[i].value === bab) sel.selectedIndex = i;
+  }
+  document.getElementById('prog-pct').value = pct;
+  document.getElementById('prog-pct-label').textContent = pct + '%';
+  document.getElementById('prog-catatan').value = catatan;
+  openModal('modal-progres');
+}
+
+async function saveProgress() {
+  const bab       = document.getElementById('prog-bab').value;
+  const persentase= document.getElementById('prog-pct').value;
+  const catatan   = document.getElementById('prog-catatan').value;
+  const res = await api('updateProgress', { bab, persentase, catatan, token: state.token }, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Progress diperbarui!', 'success');
+  closeModal('modal-progres');
+  loadMyProgress();
+}
+
+// ============================================================
+// PROFIL (Mahasiswa)
+// ============================================================
+function fillProfil() {
+  const u = state.user;
+  document.getElementById('profil-kode').value  = u.kode  || '';
+  document.getElementById('profil-nama').value  = u.nama  || '';
+  document.getElementById('profil-email').value = u.email || '';
+  const wrap = document.getElementById('profil-foto-wrap');
+  if (u.foto) {
+    wrap.innerHTML = `<img src="${u.foto}" class="photo-preview" style="margin-bottom:8px"/>`;
+  }
+}
+
+function previewFoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) return toast('Foto maksimal 2MB', 'error');
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('foto-preview').src = e.target.result;
+    document.getElementById('foto-preview-wrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadFoto() {
+  const input = document.getElementById('foto-input');
+  if (!input.files[0]) return;
+  const file   = input.files[0];
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const base64   = e.target.result.split(',')[1];
+    const mimeType = file.type;
+    toast('Mengupload foto...', 'info');
+    const res = await api('uploadPhoto', { base64, mimeType, token: state.token }, 'POST');
+    if (!res.success) return toast(res.message, 'error');
+    toast('Foto berhasil diupload!', 'success');
+    state.user.foto = res.url;
+    localStorage.setItem('sibim_user', JSON.stringify(state.user));
+    fillProfil();
+    updateMhsChip();
+    document.getElementById('foto-preview-wrap').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+// ADMIN — DASHBOARD
+// ============================================================
+async function loadAdminDashboard() {
+  const res = await api('getDashboardStats', { token: state.token });
+  if (res.success) {
+    const s = res.stats;
+    document.getElementById('stat-mhs').textContent     = s.totalMahasiswa;
+    document.getElementById('stat-slots').textContent   = s.totalSlots;
+    document.getElementById('stat-book').textContent    = s.totalBookings;
+    document.getElementById('stat-pending').textContent = s.pendingCount;
+    document.getElementById('stat-done').textContent    = s.confirmedCount;
+  }
+
+  const bRes = await api('getAllBookings', { token: state.token });
+  const c    = document.getElementById('recent-bookings-container');
+  if (!bRes.success) return;
+
+  const recent = (bRes.bookings || []).filter(b => b.status === 'menunggu').slice(0, 5);
+  if (!recent.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu konfirmasi</p></div>';
+    return;
+  }
+
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Mahasiswa</th><th>Slot</th><th>Status</th><th>Aksi</th></tr></thead>
+    <tbody>${recent.map(b => bookingRow(b)).join('')}</tbody>
+  </table></div>`;
+}
+
+// ============================================================
+// ADMIN — SLOTS
+// ============================================================
+async function loadAdminSlots() {
+  const c   = document.getElementById('admin-slots-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
+  const res = await api('getAllSlots', { token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+  state.allSlots = res.slots;
+  renderAdminSlots(state.allSlots);
+}
+
+function renderAdminSlots(slots) {
+  const c = document.getElementById('admin-slots-container');
+  if (!slots.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada slot. Tambahkan slot bimbingan.</p></div>';
+    return;
+  }
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Jenis</th><th>Tanggal</th><th>Jam</th><th>Kuota</th><th>Terisi</th><th>Catatan</th><th>Aksi</th></tr></thead>
+    <tbody>${slots.map(s => {
+      const d   = new Date(s.tanggal + 'T00:00:00');
+      const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      return `<tr>
+        <td><span class="badge badge-${s.tipe==='offline'?'blue':'teal'}">${s.tipe}</span></td>
+        <td>${tgl}</td>
+        <td>${s.jam}</td>
+        <td>${s.kuota}</td>
+        <td>${s.booked}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${s.catatan || '—'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s)})'>Edit</button>
+          <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+function filterAdminSlots(tipe, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = tipe === 'all' ? state.allSlots : state.allSlots.filter(s => s.tipe === tipe);
+  renderAdminSlots(filtered);
+}
+
+function openSlotModal() {
+  document.getElementById('modal-slot-title').textContent = 'Tambah Slot Baru';
+  document.getElementById('slot-edit-id').value  = '';
+  document.getElementById('slot-tipe').value     = 'offline';
+  document.getElementById('slot-tanggal').value  = '';
+  document.getElementById('slot-jam').value      = '';
+  document.getElementById('slot-kuota').value    = '5';
+  document.getElementById('slot-catatan').value  = '';
+  document.getElementById('slot-save-btn').textContent = 'Simpan Slot';
+  openModal('modal-slot');
+}
+
+function editSlot(s) {
+  document.getElementById('modal-slot-title').textContent = 'Edit Slot';
+  document.getElementById('slot-edit-id').value  = s.id;
+  document.getElementById('slot-tipe').value     = s.tipe;
+  document.getElementById('slot-tanggal').value  = s.tanggal;
+  document.getElementById('slot-jam').value      = s.jam;
+  document.getElementById('slot-kuota').value    = s.kuota;
+  document.getElementById('slot-catatan').value  = s.catatan || '';
+  document.getElementById('slot-save-btn').textContent = 'Update Slot';
+  openModal('modal-slot');
+}
+
+async function saveSlot() {
+  const id      = document.getElementById('slot-edit-id').value;
+  const tipe    = document.getElementById('slot-tipe').value;
+  const tanggal = document.getElementById('slot-tanggal').value;
+  const jam     = document.getElementById('slot-jam').value;
+  const kuota   = document.getElementById('slot-kuota').value;
+  const catatan = document.getElementById('slot-catatan').value;
+
+  if (!tanggal || !jam) return toast('Tanggal dan jam wajib diisi', 'error');
+
+  const action = id ? 'updateSlot' : 'createSlot';
+  const params = { tipe, tanggal, jam, kuota, catatan, token: state.token };
+  if (id) params.id = id;
+
+  const btn = document.getElementById('slot-save-btn');
+  btn.disabled = true;
+  const res = await api(action, params, 'POST');
+  btn.disabled = false;
+
+  if (!res.success) return toast(res.message, 'error');
+  toast(id ? 'Slot diperbarui!' : 'Slot ditambahkan!', 'success');
+  closeModal('modal-slot');
+  loadAdminSlots();
+}
+
+async function deleteSlotConfirm(id) {
+  if (!confirm('Hapus slot ini? Tindakan tidak dapat dibatalkan.')) return;
+  const res = await api('deleteSlot', { id, token: state.token }, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Slot dihapus', 'info');
+  loadAdminSlots();
+}
+
+// ============================================================
+// ADMIN — BOOKINGS
+// ============================================================
+async function loadAdminBookings() {
+  const c = document.getElementById('admin-bookings-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
+  const res = await api('getAllBookings', { token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+  state.allBookings = res.bookings;
+  renderAdminBookings(state.allBookings);
+}
+
+function renderAdminBookings(bookings) {
+  const c = document.getElementById('admin-bookings-container');
+  if (!bookings.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada reservasi</p></div>';
+    return;
+  }
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Mahasiswa</th><th>Foto</th><th>Slot</th><th>Status</th><th>Aksi</th></tr></thead>
+    <tbody>${bookings.map(b => bookingRow(b, true)).join('')}</tbody>
+  </table></div>`;
+}
+
+function bookingRow(b, withFoto = false) {
+  const slot = b.slot || {};
+  const mhs  = b.mahasiswa || {};
+  const d    = slot.tanggal ? new Date(slot.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '—';
+  const statusMap = {
+    menunggu: 'badge-amber', terselenggara: 'badge-green',
+    tidak_terselenggara: 'badge-rose', dibatalkan: 'badge-slate'
+  };
+  const statusLabel = {
+    menunggu: 'Menunggu', terselenggara: 'Terselenggara',
+    tidak_terselenggara: 'Tidak Terjadi', dibatalkan: 'Dibatalkan'
+  };
+  const fotoCell = withFoto
+    ? `<td>${mhs.foto ? `<img src="${mhs.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>` : '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:white;font-weight:700">' + (mhs.nama||'?').charAt(0) + '</div>'}</td>`
+    : '';
+
+  return `<tr>
+    <td>
+      <div style="font-weight:600">${mhs.nama || b.kode}</div>
+      <div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div>
+    </td>
+    ${fotoCell}
+    <td>
+      <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span>
+      <div style="font-size:0.82rem">${d} ${slot.jam||''}</div>
+    </td>
+    <td><span class="badge ${statusMap[b.status]||'badge-slate'}">${statusLabel[b.status]||b.status}</span></td>
+    <td>
+      ${b.status === 'menunggu'
+        ? `<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b)})'>Validasi</button>`
+        : `<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`}
+    </td>
+  </tr>`;
+}
+
+function filterBookings(status, btn) {
+  document.querySelectorAll('#a-bookings .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = status === 'all' ? state.allBookings : state.allBookings.filter(b => b.status === status);
+  renderAdminBookings(filtered);
+}
+
+function openValidasi(b) {
+  state.pendingValidateId = b.id;
+  const slot = b.slot || {};
+  const mhs  = b.mahasiswa || {};
+  const d    = slot.tanggal ? new Date(slot.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) : '—';
+  document.getElementById('validasi-content').innerHTML = `
+    <div class="card" style="background:var(--card2);margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        ${mhs.foto ? `<img src="${mhs.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover"/>` : `<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;font-weight:700">${(mhs.nama||'?').charAt(0)}</div>`}
+        <div>
+          <div style="font-weight:700">${mhs.nama || b.kode}</div>
+          <div style="font-size:0.82rem;color:var(--text2)">${b.kode}</div>
+        </div>
+      </div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe||'—'}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span><b>${d}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jam</span><b>${slot.jam||'—'}</b></div>
+      </div>
+    </div>`;
+  document.getElementById('validasi-catatan').value = '';
+  openModal('modal-validasi');
+}
+
+async function doValidate(status) {
+  const catatan = document.getElementById('validasi-catatan').value;
+  const res = await api('validateBooking', { bookId: state.pendingValidateId, status, catatan, token: state.token }, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi divalidasi: ' + status.replace('_', ' '), 'success');
+  closeModal('modal-validasi');
+  state.pendingValidateId = null;
+  loadAdminBookings();
+  loadAdminDashboard();
+}
+
+// ============================================================
+// ADMIN — MAHASISWA
+// ============================================================
+async function loadAdminUsers() {
+  const c = document.getElementById('admin-users-container');
+  c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
+  const res = await api('getAllUsers', { token: state.token });
+  if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
+  state.allUsers = res.users;
+  renderAdminUsers(state.allUsers);
+}
+
+function renderAdminUsers(users) {
+  const c = document.getElementById('admin-users-container');
+  if (!users.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa terdaftar</p></div>';
+    return;
+  }
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Email</th><th>Terdaftar</th><th>Aksi</th></tr></thead>
+    <tbody>${users.map(u => `<tr>
+      <td>${u.foto ? `<img src="${u.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)"/>` : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:white;font-weight:700">${(u.nama||'?').charAt(0)}</div>`}</td>
+      <td style="font-weight:600">${u.nama}</td>
+      <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${u.kode}</code></td>
+      <td style="color:var(--text2)">${u.email}</td>
+      <td style="color:var(--text3);font-size:0.8rem">${u.createdAt ? new Date(u.createdAt).toLocaleDateString('id-ID') : '—'}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="viewMhsDetail('${u.kode}','${u.nama}')">Detail</button>
+        <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}')">Hapus</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function filterUsers(q) {
+  const filtered = state.allUsers.filter(u =>
+    u.nama.toLowerCase().includes(q.toLowerCase()) ||
+    u.kode.toLowerCase().includes(q.toLowerCase())
+  );
+  renderAdminUsers(filtered);
+}
+
+async function viewMhsDetail(kode, nama) {
+  document.getElementById('detail-mhs-title').textContent = 'Detail — ' + nama;
+  document.getElementById('detail-mhs-content').innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+  openModal('modal-detail-mhs');
+
+  const [bookRes, histRes, progRes] = await Promise.all([
+    api('getAllBookings', { token: state.token }),
+    api('getAllBookings', { token: state.token }),
+    api('getDashboardStats', { token: state.token }),
+  ]);
+
+  const bookings = (bookRes.bookings || []).filter(b => b.kode === kode);
+  const statusLabel = { menunggu: 'Menunggu', terselenggara: 'Terselenggara', tidak_terselenggara: 'Tidak Terjadi', dibatalkan: 'Dibatalkan' };
+  const statusCls   = { menunggu: 'badge-amber', terselenggara: 'badge-green', tidak_terselenggara: 'badge-rose', dibatalkan: 'badge-slate' };
+
+  document.getElementById('detail-mhs-content').innerHTML = `
+    <div style="margin-bottom:16px">
+      <h3 style="margin-bottom:10px;font-size:0.95rem">Riwayat Reservasi (${bookings.length})</h3>
+      ${bookings.length
+        ? `<div class="table-wrap"><table>
+            <thead><tr><th>Slot</th><th>Tgl</th><th>Status</th></tr></thead>
+            <tbody>${bookings.map(b => `<tr>
+              <td><span class="badge badge-${b.slot?.tipe==='offline'?'blue':'teal'}">${b.slot?.tipe||'—'}</span></td>
+              <td>${b.slot?.tanggal ? new Date(b.slot.tanggal+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '—'} ${b.slot?.jam||''}</td>
+              <td><span class="badge ${statusCls[b.status]||'badge-slate'}">${statusLabel[b.status]||b.status}</span></td>
+            </tr>`).join('')}</tbody>
+          </table></div>`
+        : '<p style="color:var(--text3);font-size:0.88rem">Belum ada reservasi</p>'}
+    </div>`;
+}
+
+async function deleteUserConfirm(kode) {
+  if (!confirm(`Hapus mahasiswa dengan kode "${kode}"? Tindakan tidak dapat dibatalkan.`)) return;
+  const res = await api('deleteUser', { kode, token: state.token }, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Mahasiswa dihapus', 'info');
+  loadAdminUsers();
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
