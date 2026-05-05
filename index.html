@@ -1395,7 +1395,6 @@ function renderDosenSlots(slots) {
     return; 
   }
 
-  // PERBAIKAN: Ambil tanggal lokal sesuai zona waktu perangkat
   const now = new Date();
   const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
 
@@ -1404,19 +1403,15 @@ function renderDosenSlots(slots) {
     <tbody>${slots.map(s => {
       const terisi = s.bookedBy && s.bookedBy !== '';
       
-      // LOGIKA HANGUS: Jika ditandai hangus dari database ATAU jika (belum dipesan + lewat tanggal lokal)
       const isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
       
-      // Pengaturan Badge Status
       let badgeStatus = '';
       if (terisi) badgeStatus = '<span class="badge badge-rose">Terisi</span>';
       else if (isHangus) badgeStatus = '<span class="badge badge-slate" style="opacity:0.7">Hangus</span>';
       else badgeStatus = '<span class="badge badge-green">Tersedia</span>';
 
-      // Pengaturan Tombol Aksi (Sembunyikan jika hangus)
       let aksiHTML = '';
       if (isHangus) {
-        // Teks ditambahkan sesuai permintaan
         aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Slot ini sudah kadaluarsa</small></span>';
       } else {
         aksiHTML = `
@@ -1475,18 +1470,37 @@ async function saveSlot() {
   const jamMulai=document.getElementById('slot-jam-mulai').value;
   const jamSelesai=document.getElementById('slot-jam-selesai').value;
   const catatan=document.getElementById('slot-catatan').value;
+  
   if (!tanggal||!jamMulai||!jamSelesai) return toast('Tanggal dan jam wajib diisi','error');
   if (jamSelesai<=jamMulai) return toast('Jam selesai harus setelah jam mulai','error');
+
+  // --- TAMBAHAN VALIDASI: CEK DUPLIKASI JADWAL ---
+  // Mencegah pembuatan double slot karena salah klik atau jaringan lambat
+  const isDuplicate = state.dosenSlots.some(s => 
+    s.tanggal === tanggal && 
+    s.jamMulai === jamMulai && 
+    s.id !== id // Abaikan diri sendiri kalau sedang edit slot
+  );
+  if (isDuplicate) {
+    return toast('Sesi pada Tanggal dan Jam Mulai ini sudah ada!', 'error');
+  }
+  // ----------------------------------------------
+
   const btn=document.getElementById('slot-save-btn');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+  
   const action=id?'updateSlot':'createSlot';
   const params={tipe,tanggal,jamMulai,jamSelesai,catatan,token:state.token};
   if (id) params.id=id;
+  
   const res=await api(action,params,'POST');
+  
   btn.disabled=false; btn.textContent=id?'Update Sesi':'Simpan Sesi';
   if (!res.success) return toast(res.message,'error');
+  
   toast(id?'Sesi diperbarui!':'Sesi ditambahkan!','success');
-  closeModal('modal-slot'); loadDosenSlots();
+  closeModal('modal-slot'); 
+  loadDosenSlots();
 }
 
 async function deleteSlotConfirm(id) {
