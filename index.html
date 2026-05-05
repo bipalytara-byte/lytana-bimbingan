@@ -1395,14 +1395,16 @@ function renderDosenSlots(slots) {
     return; 
   }
 
-  const todayStr = new Date().toISOString().split('T')[0]; // Mendapatkan YYYY-MM-DD hari ini
+  // PERBAIKAN: Ambil tanggal lokal sesuai zona waktu perangkat
+  const now = new Date();
+  const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
 
   c.innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th><th>Aksi</th></tr></thead>
     <tbody>${slots.map(s => {
       const terisi = s.bookedBy && s.bookedBy !== '';
       
-      // LOGIKA HANGUS: Jika ditandai hangus dari database ATAU jika (belum dipesan + lewat tanggal)
+      // LOGIKA HANGUS: Jika ditandai hangus dari database ATAU jika (belum dipesan + lewat tanggal lokal)
       const isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
       
       // Pengaturan Badge Status
@@ -1414,7 +1416,8 @@ function renderDosenSlots(slots) {
       // Pengaturan Tombol Aksi (Sembunyikan jika hangus)
       let aksiHTML = '';
       if (isHangus) {
-        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic">Terkunci</span>';
+        // Teks ditambahkan sesuai permintaan
+        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Slot ini sudah kadaluarsa</small></span>';
       } else {
         aksiHTML = `
           <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button>
