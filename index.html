@@ -21,429 +21,94 @@
   --font:'Plus Jakarta Sans',sans-serif;--font2:'Sora',sans-serif;
 }
 body{font-family:var(--font);background:var(--navy);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(37,99,235,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
 #app{position:relative;z-index:1}
-h1,h2,h3{font-family:var(--font2);font-weight:700;line-height:1.25}
-h1{font-size:2rem}h2{font-size:1.4rem}h3{font-size:1.1rem}
-p{color:var(--text2)}
+h1,h2,h3{font-family:var(--font2);font-weight:700}
 .page{display:none;min-height:100vh}.page.active{display:block}
-.container{max-width:1100px;margin:0 auto;padding:0 20px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
-.topbar{position:sticky;top:0;z-index:100;background:rgba(15,28,46,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 20px}
-.topbar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{font-family:var(--font2);font-weight:700;font-size:1.25rem;color:var(--sky);letter-spacing:-0.02em}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.user-chip{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border2);border-radius:40px;padding:5px 12px 5px 5px;font-size:0.82rem;color:var(--text2)}
-.avatar-ph{border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;color:white;flex-shrink:0}
-.role-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.04em}
-.role-badge.dosen{background:rgba(249,115,22,0.15);color:var(--orange)}
-.role-badge.admin{background:rgba(245,158,11,0.15);color:var(--amber)}
-.nav-tabs{display:flex;gap:4px;background:var(--card);border-radius:10px;padding:4px}
-.nav-tab{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:0.82rem;font-weight:500;color:var(--text2);transition:all .2s;border:none;background:none}
-.nav-tab.active{background:var(--blue);color:white}
-.nav-tab:hover:not(.active){color:var(--text);background:var(--card2)}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
-.card-sm{padding:16px;border-radius:var(--radius2)}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:0.82rem;font-weight:600;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase}
-.form-input,.form-select,.form-textarea{background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:var(--radius2);padding:11px 14px;color:var(--text);font-family:var(--font);font-size:0.92rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
-.form-select option{background:var(--navy2)}
-.form-textarea{resize:vertical;min-height:80px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--radius2);font-family:var(--font);font-size:0.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
-.btn-primary{background:var(--blue);color:white}.btn-primary:hover:not(:disabled){background:var(--blue2);box-shadow:0 4px 16px rgba(37,99,235,0.4)}
-.btn-teal{background:var(--teal);color:white}.btn-teal:hover:not(:disabled){background:var(--teal2)}
-.btn-orange{background:var(--orange);color:white}.btn-orange:hover:not(:disabled){filter:brightness(1.1)}
-.btn-rose{background:rgba(244,63,94,0.15);color:var(--rose);border:1px solid rgba(244,63,94,0.3)}.btn-rose:hover:not(:disabled){background:rgba(244,63,94,0.25)}
-.btn-ghost{background:var(--card2);color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover:not(:disabled){color:var(--text)}
-.btn-amber{background:var(--amber);color:var(--navy)}
-.btn-sm{padding:6px 12px;font-size:0.8rem}.btn-lg{padding:14px 28px;font-size:0.95rem}.btn-full{width:100%}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600}
-.badge-green{background:rgba(16,185,129,0.15);color:var(--green)}
-.badge-amber{background:rgba(245,158,11,0.15);color:var(--amber)}
-.badge-rose{background:rgba(244,63,94,0.15);color:var(--rose)}
-.badge-blue{background:rgba(37,99,235,0.15);color:var(--blue2)}
-.badge-slate{background:rgba(148,163,184,0.15);color:var(--slate)}
-.badge-teal{background:rgba(20,184,166,0.15);color:var(--teal2)}
-.badge-orange{background:rgba(249,115,22,0.15);color:var(--orange)}
-#toast-container{position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{background:var(--navy2);border:1px solid var(--border2);border-radius:var(--radius2);padding:12px 16px;font-size:0.88rem;color:var(--text);box-shadow:var(--shadow);animation:slideIn .3s ease;pointer-events:all;min-width:260px;max-width:340px;display:flex;align-items:center;gap:10px}
-.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--rose)}.toast.info{border-left:3px solid var(--blue2)}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.modal-overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
-.modal-lg{max-width:660px}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.4rem;line-height:1;padding:4px}
-.modal-close:hover{color:var(--text)}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
-.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.slot-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .2s}
-.slot-card:hover{border-color:var(--border2);background:var(--card2)}
-.slot-card.full{opacity:0.65}
-.slot-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.slot-type-badge{padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
-.slot-type-badge.offline{background:rgba(139,92,246,0.2);color:var(--purple)}
-.slot-type-badge.online{background:rgba(56,189,248,0.2);color:var(--sky)}
-.slot-quota-bar{height:4px;background:var(--border);border-radius:4px;margin:12px 0 8px;overflow:hidden}
-.slot-quota-fill{height:100%;border-radius:4px;transition:width .5s}
-.slot-quota-fill.low{background:var(--green)}.slot-quota-fill.high{background:var(--rose)}
-.prog-bar{height:8px;background:var(--border);border-radius:8px;overflow:hidden}
-.prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--teal2));transition:width .5s}
-.prog-bab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:500px){.prog-bab-grid{grid-template-columns:1fr}}
-.prog-bab-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;display:flex;flex-direction:column;gap:8px}
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:0.87rem}
-th{padding:12px 14px;text-align:left;font-size:0.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;background:var(--card);border-bottom:1px solid var(--border)}
-td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--card2)}
-.stat-card{text-align:center;padding:20px}
-.stat-number{font-size:2.2rem;font-weight:700;font-family:var(--font2);line-height:1;margin:8px 0 4px}
-.stat-label{font-size:0.82rem;color:var(--text2)}
-.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.form-label{font-size:0.82rem;font-weight:600;color:var(--text2);text-transform:uppercase}
+.form-input,.form-select,.form-textarea{background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:var(--radius2);padding:11px 14px;color:var(--text);width:100%}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:var(--radius2);font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--blue);color:white}
+.btn-orange{background:var(--orange);color:white}
+.btn-ghost{background:var(--card2);color:var(--text2);border:1px solid var(--border2)}
+.btn-teal{background:var(--teal);color:white}
+.btn-full{width:100%}.btn-sm{padding:6px 12px;font-size:0.8rem}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(15,28,46,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 20px}
+.topbar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-tabs{display:flex;gap:4px;background:var(--card);border-radius:10px;padding:4px}
+.nav-tab{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:0.82rem;color:var(--text2);border:none;background:none}
+.nav-tab.active{background:var(--blue);color:white}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:40px;padding:5px 12px}
+.avatar-ph{border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;color:white}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center}
 .login-box{width:100%;max-width:440px}
-.login-logo{text-align:center;margin-bottom:36px}
-.login-logo h1{font-size:2.8rem;background:linear-gradient(135deg,var(--sky),var(--teal2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.03em}
-.login-logo h1 span{background:inherit;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.login-logo p{color:var(--text2);font-size:0.8rem;margin-top:8px;line-height:1.5;max-width:320px;margin-left:auto;margin-right:auto}
-.login-tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:4px;margin-bottom:24px}
-.login-tab{flex:1;padding:8px;border-radius:7px;text-align:center;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--text2);border:none;background:none;transition:all .2s}
-.login-tab.active{background:var(--blue);color:white}
-.login-tab.active-dosen{background:var(--orange);color:white}
-.register-role-tabs{display:flex;gap:8px;margin-bottom:16px}
-.role-tab{flex:1;padding:10px;border-radius:var(--radius2);text-align:center;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--text2);border:2px solid var(--border2);background:var(--card);transition:all .2s}
-.role-tab.active-mhs{border-color:var(--blue);color:var(--blue2);background:rgba(37,99,235,0.08)}
-.role-tab.active-dosen{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,0.08)}
-.login-form-section{display:none}
-.login-form-section.active{display:flex;flex-direction:column;gap:14px}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.section-title h2{font-size:1.25rem}
-.section-title p{font-size:0.85rem;color:var(--text2);margin-top:2px}
 .main-content{padding:28px 20px;max-width:1100px;margin:0 auto}
-.page-section{display:none}.page-section.active{display:block}
-.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
-.type-selector{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.type-card{padding:20px;border-radius:var(--radius);border:2px solid var(--border);cursor:pointer;text-align:center;transition:all .2s;background:var(--card)}
-.type-card:hover{border-color:var(--border2)}
-.type-card.selected.offline{border-color:var(--purple);background:rgba(139,92,246,0.1)}
-.type-card.selected.online{border-color:var(--sky);background:rgba(56,189,248,0.1)}
-.type-card .type-icon{font-size:2rem;margin-bottom:8px}
-.type-card .type-name{font-weight:700;font-size:1rem}
-.type-card .type-desc{font-size:0.8rem;color:var(--text2);margin-top:4px}
-.empty-state{text-align:center;padding:48px 24px}
-.empty-state .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.5}
-.empty-state p{color:var(--text2)}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+#toast-container{position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--navy2);border-radius:var(--radius2);padding:12px 16px;font-size:0.88rem;color:var(--text);border-left:4px solid var(--blue2)}
+.photo-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border2)}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{display:flex;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--text2)}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.filter-btn{padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--card);color:var(--text2);transition:all .2s}
-.filter-btn.active{background:var(--blue);color:white;border-color:var(--blue)}
-.timeline{display:flex;flex-direction:column;gap:0}
-.timeline-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
-.timeline-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
-.timeline-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700}
-.timeline-dot.green{background:rgba(16,185,129,0.2);color:var(--green);border:2px solid var(--green)}
-.timeline-dot.rose{background:rgba(244,63,94,0.2);color:var(--rose);border:2px solid var(--rose)}
-.timeline-dot.amber{background:rgba(245,158,11,0.2);color:var(--amber);border:2px solid var(--amber)}
-.timeline-dot.slate{background:rgba(148,163,184,0.15);color:var(--slate);border:2px solid var(--slate)}
-.timeline-body{flex:1;padding-top:4px}
-.timeline-body .meta{font-size:0.78rem;color:var(--text3);margin-top:4px}
-.photo-upload-area{border:2px dashed var(--border2);border-radius:var(--radius2);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
-.photo-upload-area:hover{border-color:var(--blue2);background:rgba(37,99,235,0.05)}
-.photo-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--border2)}
-.student-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .2s;cursor:pointer}
-.student-card:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px)}
-.search-wrap{position:relative}.search-wrap .form-input{padding-left:36px}
-.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)}
-.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.03em}
-.status-aktif_bimbingan{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
-.status-tidak_aktif{background:rgba(148,163,184,0.15);color:var(--slate);border:1px solid rgba(148,163,184,0.3)}
-.status-revisi{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)}
-.status-menunggu_sidang{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)}
-.status-lulus{background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3)}
-.rekap-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:24px}
-.rekap-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;text-align:center}
-.rekap-stat .num{font-size:1.8rem;font-weight:700;font-family:var(--font2);line-height:1;margin-bottom:4px}
-.rekap-stat .lbl{font-size:0.75rem;color:var(--text2)}
-@keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:0.6}}
-.inaktif-warn{animation:pulse-warn 2s ease-in-out infinite}
 </style>
 </head>
 <body>
 <div id="app">
 <div id="toast-container"></div>
 
-<!-- ==================== LOGIN PAGE ==================== -->
+<!-- PAGE LOGIN -->
 <div id="page-login" class="page active">
-<div class="login-page"><div class="login-box">
-  <div class="login-logo">
-    <h1><span>Lytana</span></h1>
-    <p>Linkage of Your Technical Appointment & Network Assistance</p>
-  </div>
-  <div class="card">
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="switchLoginTab('login')">Masuk</button>
-      <button class="login-tab" onclick="switchLoginTab('register')">Daftar Baru</button>
+  <div class="login-page"><div class="login-box">
+    <div style="text-align:center;margin-bottom:30px">
+      <h1 style="color:var(--sky)">Lytana</h1>
+      <p style="font-size:0.8rem">Linkage of Your Technical Appointment & Network Assistance</p>
     </div>
-
-    <!-- LOGIN -->
-    <div id="login-form" class="login-form-section active">
+    <div class="card">
       <div class="form-group">
-        <label class="form-label">Kode Login <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">(kode unik + NIM, contoh: budi2311033)</span></label>
-        <input id="login-kode" class="form-input" type="text" placeholder="Contoh: budi2311033" autocomplete="off"/>
+        <label class="form-label">Kode Login</label>
+        <input id="login-kode" class="form-input" type="text" placeholder="Masukkan kode unik/NIM"/>
       </div>
-      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()"><span id="login-btn-text">Masuk</span></button>
-      <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Belum punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('register')">Daftar Baru</b></p>
-      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:4px">Lupa kode login? Hubungi <b>BAAK</b> untuk reset akun.</p>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="register-form" class="login-form-section">
-      <div class="register-role-tabs">
-        <div class="role-tab active-mhs" id="rtab-mhs" onclick="switchRegisterRole('mahasiswa')">🎓 Mahasiswa</div>
-        <div class="role-tab" id="rtab-dosen" onclick="switchRegisterRole('dosen')">👨‍🏫 Dosen</div>
-      </div>
-      <!-- Form Mahasiswa -->
-      <div id="reg-mhs-form" style="display:flex;flex-direction:column;gap:12px">
-        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
-          🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b>.
-        </div>
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="form-label">Kode Unik <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">min. 4 karakter</span></label>
-            <input id="reg-kode-unik" class="form-input" type="text" placeholder="Contoh: budi" maxlength="20" oninput="previewKodeLogin()"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">NIM <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">7 digit angka</span></label>
-            <input id="reg-nim" class="form-input" type="text" inputmode="numeric" placeholder="Contoh: 2311033" maxlength="7" oninput="previewKodeLogin()"/>
-          </div>
-        </div>
-        <div id="kode-login-preview" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem">
-          <span style="color:var(--text2)">Kode login kamu: </span>
-          <b id="kode-login-gabungan" style="color:var(--blue2);font-family:monospace;font-size:1rem;letter-spacing:0.02em"></b>
-          <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">⚠️ Simpan kode ini baik-baik. Jika lupa, hubungi BAAK.</div>
-        </div>
-        <div id="warn-kode-login" style="display:none;font-size:0.78rem;color:var(--rose);margin-top:-6px"></div>
-        <div class="form-group"><label class="form-label">Nama Lengkap</label>
-          <input id="reg-nama" class="form-input" type="text" placeholder="Sesuai KTM"/></div>
-        <div class="form-group"><label class="form-label">Email</label>
-          <input id="reg-email" class="form-input" type="email" placeholder="email aktif kamu"/></div>
-        <div class="grid-2">
-          <div class="form-group"><label class="form-label">Pembimbing 1</label>
-            <select id="reg-dosen1" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
-          <div class="form-group"><label class="form-label">Pembimbing 2</label>
-            <select id="reg-dosen2" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
-        </div>
-        <div id="warn-pembimbing" style="display:none;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:8px;padding:8px 12px;font-size:0.82rem;color:var(--rose)">
-          ⚠️ Pembimbing 1 dan Pembimbing 2 tidak boleh dosen yang sama
-        </div>
-        <button class="btn btn-primary btn-full" onclick="doRegister()"><span id="reg-btn-text">Buat Akun Mahasiswa</span></button>
-      </div>
-      
-      <!-- Form Dosen -->
-      <div id="reg-dosen-form" style="display:none;flex-direction:column;gap:12px">
-        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
-          👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
-        </div>
-        <div class="form-group">
-          <label class="form-label" style="color:var(--orange)">🔑 Token Keamanan</label>
-          <input id="dreg-token" class="form-input" type="password" placeholder="Masukkan token dari Admin" style="border-color:var(--orange)"/>
-        </div>
-        <div class="form-group"><label class="form-label">Kode Unik</label>
-          <input id="dreg-kode" class="form-input" type="text" placeholder="Buat Kode Unik Untuk Login"/></div>
-        <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
-          <input id="dreg-nama" class="form-input" type="text" placeholder="Dr. Budi Santoso, M.Kom"/></div>
-        <div class="form-group"><label class="form-label">Email</label>
-          <input id="dreg-email" class="form-input" type="email" placeholder="dosen@kampus.ac.id"/></div>
-        <div class="form-group"><label class="form-label">Program Studi</label>
-          <select id="dreg-prodi" class="form-select">
-            <option value="">-- Pilih Program Studi --</option>
-            <option value="S1 Teknik Informatika">S1 Teknik Informatika</option>
-            <option value="S1 Sistem Informasi">S1 Sistem Informasi</option>
-            <option value="D3 Manajemen Informatika">D3 Manajemen Informatika</option>
-          </select></div>
-        <button class="btn btn-orange btn-full" onclick="doRegisterDosen()"><span id="dreg-btn-text">Buat Akun Dosen</span></button>
-      </div>
-      <p style="text-align:center;font-size:0.82rem;color:var(--text3);margin-top:4px">Sudah punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('login')">Masuk</b></p>
-    </div>
-  </div>
-  <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text3)">© 2026 Lytana — Powered by Skuro Production</p>
-</div></div>
-</div>
-
-<!-- ==================== MAHASISWA PAGE ==================== -->
-<div id="page-mahasiswa" class="page">
-  <div class="topbar"><div class="topbar-inner">
-    <div class="logo">Lytana</div>
-    <div class="nav-tabs">
-      <button class="nav-tab active" onclick="mSwitch('reservasi')">Reservasi</button>
-      <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
-      <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
-      <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
-    </div>
-    <div class="topbar-right">
-      <div class="user-chip"><div id="m-avatar-wrap"></div><span id="m-nama-chip">—</span></div>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+      <button class="btn btn-primary btn-full" onclick="doLogin()"><span id="login-btn-text">Masuk</span></button>
     </div>
   </div></div>
-  <div class="main-content">
-    <div id="m-reservasi" class="page-section active">
-      <div class="section-header">
-        <div class="section-title"><h2>Reservasi Bimbingan</h2><p id="m-dosen-label">Pilih jenis sesi bimbingan</p></div>
-      </div>
-      <div class="type-selector">
-        <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
-          <div class="type-icon">🏢</div><div class="type-name">Offline</div><div class="type-desc">Tatap muka di kampus</div>
-        </div>
-        <div class="type-card online" id="type-online" onclick="selectType('online')">
-          <div class="type-icon">💻</div><div class="type-name">Online</div><div class="type-desc">Via Zoom / Google Meet</div>
-        </div>
-      </div>
-      <div id="slots-container"><div class="empty-state"><div class="empty-icon">👆</div><p>Pilih jenis bimbingan di atas</p></div></div>
-    </div>
-    <div id="m-riwayat" class="page-section">
-      <div class="section-header">
-        <div class="section-title"><h2>Riwayat Bimbingan</h2><p>Rekap semua aktivitas bimbingan</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="loadMyHistory()">↻ Refresh</button>
-      </div>
-      <div id="history-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
-    </div>
-    <div id="m-progres" class="page-section">
-      <div class="section-header">
-        <div class="section-title"><h2>Progres Skripsi</h2><p>Pantau kemajuan pengerjaan</p></div>
-        <button class="btn btn-primary btn-sm" onclick="openProgresModal()">+ Update Progres</button>
-      </div>
-      <div id="progres-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
-    </div>
-    <div id="m-profil" class="page-section">
-      <div class="section-header"><div class="section-title"><h2>Profil Saya</h2></div></div>
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-bottom:16px">Informasi Akun</h3>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="form-group"><label class="form-label">Kode Unik</label><input id="profil-kode" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="profil-nama" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Email</label><input id="profil-email" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="grid-2">
-              <div class="form-group"><label class="form-label">Pembimbing 1</label><input id="profil-dosen1" class="form-input" readonly style="opacity:.7"/></div>
-              <div class="form-group"><label class="form-label">Pembimbing 2</label><input id="profil-dosen2" class="form-input" readonly style="opacity:.7"/></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h3 style="margin-bottom:16px">Foto Profil</h3>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-            <div id="profil-foto-wrap"></div>
-            <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewFoto(event)"/></label>
-            <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
-              <img id="foto-preview" src="" class="photo-preview"/>
-              <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
-            </div>
-            <small style="color:var(--text3);text-align:center">Maks 2MB. Foto dilihat oleh dosen.</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ==================== DOSEN PAGE ==================== -->
+<!-- PAGE DOSEN -->
 <div id="page-dosen" class="page">
   <div class="topbar"><div class="topbar-inner">
-    <div class="logo">Lytana</div>
+    <div style="font-weight:700;color:var(--sky)">Lytana</div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="dSwitch('dashboard')">Dashboard</button>
-      <button class="nav-tab" onclick="dSwitch('sesi')">Sesi</button>
-      <button class="nav-tab" onclick="dSwitch('reservasi')">Reservasi</button>
-      <button class="nav-tab" onclick="dSwitch('mahasiswa')">Mahasiswa</button>
       <button class="nav-tab" onclick="dSwitch('profil')">Profil</button>
     </div>
-    <div class="topbar-right">
-      <div class="user-chip">
-        <div id="d-avatar-wrap"></div>
-        <span id="d-nama-chip">—</span>
-        <span class="role-badge dosen">DOSEN</span>
-      </div>
+    <div class="user-chip">
+      <div id="d-avatar-wrap"></div>
+      <span id="d-nama-chip">—</span>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
     </div>
   </div></div>
   <div class="main-content">
     <div id="d-dashboard" class="page-section active">
-      <div class="section-header">
-        <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
-      </div>
-      <div class="grid-3" style="margin-bottom:24px">
-        <div class="card stat-card"><div class="stat-label">Mahasiswa Bimbingan</div><div class="stat-number" id="d-stat-mhs" style="color:var(--blue2)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Sesi Aktif</div><div class="stat-number" id="d-stat-sesi" style="color:var(--teal2)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-number" id="d-stat-pending" style="color:var(--amber)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Sesi Tersedia</div><div class="stat-number" id="d-stat-tersedia" style="color:var(--green)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Sesi Terisi</div><div class="stat-number" id="d-stat-terisi" style="color:var(--purple)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Terselenggara</div><div class="stat-number" id="d-stat-done" style="color:var(--green)">—</div></div>
-      </div>
-      <div id="d-recent-bookings"><div class="loading-overlay"><div class="spinner"></div></div></div>
-    </div>
-    <div id="d-sesi" class="page-section">
-      <div class="section-header">
-        <div class="section-title"><h2>Manajemen Sesi</h2><p>Buat dan kelola sesi bimbinganmu</p></div>
-        <button class="btn btn-orange" onclick="openSlotModal()">+ Tambah Sesi</button>
-      </div>
-      <div id="d-slots-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
-    </div>
-    <div id="d-reservasi" class="page-section">
-      <div class="section-header">
-        <div class="section-title"><h2>Daftar Reservasi</h2><p>Validasi kehadiran bimbingan mahasiswamu</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="loadDosenBookings()">↻ Refresh</button>
-      </div>
-      <div id="d-bookings-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
-    </div>
-    <div id="d-mahasiswa" class="page-section">
-      <div class="section-header">
-        <div class="section-title"><h2>Mahasiswa Bimbingan</h2><p>Lihat progress dan data mahasiswamu</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="loadDosenStudents()">↻ Refresh</button>
-      </div>
-      <div class="search-wrap" style="margin-bottom:16px;max-width:320px">
-        <span class="search-icon">🔍</span>
-        <input class="form-input" id="d-search-mhs" type="text" placeholder="Cari nama atau kode..." oninput="filterDosenStudents(this.value)"/>
-      </div>
-      <div id="d-students-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+      <h2>Selamat Datang, Dosen!</h2>
     </div>
     <div id="d-profil" class="page-section">
-      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2></div></div>
-      <div class="grid-2">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="card">
-          <h3 style="margin-bottom:16px">Informasi Akun</h3>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="form-group">
-              <label class="form-label">Kode Dosen (Kode Login)</label>
-              <input id="d-profil-kode" class="form-input"/>
-            </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:4px; width: fit-content;" onclick="updateKodeDosen(this)">Simpan Kode Baru</button>
-            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7"/></div>
+          <h3>Informasi Akun</h3>
+          <div class="form-group">
+            <label class="form-label">Kode Dosen (Login)</label>
+            <input id="d-profil-kode" class="form-input"/>
           </div>
+          <button class="btn btn-primary btn-sm" onclick="updateKodeDosen(this)">Simpan Kode Baru</button>
+          <div class="form-group"><label class="form-label">Nama</label><input id="d-profil-nama" class="form-input" readonly/></div>
         </div>
-        <div class="card">
-          <h3 style="margin-bottom:16px">Foto Profil</h3>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-            <div id="d-profil-foto-wrap"></div>
-            <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="d-foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewDosenFoto(event)"/></label>
-            <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
-              <img id="d-foto-preview" src="" class="photo-preview"/>
-              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload Foto</button>
-            </div>
+        <div class="card" style="text-align:center">
+          <h3>Foto Profil</h3>
+          <div id="d-profil-foto-wrap" style="margin:20px 0"></div>
+          <input type="file" id="d-foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewDosenFoto(event)"/>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('d-foto-input').click()">Pilih Foto</button>
+          <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;margin-top:10px">
+            <img id="d-foto-preview" class="photo-preview"/>
+            <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()" style="margin-top:10px">Upload Foto</button>
           </div>
         </div>
       </div>
@@ -451,74 +116,37 @@ tr:hover td{background:var(--card2)}
   </div>
 </div>
 
-<!-- ==================== ADMIN PAGE (省略) ==================== -->
-<div id="page-admin" class="page">
-  <!-- Content Super Admin -->
 </div>
 
-<!-- ==================== MODALS ==================== -->
-<div class="modal-overlay" id="modal-slot">
-  <div class="modal">
-    <div class="modal-header"><h3 id="modal-slot-title">Tambah Sesi Baru</h3><button class="modal-close" onclick="closeModal('modal-slot')">×</button></div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="form-group"><label class="form-label">Jenis Bimbingan</label>
-        <select id="slot-tipe" class="form-select"><option value="offline">🏢 Offline — Tatap muka</option><option value="online">💻 Online — Zoom / Meet</option></select></div>
-      <div class="form-group"><label class="form-label">Tanggal</label><input id="slot-tanggal" class="form-input" type="date"/></div>
-      <div class="grid-2">
-        <div class="form-group"><label class="form-label">Jam Mulai</label><input id="slot-jam-mulai" class="form-input" type="time"/></div>
-        <div class="form-group"><label class="form-label">Jam Selesai</label><input id="slot-jam-selesai" class="form-input" type="time"/></div>
-      </div>
-      <div class="form-group"><label class="form-label">Catatan / Link Meeting</label>
-        <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang 301, https://zoom.us/..., dsb."/></div>
-      <input type="hidden" id="slot-edit-id"/>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button>
-      <button class="btn btn-orange" id="slot-save-btn" onclick="saveSlot()">Simpan Sesi</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Validasi, Progres, dll (省略 agar kode tidak terlalu panjang) -->
-
-</div>
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6pBW3mvuDY045_aq86yuSoXaSZuW33DnZQAPnkpvSC6-G4U724Ys8RQiizNz4rwZVLg/exec';
+let state = { user:null, token:null };
 
-let state = {
-  user:null, token:null, selectedType:null,
-  slots:[], allBookings:[], allSlots:[], allUsers:[], allDosen:[],
-  dosenSlots:[], dosenBookings:[], dosenStudents:[],
-  pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null
-};
+// HELPERS
+function toast(msg, type='info') {
+  const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
 
-// ============================================================
-// HELPERS & PHOTO COMPRESSOR
-// ============================================================
-function renderAvatar(foto, nama, size=28) {
-  const letter = (nama||'?').charAt(0).toUpperCase();
-  const fz = size * 0.4;
-  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}px;flex-shrink:0">${letter}</div>`;
-  if (!foto || foto.trim()==='') return fallback;
-  const safeFallback = fallback.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${safeFallback}'"/>`;
+function renderAvatar(foto, nama, size=30) {
+  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%">${nama[0]}</div>`;
+  if (!foto) return fallback;
+  const safeFallback = fallback.replace(/"/g, "&quot;");
+  return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover" onerror="this.outerHTML='${safeFallback}'"/>`;
 }
 
 function compressImage(file, maxSize, callback) {
-  if (!file.type.match(/image\/(jpeg|png)/)) {
-    return toast('Hanya file JPG dan PNG yang diperbolehkan', 'error');
-  }
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = (e) => {
     const img = new Image();
-    img.onload = function() {
+    img.onload = () => {
       const canvas = document.createElement('canvas');
-      let width = img.width; let height = img.height;
-      if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } }
-      else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
-      canvas.width = width; canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+      let w = img.width, h = img.height;
+      if (w > h) { if(w > maxSize){ h*=maxSize/w; w=maxSize; } }
+      else { if(h > maxSize){ w*=maxSize/h; h=maxSize; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       callback(canvas.toDataURL('image/jpeg', 0.8));
     };
     img.src = e.target.result;
@@ -526,84 +154,89 @@ function compressImage(file, maxSize, callback) {
   reader.readAsDataURL(file);
 }
 
-// ============================================================
-// API & ACTIONS
-// ============================================================
-async function api(action, params={}, method='GET') {
-  try {
-    let url, options;
-    if (method==='GET') {
-      url = GAS_URL+'?'+new URLSearchParams({action,...params}).toString();
-      options = {method:'GET'};
-    } else {
-      url = GAS_URL;
-      options = {method:'POST', body:JSON.stringify({action, token:state.token, ...params})};
-    }
-    const res = await fetch(url, options);
-    return await res.json();
-  } catch(err) { return {success:false, message:'Koneksi gagal: '+err.message}; }
+// API
+async function api(action, params={}, method='POST') {
+  const options = { method: 'POST', body: JSON.stringify({ action, token: state.token, ...params }) };
+  const res = await fetch(GAS_URL, options);
+  return await res.json();
 }
 
-function toast(msg, type='info') {
-  const icons={success:'✓',error:'✕',info:'ℹ'};
-  const el=document.createElement('div');
-  el.className='toast '+type;
-  el.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(()=>el.remove(), 3500);
+// LOGIC
+async function doLogin() {
+  const kode = document.getElementById('login-kode').value.trim();
+  if(!kode) return toast('Masukkan kode');
+  const btn = document.getElementById('login-btn-text'); btn.innerHTML='<div class="spinner"></div>';
+  const res = await api('login', {kode});
+  btn.textContent='Masuk';
+  if(!res.success) return toast(res.message);
+  state.token = res.token; state.user = res.user;
+  localStorage.setItem('lytana_token', res.token);
+  localStorage.setItem('lytana_user', JSON.stringify(res.user));
+  if(res.user.role === 'dosen') { showPage('dosen'); fillDosenProfil(); updateDosenChip(); }
+  else { toast('Halaman mahasiswa belum dimuat di contoh ini'); }
 }
 
-// ============================================================
-// DOSEN — PROFIL & KODE
-// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+
+function dSwitch(s) {
+  document.querySelectorAll('#page-dosen .page-section').forEach(x=>x.classList.remove('active'));
+  document.getElementById('d-'+s).classList.add('active');
+  if(s==='profil') fillDosenProfil();
+}
+
+function updateDosenChip() {
+  document.getElementById('d-nama-chip').textContent = state.user.nama;
+  document.getElementById('d-avatar-wrap').innerHTML = renderAvatar(state.user.foto, state.user.nama);
+}
+
 function fillDosenProfil() {
-  const u=state.user;
-  document.getElementById('d-profil-kode').value=u.kode||'';
-  document.getElementById('d-profil-nama').value=u.nama||'';
-  document.getElementById('d-profil-email').value=u.email||'';
-  document.getElementById('d-profil-prodi').value=u.prodi||'';
-  document.getElementById('d-profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
+  document.getElementById('d-profil-kode').value = state.user.kode;
+  document.getElementById('d-profil-nama').value = state.user.nama;
+  document.getElementById('d-profil-foto-wrap').innerHTML = renderAvatar(state.user.foto, state.user.nama, 80);
 }
 
-async function updateKodeDosen(btn) {
-  const newKode = document.getElementById('d-profil-kode').value.trim();
-  if(!newKode || newKode.length < 4) return toast('Kode Dosen minimal 4 karakter', 'error');
-  if(newKode === state.user.kode) return toast('Tidak ada perubahan kode', 'info');
-  if(!confirm('Yakin ingin merubah kode login Anda? Jika iya, Anda akan diminta login kembali.')) return;
-  const oldText = btn.textContent;
-  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>';
-  const res = await api('updateDosenProfile', {newKode}, 'POST');
-  btn.disabled = false; btn.textContent = oldText;
-  if(!res.success) return toast(res.message, 'error');
-  toast('Kode berhasil diupdate! Silakan login kembali.', 'success');
-  setTimeout(() => doLogout(), 2500);
-}
-
-let compressedDosenFoto = null;
-function previewDosenFoto(event) {
-  const file = event.target.files[0]; if(!file) return;
-  compressImage(file, 400, (dataUrl) => {
-    document.getElementById('d-foto-preview').src = dataUrl;
-    document.getElementById('d-foto-preview-wrap').style.display = 'flex';
-    document.getElementById('d-profil-foto-wrap').style.display = 'none';
-    compressedDosenFoto = dataUrl;
+let compressedFoto = null;
+function previewDosenFoto(e) {
+  const file = e.target.files[0];
+  compressImage(file, 400, (url) => {
+    compressedFoto = url;
+    document.getElementById('d-foto-preview').src = url;
+    document.getElementById('d-foto-preview-wrap').style.display='flex';
   });
 }
 
 async function uploadDosenFoto() {
-  if(!compressedDosenFoto) return;
-  toast('Mengupload foto...', 'info');
-  const res = await api('uploadPhotoDosen', {base64:compressedDosenFoto.split(',')[1], mimeType:'image/jpeg'}, 'POST');
-  if (!res.success) return toast(res.message, 'error');
-  toast('Foto berhasil diupload!', 'success');
-  state.user.foto = res.url;
-  localStorage.setItem('lytana_user', JSON.stringify(state.user));
-  document.getElementById('d-foto-preview-wrap').style.display = 'none';
-  document.getElementById('d-profil-foto-wrap').style.display = 'flex';
-  fillDosenProfil(); updateDosenChip();
+  const res = await api('uploadPhotoDosen', { base64: compressedFoto.split(',')[1] });
+  if(res.success) { 
+    state.user.foto = res.url; 
+    localStorage.setItem('lytana_user', JSON.stringify(state.user));
+    updateDosenChip(); fillDosenProfil();
+    document.getElementById('d-foto-preview-wrap').style.display='none';
+    toast('Foto diperbarui');
+  }
 }
 
-// ... Fungsi lainnya seperti doLogin, saveSlot, dll tetap sama ...
+async function updateKodeDosen(btn) {
+  const newKode = document.getElementById('d-profil-kode').value.trim();
+  const res = await api('updateDosenProfile', {newKode});
+  if(res.success) { toast('Kode diubah, silakan login ulang'); setTimeout(()=>doLogout(), 2000); }
+  else { toast(res.message); }
+}
+
+function doLogout() {
+  localStorage.clear(); location.reload();
+}
+
+// Auto Login
+(function(){
+  const t=localStorage.getItem('lytana_token'), u=localStorage.getItem('lytana_user');
+  if(t && u) { state.token=t; state.user=JSON.parse(u); 
+    if(state.user.role==='dosen') { showPage('dosen'); updateDosenChip(); }
+  }
+})();
 </script>
 </body>
 </html>
