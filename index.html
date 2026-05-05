@@ -32,6 +32,7 @@ p{color:var(--text2)}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+/* Topbar */
 .topbar{position:sticky;top:0;z-index:100;background:rgba(15,28,46,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 20px}
 .topbar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .logo{font-family:var(--font2);font-weight:700;font-size:1.25rem;color:var(--sky);letter-spacing:-0.02em}
@@ -45,14 +46,17 @@ p{color:var(--text2)}
 .nav-tab{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:0.82rem;font-weight:500;color:var(--text2);transition:all .2s;border:none;background:none}
 .nav-tab.active{background:var(--blue);color:white}
 .nav-tab:hover:not(.active){color:var(--text);background:var(--card2)}
+/* Cards */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
 .card-sm{padding:16px;border-radius:var(--radius2)}
+/* Forms */
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-label{font-size:0.82rem;font-weight:600;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase}
 .form-input,.form-select,.form-textarea{background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:var(--radius2);padding:11px 14px;color:var(--text);font-family:var(--font);font-size:0.92rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
 .form-select option{background:var(--navy2)}
 .form-textarea{resize:vertical;min-height:80px}
+/* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--radius2);font-family:var(--font);font-size:0.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
 .btn:disabled{opacity:0.5;cursor:not-allowed}
 .btn-primary{background:var(--blue);color:white}.btn-primary:hover:not(:disabled){background:var(--blue2);box-shadow:0 4px 16px rgba(37,99,235,0.4)}
@@ -62,6 +66,7 @@ p{color:var(--text2)}
 .btn-ghost{background:var(--card2);color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover:not(:disabled){color:var(--text)}
 .btn-amber{background:var(--amber);color:var(--navy)}
 .btn-sm{padding:6px 12px;font-size:0.8rem}.btn-lg{padding:14px 28px;font-size:0.95rem}.btn-full{width:100%}
+/* Badges */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600}
 .badge-green{background:rgba(16,185,129,0.15);color:var(--green)}
 .badge-amber{background:rgba(245,158,11,0.15);color:var(--amber)}
@@ -70,10 +75,12 @@ p{color:var(--text2)}
 .badge-slate{background:rgba(148,163,184,0.15);color:var(--slate)}
 .badge-teal{background:rgba(20,184,166,0.15);color:var(--teal2)}
 .badge-orange{background:rgba(249,115,22,0.15);color:var(--orange)}
+/* Toast */
 #toast-container{position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{background:var(--navy2);border:1px solid var(--border2);border-radius:var(--radius2);padding:12px 16px;font-size:0.88rem;color:var(--text);box-shadow:var(--shadow);animation:slideIn .3s ease;pointer-events:all;min-width:260px;max-width:340px;display:flex;align-items:center;gap:10px}
 .toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--rose)}.toast.info{border-left:3px solid var(--blue2)}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
 .modal{background:var(--navy2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
@@ -83,6 +90,7 @@ p{color:var(--text2)}
 .modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.4rem;line-height:1;padding:4px}
 .modal-close:hover{color:var(--text)}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+/* Slot cards */
 .slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .slot-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .2s}
 .slot-card:hover{border-color:var(--border2);background:var(--card2)}
@@ -94,20 +102,24 @@ p{color:var(--text2)}
 .slot-quota-bar{height:4px;background:var(--border);border-radius:4px;margin:12px 0 8px;overflow:hidden}
 .slot-quota-fill{height:100%;border-radius:4px;transition:width .5s}
 .slot-quota-fill.low{background:var(--green)}.slot-quota-fill.high{background:var(--rose)}
+/* Progress */
 .prog-bar{height:8px;background:var(--border);border-radius:8px;overflow:hidden}
 .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--teal2));transition:width .5s}
 .prog-bab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:500px){.prog-bab-grid{grid-template-columns:1fr}}
 .prog-bab-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;display:flex;flex-direction:column;gap:8px}
+/* Table */
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:0.87rem}
 th{padding:12px 14px;text-align:left;font-size:0.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;background:var(--card);border-bottom:1px solid var(--border)}
 td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--card2)}
+/* Stat cards */
 .stat-card{text-align:center;padding:20px}
 .stat-number{font-size:2.2rem;font-weight:700;font-family:var(--font2);line-height:1;margin:8px 0 4px}
 .stat-label{font-size:0.82rem;color:var(--text2)}
+/* Login */
 .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
 .login-box{width:100%;max-width:440px}
 .login-logo{text-align:center;margin-bottom:36px}
@@ -124,12 +136,14 @@ tr:hover td{background:var(--card2)}
 .role-tab.active-dosen{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,0.08)}
 .login-form-section{display:none}
 .login-form-section.active{display:flex;flex-direction:column;gap:14px}
+/* Section */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
 .section-title h2{font-size:1.25rem}
 .section-title p{font-size:0.85rem;color:var(--text2);margin-top:2px}
 .main-content{padding:28px 20px;max-width:1100px;margin:0 auto}
 .page-section{display:none}.page-section.active{display:block}
 .divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+/* Type selector */
 .type-selector{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
 .type-card{padding:20px;border-radius:var(--radius);border:2px solid var(--border);cursor:pointer;text-align:center;transition:all .2s;background:var(--card)}
 .type-card:hover{border-color:var(--border2)}
@@ -138,15 +152,18 @@ tr:hover td{background:var(--card2)}
 .type-card .type-icon{font-size:2rem;margin-bottom:8px}
 .type-card .type-name{font-weight:700;font-size:1rem}
 .type-card .type-desc{font-size:0.8rem;color:var(--text2);margin-top:4px}
+/* Empty & loading */
 .empty-state{text-align:center;padding:48px 24px}
 .empty-state .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.5}
 .empty-state p{color:var(--text2)}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-overlay{display:flex;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--text2)}
+/* Filter */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
 .filter-btn{padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--card);color:var(--text2);transition:all .2s}
 .filter-btn.active{background:var(--blue);color:white;border-color:var(--blue)}
+/* Timeline */
 .timeline{display:flex;flex-direction:column;gap:0}
 .timeline-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
 .timeline-item:not(:last-child)::before{content:'absolute';left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
@@ -157,23 +174,28 @@ tr:hover td{background:var(--card2)}
 .timeline-dot.slate{background:rgba(148,163,184,0.15);color:var(--slate);border:2px solid var(--slate)}
 .timeline-body{flex:1;padding-top:4px}
 .timeline-body .meta{font-size:0.78rem;color:var(--text3);margin-top:4px}
+/* Photo upload */
 .photo-upload-area{border:2px dashed var(--border2);border-radius:var(--radius2);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
 .photo-upload-area:hover{border-color:var(--blue2);background:rgba(37,99,235,0.05)}
 .photo-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--border2)}
+/* Student card */
 .student-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .2s;cursor:pointer}
 .student-card:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px)}
 .search-wrap{position:relative}.search-wrap .form-input{padding-left:36px}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)}
+/* Status Skripsi Badges */
 .status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.03em}
 .status-aktif_bimbingan{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
 .status-tidak_aktif{background:rgba(148,163,184,0.15);color:var(--slate);border:1px solid rgba(148,163,184,0.3)}
 .status-revisi{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)}
 .status-menunggu_sidang{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)}
 .status-lulus{background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3)}
+/* Rekap export panel */
 .rekap-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:24px}
 .rekap-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;text-align:center}
 .rekap-stat .num{font-size:1.8rem;font-weight:700;font-family:var(--font2);line-height:1;margin-bottom:4px}
 .rekap-stat .lbl{font-size:0.75rem;color:var(--text2)}
+/* Inaktif warning pulse */
 @keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:0.6}}
 .inaktif-warn{animation:pulse-warn 2s ease-in-out infinite}
 </style>
@@ -215,9 +237,10 @@ tr:hover td{background:var(--card2)}
       <!-- Form Mahasiswa -->
       <div id="reg-mhs-form" style="display:flex;flex-direction:column;gap:12px">
         <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
-          🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>.
+          🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b>.
         </div>
 
+        <!-- Input kode unik dan NIM terpisah, digabung otomatis -->
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">Kode Unik <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">min. 4 karakter</span></label>
@@ -229,6 +252,7 @@ tr:hover td{background:var(--card2)}
           </div>
         </div>
 
+        <!-- Preview kode login gabungan -->
         <div id="kode-login-preview" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem">
           <span style="color:var(--text2)">Kode login kamu: </span>
           <b id="kode-login-gabungan" style="color:var(--blue2);font-family:monospace;font-size:1rem;letter-spacing:0.02em"></b>
@@ -241,6 +265,7 @@ tr:hover td{background:var(--card2)}
         <div class="form-group"><label class="form-label">Email</label>
           <input id="reg-email" class="form-input" type="email" placeholder="email aktif kamu"/></div>
 
+        <!-- DROPDOWN DUAL PEMBIMBING -->
         <div class="grid-2">
           <div class="form-group"><label class="form-label">Pembimbing 1</label>
             <select id="reg-dosen1" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
@@ -259,10 +284,13 @@ tr:hover td{background:var(--card2)}
         <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
           👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
         </div>
+        
+        <!-- KOLOM TOKEN KEAMANAN -->
         <div class="form-group">
           <label class="form-label" style="color:var(--orange)">🔑 Token Keamanan</label>
           <input id="dreg-token" class="form-input" type="password" placeholder="Masukkan token dari Admin" style="border-color:var(--orange)"/>
         </div>
+        
         <div class="form-group"><label class="form-label">Kode Unik</label>
           <input id="dreg-kode" class="form-input" type="text" placeholder="Buat Kode Unik Untuk Login"/></div>
         <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
@@ -342,10 +370,12 @@ tr:hover td{background:var(--card2)}
             <div class="form-group"><label class="form-label">Kode Unik</label><input id="profil-kode" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="profil-nama" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Email</label><input id="profil-email" class="form-input" readonly style="opacity:.7"/></div>
+            
             <div class="grid-2">
               <div class="form-group"><label class="form-label">Pembimbing 1</label><input id="profil-dosen1" class="form-input" readonly style="opacity:.7"/></div>
               <div class="form-group"><label class="form-label">Pembimbing 2</label><input id="profil-dosen2" class="form-input" readonly style="opacity:.7"/></div>
             </div>
+
           </div>
         </div>
         <div class="card">
@@ -353,12 +383,12 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="foto-input" accept=".jpg, .jpeg, .png" style="display:none" onchange="previewFoto(event)"/></label>
+              <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="previewFoto(event)"/></label>
             <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="foto-preview" src="" class="photo-preview"/>
               <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
             </div>
-            <small style="color:var(--text3);text-align:center">Hanya JPG/PNG. Otomatis dikompres & dipotong bulat.</small>
+            <small style="color:var(--text3);text-align:center">Maks 2MB. Foto dilihat oleh dosen.</small>
           </div>
         </div>
       </div>
@@ -458,17 +488,15 @@ tr:hover td{background:var(--card2)}
     </div>
 
     <div id="d-profil" class="page-section">
-      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2><p>Kelola data dan kredensial akun</p></div></div>
+      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2></div></div>
       <div class="grid-2">
         <div class="card">
           <h3 style="margin-bottom:16px">Informasi Akun</h3>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="form-group"><label class="form-label">Kode Dosen (Login)</label><input id="d-profil-kode" class="form-input" /></div>
-            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" /></div>
-            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" type="email" /></div>
-            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7; background:rgba(0,0,0,0.2); cursor:not-allowed"/></div>
-            
-            <button class="btn btn-primary" style="margin-top:8px" onclick="simpanProfilDosen()">Simpan Perubahan Profil</button>
+            <div class="form-group"><label class="form-label">Kode Dosen</label><input id="d-profil-kode" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7"/></div>
           </div>
         </div>
         <div class="card">
@@ -476,12 +504,11 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="d-profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="d-foto-input" accept=".jpg, .jpeg, .png" style="display:none" onchange="previewDosenFoto(event)"/></label>
+              <input type="file" id="d-foto-input" accept="image/*" style="display:none" onchange="previewDosenFoto(event)"/></label>
             <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="d-foto-preview" src="" class="photo-preview"/>
-              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload & Terapkan Foto</button>
+              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload Foto</button>
             </div>
-            <small style="color:var(--text3);text-align:center">Hanya JPG/PNG. Otomatis dikompres & dipotong bulat.</small>
           </div>
         </div>
       </div>
@@ -590,7 +617,9 @@ tr:hover td{background:var(--card2)}
           <button class="btn btn-amber btn-sm" onclick="exportAkademikCSV()">⬇ Export CSV</button>
         </div>
       </div>
+      <!-- Summary bar -->
       <div id="a-rekap-summary" class="rekap-summary"></div>
+      <!-- Filter -->
       <div class="filter-row" id="a-rekap-filter">
         <button class="filter-btn active" onclick="filterRekap('semua',this)">Semua</button>
         <button class="filter-btn" onclick="filterRekap('aktif_bimbingan',this)">Aktif Bimbingan</button>
@@ -599,6 +628,7 @@ tr:hover td{background:var(--card2)}
         <button class="filter-btn" onclick="filterRekap('menunggu_sidang',this)">Menunggu Sidang</button>
         <button class="filter-btn" onclick="filterRekap('lulus',this)">Lulus</button>
       </div>
+      <!-- Per-dosen breakdown -->
       <div id="a-rekap-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
 
@@ -606,24 +636,132 @@ tr:hover td{background:var(--card2)}
 </div>
 
 <!-- ==================== MODALS ==================== -->
-<div class="modal-overlay" id="modal-booking"><div class="modal"><div class="modal-header"><h3>Konfirmasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-booking')">×</button></div><div id="modal-booking-content"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-booking')">Batal</button><button class="btn btn-primary" id="modal-booking-btn" onclick="confirmBooking()">Konfirmasi Reservasi</button></div></div></div>
 
-<div class="modal-overlay" id="modal-progres"><div class="modal"><div class="modal-header"><h3>Update Progres Skripsi</h3><button class="modal-close" onclick="closeModal('modal-progres')">×</button></div><div style="display:flex;flex-direction:column;gap:14px"><div class="form-group"><label class="form-label">Bab / Bagian</label><select id="prog-bab" class="form-select"><option value="Bab 1">Bab 1 — Pendahuluan</option><option value="Bab 2">Bab 2 — Tinjauan Pustaka</option><option value="Bab 3">Bab 3 — Metodologi</option><option value="Bab 4">Bab 4 — Hasil & Pembahasan</option><option value="Bab 5">Bab 5 — Kesimpulan</option><option value="Revisi">Revisi</option></select></div><div class="form-group"><label class="form-label">Persentase: <span id="prog-pct-label" style="color:var(--blue2)">50%</span></label><input type="range" id="prog-pct" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('prog-pct-label').textContent=this.value+'%'"/></div><div class="form-group"><label class="form-label">Catatan</label><textarea id="prog-catatan" class="form-textarea" placeholder="Progres, kendala, dsb."></textarea></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-progres')">Batal</button><button class="btn btn-teal" onclick="saveProgress()">Simpan</button></div></div></div>
+<!-- Modal Booking Konfirmasi -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-header"><h3>Konfirmasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-booking')">×</button></div>
+    <div id="modal-booking-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Batal</button>
+      <button class="btn btn-primary" id="modal-booking-btn" onclick="confirmBooking()">Konfirmasi Reservasi</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="modal-slot"><div class="modal"><div class="modal-header"><h3 id="modal-slot-title">Tambah Sesi Baru</h3><button class="modal-close" onclick="closeModal('modal-slot')">×</button></div><div style="display:flex;flex-direction:column;gap:14px"><div class="form-group"><label class="form-label">Jenis Bimbingan</label><select id="slot-tipe" class="form-select"><option value="offline">🏢 Offline — Tatap muka</option><option value="online">💻 Online — Zoom / Meet</option></select></div><div class="form-group"><label class="form-label">Tanggal</label><input id="slot-tanggal" class="form-input" type="date"/></div><div class="grid-2"><div class="form-group"><label class="form-label">Jam Mulai</label><input id="slot-jam-mulai" class="form-input" type="time"/></div><div class="form-group"><label class="form-label">Jam Selesai</label><input id="slot-jam-selesai" class="form-input" type="time"/></div></div><div class="form-group"><label class="form-label">Catatan / Link Meeting</label><input id="slot-catatan" class="form-input" type="text" placeholder="Ruang 301, https://zoom.us/..., dsb."/></div><input type="hidden" id="slot-edit-id"/><div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">💡 Setiap sesi hanya bisa dipesan oleh <b style="color:var(--text)">1 mahasiswa</b>.</div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button><button class="btn btn-orange" id="slot-save-btn" onclick="saveSlot()">Simpan Sesi</button></div></div></div>
+<!-- Modal Progres -->
+<div class="modal-overlay" id="modal-progres">
+  <div class="modal">
+    <div class="modal-header"><h3>Update Progres Skripsi</h3><button class="modal-close" onclick="closeModal('modal-progres')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Bab / Bagian</label>
+        <select id="prog-bab" class="form-select">
+          <option value="Bab 1">Bab 1 — Pendahuluan</option><option value="Bab 2">Bab 2 — Tinjauan Pustaka</option>
+          <option value="Bab 3">Bab 3 — Metodologi</option><option value="Bab 4">Bab 4 — Hasil & Pembahasan</option>
+          <option value="Bab 5">Bab 5 — Kesimpulan</option><option value="Revisi">Revisi</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Persentase: <span id="prog-pct-label" style="color:var(--blue2)">50%</span></label>
+        <input type="range" id="prog-pct" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('prog-pct-label').textContent=this.value+'%'"/></div>
+      <div class="form-group"><label class="form-label">Catatan</label>
+        <textarea id="prog-catatan" class="form-textarea" placeholder="Progres, kendala, dsb."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-progres')">Batal</button>
+      <button class="btn btn-teal" onclick="saveProgress()">Simpan</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="modal-validasi"><div class="modal"><div class="modal-header"><h3>Validasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-validasi')">×</button></div><div id="validasi-content"></div><div style="margin-top:16px"><div class="form-group"><label class="form-label">Catatan (opsional)</label><textarea id="validasi-catatan" class="form-textarea" placeholder="Topik yang dibahas, tindak lanjut, dsb."></textarea></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-validasi')">Batal</button><button class="btn btn-rose" onclick="doValidate('tidak_terselenggara')">Tidak Terjadi</button><button class="btn btn-teal" onclick="doValidate('terselenggara')">✓ Terselenggara</button></div></div></div>
+<!-- Modal Sesi (Dosen) -->
+<div class="modal-overlay" id="modal-slot">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-slot-title">Tambah Sesi Baru</h3><button class="modal-close" onclick="closeModal('modal-slot')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Jenis Bimbingan</label>
+        <select id="slot-tipe" class="form-select"><option value="offline">🏢 Offline — Tatap muka</option><option value="online">💻 Online — Zoom / Meet</option></select></div>
+      <div class="form-group"><label class="form-label">Tanggal</label><input id="slot-tanggal" class="form-input" type="date"/></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Jam Mulai</label><input id="slot-jam-mulai" class="form-input" type="time"/></div>
+        <div class="form-group"><label class="form-label">Jam Selesai</label><input id="slot-jam-selesai" class="form-input" type="time"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Catatan / Link Meeting</label>
+        <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang 301, https://zoom.us/..., dsb."/></div>
+      <input type="hidden" id="slot-edit-id"/>
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+        💡 Setiap sesi hanya bisa dipesan oleh <b style="color:var(--text)">1 mahasiswa</b>.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button>
+      <button class="btn btn-orange" id="slot-save-btn" onclick="saveSlot()">Simpan Sesi</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="modal-student-detail"><div class="modal modal-lg"><div class="modal-header"><h3 id="modal-student-title">Detail Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-student-detail')">×</button></div><div id="modal-student-content"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-student-detail')">Tutup</button></div></div></div>
+<!-- Modal Validasi -->
+<div class="modal-overlay" id="modal-validasi">
+  <div class="modal">
+    <div class="modal-header"><h3>Validasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-validasi')">×</button></div>
+    <div id="validasi-content"></div>
+    <div style="margin-top:16px"><div class="form-group"><label class="form-label">Catatan (opsional)</label>
+      <textarea id="validasi-catatan" class="form-textarea" placeholder="Topik yang dibahas, tindak lanjut, dsb."></textarea></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-validasi')">Batal</button>
+      <button class="btn btn-rose" onclick="doValidate('tidak_terselenggara')">Tidak Terjadi</button>
+      <button class="btn btn-teal" onclick="doValidate('terselenggara')">✓ Terselenggara</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="modal-reset-kode"><div class="modal"><div class="modal-header"><h3>Reset Kode Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-reset-kode')">×</button></div><div style="display:flex;flex-direction:column;gap:14px"><div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">⚠️ Mahasiswa harus login ulang menggunakan kode baru setelah direset.</div><div class="form-group"><label class="form-label">Kode Lama</label><input id="reset-kode-lama" class="form-input" readonly style="opacity:.7"/></div><div class="form-group"><label class="form-label">Kode Baru</label><input id="reset-kode-baru" class="form-input" type="text" placeholder="Min. 4 karakter"/></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-reset-kode')">Batal</button><button class="btn btn-amber" onclick="doResetKode()">Reset Kode</button></div></div></div>
+<!-- Modal Detail Mahasiswa (Dosen) -->
+<div class="modal-overlay" id="modal-student-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h3 id="modal-student-title">Detail Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-student-detail')">×</button></div>
+    <div id="modal-student-content"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-student-detail')">Tutup</button></div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="modal-set-status"><div class="modal"><div class="modal-header"><h3>Ubah Status Skripsi</h3><button class="modal-close" onclick="closeModal('modal-set-status')">×</button></div><div style="display:flex;flex-direction:column;gap:10px" id="modal-set-status-content"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px"><button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)" onclick="confirmSetStatus('aktif_bimbingan')">✅ Aktif Bimbingan</button><button class="btn btn-sm" style="background:rgba(148,163,184,0.15);color:var(--slate);border:1px solid rgba(148,163,184,0.3)" onclick="confirmSetStatus('tidak_aktif')">⏸ Tidak Aktif</button><button class="btn btn-sm" style="background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)" onclick="confirmSetStatus('revisi')">✏️ Revisi</button><button class="btn btn-sm" style="background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)" onclick="confirmSetStatus('menunggu_sidang')">🏛 Menunggu Sidang</button><button class="btn btn-sm" style="background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3);grid-column:1/-1" onclick="confirmSetStatus('lulus')">🎓 Lulus / Wisuda</button></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-set-status')">Batal</button></div></div></div>
+<!-- Modal Reset Kode (Admin) -->
+<div class="modal-overlay" id="modal-reset-kode">
+  <div class="modal">
+    <div class="modal-header"><h3>Reset Kode Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-reset-kode')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+        ⚠️ Mahasiswa harus login ulang menggunakan kode baru setelah direset.
+      </div>
+      <div class="form-group"><label class="form-label">Kode Lama</label><input id="reset-kode-lama" class="form-input" readonly style="opacity:.7"/></div>
+      <div class="form-group"><label class="form-label">Kode Baru</label><input id="reset-kode-baru" class="form-input" type="text" placeholder="Min. 4 karakter"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reset-kode')">Batal</button>
+      <button class="btn btn-amber" onclick="doResetKode()">Reset Kode</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Set Status Skripsi -->
+<div class="modal-overlay" id="modal-set-status">
+  <div class="modal">
+    <div class="modal-header"><h3>Ubah Status Skripsi</h3><button class="modal-close" onclick="closeModal('modal-set-status')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="modal-set-status-content"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)" onclick="confirmSetStatus('aktif_bimbingan')">✅ Aktif Bimbingan</button>
+      <button class="btn btn-sm" style="background:rgba(148,163,184,0.15);color:var(--slate);border:1px solid rgba(148,163,184,0.3)" onclick="confirmSetStatus('tidak_aktif')">⏸ Tidak Aktif</button>
+      <button class="btn btn-sm" style="background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)" onclick="confirmSetStatus('revisi')">✏️ Revisi</button>
+      <button class="btn btn-sm" style="background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)" onclick="confirmSetStatus('menunggu_sidang')">🏛 Menunggu Sidang</button>
+      <button class="btn btn-sm" style="background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3);grid-column:1/-1" onclick="confirmSetStatus('lulus')">🎓 Lulus / Wisuda</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-set-status')">Batal</button>
+    </div>
+  </div>
+</div>
 
 </div><!-- /#app -->
 <script>
 // ============================================================
-// URL DEPLOYMENT GOOGLE APPS SCRIPT-MU
+// GANTI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT-MU
 // ============================================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6pBW3mvuDY045_aq86yuSoXaSZuW33DnZQAPnkpvSC6-G4U724Ys8RQiizNz4rwZVLg/exec';
 // ============================================================
@@ -635,42 +773,20 @@ let state = {
   pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null
 };
 
-let pendingDosenFoto = null;
-let pendingMhsFoto = null;
-
-function compressImage(file, maxSize=256) {
-  return new Promise((resolve, reject) => {
-    if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) return reject('Format tidak didukung. Hanya JPG/PNG.');
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = event => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width, height = img.height;
-        if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } 
-        else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
-        canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#162336'; ctx.fillRect(0, 0, width, height); ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.8));
-      };
-      img.onerror = () => reject('Gagal memproses gambar');
-    };
-    reader.onerror = () => reject('Gagal membaca file');
-  });
-}
-
+// ============================================================
+// AVATAR FALLBACK HELPER (Anti Broken Image)
+// ============================================================
 function renderAvatar(foto, nama, size=28) {
   const letter = (nama||'?').charAt(0).toUpperCase();
   const fz = size * 0.4;
-  return `<div style="position:relative; width:${size}px; height:${size}px; flex-shrink:0; border-radius:50%; overflow:hidden; border:2px solid var(--border2); background:linear-gradient(135deg,var(--blue),var(--purple))">
-            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:700;color:white;position:absolute;inset:0;z-index:1">${letter}</div>
-            ${foto && foto.trim() !== '' && foto !== 'null' ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:2" onerror="this.style.display='none'"/>` : ''}
-          </div>`;
+  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}px;flex-shrink:0">${letter}</div>`;
+  if (!foto || foto.trim()==='') return fallback;
+  return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${fallback.replace(/'/g, "\\'")}'"/>`;
 }
 
+// ============================================================
+// API
+// ============================================================
 async function api(action, params={}, method='GET') {
   try {
     let url, options;
@@ -686,6 +802,9 @@ async function api(action, params={}, method='GET') {
   } catch(err) { return {success:false, message:'Koneksi gagal: '+err.message}; }
 }
 
+// ============================================================
+// TOAST & MODAL
+// ============================================================
 function toast(msg, type='info') {
   const icons={success:'✓',error:'✕',info:'ℹ'};
   const el=document.createElement('div');
@@ -698,6 +817,9 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
 
+// ============================================================
+// DATE HELPER
+// ============================================================
 function fmtTgl(tglStr, opts) {
   if (!tglStr||tglStr.length<8) return '—';
   const d=new Date(tglStr+'T00:00:00');
@@ -705,6 +827,9 @@ function fmtTgl(tglStr, opts) {
   return d.toLocaleDateString('id-ID', opts||{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
+// ============================================================
+// PAGE NAV
+// ============================================================
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -713,21 +838,35 @@ function mSwitch(s) {
   document.querySelectorAll('#page-mahasiswa .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('m-'+s).classList.add('active');
   document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t,i)=>t.classList.toggle('active',['reservasi','riwayat','progres','profil'][i]===s));
-  if(s==='riwayat') loadMyHistory(); if(s==='progres') loadMyProgress(); if(s==='profil') fillProfil();
+  if(s==='riwayat') loadMyHistory();
+  if(s==='progres') loadMyProgress();
+  if(s==='profil')  fillProfil();
 }
 function dSwitch(s) {
   document.querySelectorAll('#page-dosen .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('d-'+s).classList.add('active');
   document.querySelectorAll('#page-dosen .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','sesi','reservasi','mahasiswa','profil'][i]===s));
-  if(s==='dashboard') loadDosenDashboard(); if(s==='sesi') loadDosenSlots(); if(s==='reservasi') loadDosenBookings(); if(s==='mahasiswa') loadDosenStudents(); if(s==='profil') fillDosenProfil();
+  if(s==='dashboard') loadDosenDashboard();
+  if(s==='sesi')      loadDosenSlots();
+  if(s==='reservasi') loadDosenBookings();
+  if(s==='mahasiswa') loadDosenStudents();
+  if(s==='profil')    fillDosenProfil();
 }
 function aSwitch(s) {
   document.querySelectorAll('#page-admin .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('a-'+s).classList.add('active');
   document.querySelectorAll('#page-admin .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','dosen','mahasiswa','bookings','slots','rekap'][i]===s));
-  if(s==='dashboard') loadAdminDashboard(); if(s==='dosen') loadAdminDosen(); if(s==='mahasiswa') loadAdminUsers(); if(s==='bookings') loadAdminBookings(); if(s==='slots') loadAdminSlots(); if(s==='rekap') loadAkademikRekap();
+  if(s==='dashboard') loadAdminDashboard();
+  if(s==='dosen')     loadAdminDosen();
+  if(s==='mahasiswa') loadAdminUsers();
+  if(s==='bookings')  loadAdminBookings();
+  if(s==='slots')     loadAdminSlots();
+  if(s==='rekap')     loadAkademikRekap();
 }
 
+// ============================================================
+// AUTH & REGISTRASI DUAL PEMBIMBING
+// ============================================================
 function switchLoginTab(tab) {
   document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['login','register'][i]===tab));
   document.getElementById('login-form').classList.toggle('active', tab==='login');
@@ -750,10 +889,17 @@ async function loadDosenDropdown() {
     sel2.innerHTML='<option value="">Belum ada dosen terdaftar</option>'; 
     return; 
   }
-  const optionsHTML1 = '<option value="">-- Pilih Pembimbing 1 --</option>' + res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
-  const optionsHTML2 = '<option value="">-- Pilih Pembimbing 2 (Opsional) --</option>' + res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
-  sel1.innerHTML = optionsHTML1; sel2.innerHTML = optionsHTML2;
-  sel1.addEventListener('change', validatePembimbing); sel2.addEventListener('change', validatePembimbing);
+  const optionsHTML1 = '<option value="">-- Pilih Pembimbing 1 --</option>' + 
+    res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
+  const optionsHTML2 = '<option value="">-- Pilih Pembimbing 2 (Opsional) --</option>' + 
+    res.dosen.map(d=>`<option value="${d.kode}">${d.nama}${d.prodi?' ('+d.prodi+')':''}</option>`).join('');
+  
+  sel1.innerHTML = optionsHTML1;
+  sel2.innerHTML = optionsHTML2;
+
+  // Pasang validasi real-time setelah dropdown terisi
+  sel1.addEventListener('change', validatePembimbing);
+  sel2.addEventListener('change', validatePembimbing);
 }
 
 function validatePembimbing() {
@@ -775,6 +921,10 @@ async function doLogin() {
   onLogin(res.token, res.user);
 }
 
+// ── Helper kode login = kode unik + NIM ──────────────────────
+const NIM_LENGTH   = 7;   // harus sama dengan CONFIG.NIM_LENGTH di backend
+const KODE_MIN_LEN = 4;   // harus sama dengan CONFIG.KODE_MIN_LENGTH di backend
+
 function previewKodeLogin() {
   const kodeUnik = document.getElementById('reg-kode-unik').value.trim();
   const nim      = document.getElementById('reg-nim').value.trim();
@@ -782,48 +932,96 @@ function previewKodeLogin() {
   const gabungan = document.getElementById('kode-login-gabungan');
   const warn     = document.getElementById('warn-kode-login');
 
+  // Hanya angka untuk NIM
   document.getElementById('reg-nim').value = nim.replace(/[^0-9]/g, '');
   const nimClean = document.getElementById('reg-nim').value;
+
   const kodeGabung = kodeUnik + nimClean;
-  warn.style.display = 'none'; warn.textContent = '';
+  warn.style.display = 'none';
+  warn.textContent   = '';
 
   if (!kodeUnik && !nimClean) { preview.style.display = 'none'; return; }
-  if (kodeUnik && kodeUnik.length < 4) { warn.textContent = '⚠️ Kode unik minimal 4 karakter'; warn.style.display = 'block'; }
-  if (nimClean && nimClean.length !== 7) { warn.textContent = '⚠️ NIM harus tepat 7 digit angka'; warn.style.display = 'block'; }
-  if (kodeUnik && nimClean) { gabungan.textContent = kodeGabung; preview.style.display = 'block'; } 
-  else { preview.style.display = 'none'; }
+
+  if (kodeUnik && kodeUnik.length < KODE_MIN_LEN) {
+    warn.textContent   = '⚠️ Kode unik minimal ' + KODE_MIN_LEN + ' karakter';
+    warn.style.display = 'block';
+  }
+  if (nimClean && nimClean.length !== NIM_LENGTH) {
+    warn.textContent   = '⚠️ NIM harus tepat ' + NIM_LENGTH + ' digit angka';
+    warn.style.display = 'block';
+  }
+
+  if (kodeUnik && nimClean) {
+    gabungan.textContent  = kodeGabung;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
 }
+// ─────────────────────────────────────────────────────────────
 
 async function doRegister() {
-  const kodeUnik = document.getElementById('reg-kode-unik').value.trim(), nim = document.getElementById('reg-nim').value.trim(), nama = document.getElementById('reg-nama').value.trim(), email = document.getElementById('reg-email').value.trim(), dosenKode1 = document.getElementById('reg-dosen1').value, dosenKode2 = document.getElementById('reg-dosen2').value;
-  if (!kodeUnik || !nim || !nama || !email) return toast('Semua field wajib diisi', 'error');
-  if (kodeUnik.length < 4) return toast('Kode unik minimal 4 karakter', 'error');
-  if (!/^\d{7}$/.test(nim)) return toast('NIM harus tepat 7 digit angka', 'error');
-  if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan 2 tidak boleh sama', 'error');
+  const kodeUnik   = document.getElementById('reg-kode-unik').value.trim();
+  const nim        = document.getElementById('reg-nim').value.trim();
+  const nama       = document.getElementById('reg-nama').value.trim();
+  const email      = document.getElementById('reg-email').value.trim();
+  const dosenKode1 = document.getElementById('reg-dosen1').value;
+  const dosenKode2 = document.getElementById('reg-dosen2').value;
 
+  // Validasi input terpisah
+  if (!kodeUnik || !nim || !nama || !email) return toast('Semua field wajib diisi', 'error');
+  if (kodeUnik.length < KODE_MIN_LEN) return toast('Kode unik minimal ' + KODE_MIN_LEN + ' karakter', 'error');
+  if (!/^\d{7}$/.test(nim)) return toast('NIM harus tepat 7 digit angka. Contoh: 2311033', 'error');
+
+  // Validasi pembimbing tidak boleh sama
+  if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama', 'error');
+
+  // Gabungkan kode unik + NIM sebagai kode login
   const kode = kodeUnik + nim;
-  const btn = document.getElementById('reg-btn-text'); btn.innerHTML = '<div class="spinner"></div>';
+
+  const btn = document.getElementById('reg-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
   const res = await api('register', {kode, nama, email, dosenKode1, dosenKode2}, 'POST');
   btn.textContent = 'Buat Akun Mahasiswa';
   if (!res.success) return toast(res.message, 'error');
-  toast('Akun berhasil dibuat!', 'success'); onLogin(res.token, res.user);
+  toast('Akun berhasil dibuat! Kode login kamu: ' + kode, 'success');
+  onLogin(res.token, res.user);
 }
 
 async function doRegisterDosen() {
-  const kode = document.getElementById('dreg-kode').value.trim(), nama = document.getElementById('dreg-nama').value.trim(), email = document.getElementById('dreg-email').value.trim(), prodi = document.getElementById('dreg-prodi').value, token = document.getElementById('dreg-token').value.trim(); 
-  if (!kode || !nama || !email || !token) return toast('Semua field wajib diisi!', 'error');
+  const kode = document.getElementById('dreg-kode').value.trim();
+  const nama = document.getElementById('dreg-nama').value.trim();
+  const email = document.getElementById('dreg-email').value.trim();
+  const prodi = document.getElementById('dreg-prodi').value;
+  const token = document.getElementById('dreg-token').value.trim(); // Ambil input token
+  
+  // 1. Cek apakah ada field yang kosong
+  if (!kode || !nama || !email || !token) {
+    return toast('Semua field wajib diisi, termasuk Token!', 'error');
+  }
 
-  const btn = document.getElementById('dreg-btn-text'); btn.innerHTML = '<div class="spinner"></div>';
+  const btn = document.getElementById('dreg-btn-text');
+  btn.innerHTML = '<div class="spinner"></div>';
+  
+  // 2. Kirim semua data beserta Token ke backend
   const res = await api('registerDosen', {kode, nama, email, prodi, token}, 'POST');
+  
   btn.textContent = 'Buat Akun Dosen';
   
-  if (!res.success) { document.getElementById('dreg-token').value = ''; return toast(res.message, 'error'); }
-  toast('Akun dosen berhasil dibuat!', 'success'); onLogin(res.token, res.user);
+  // 3. Jika ditolak oleh backend (misal: token salah)
+  if (!res.success) {
+    document.getElementById('dreg-token').value = ''; // Kosongkan field token jika salah
+    return toast(res.message, 'error');
+  }
+  
+  toast('Akun dosen berhasil dibuat!', 'success');
+  onLogin(res.token, res.user);
 }
 
 function onLogin(token, user) {
   state.token=token; state.user=user;
-  localStorage.setItem('lytana_token', token); localStorage.setItem('lytana_user', JSON.stringify(user));
+  localStorage.setItem('lytana_token', token);
+  localStorage.setItem('lytana_user', JSON.stringify(user));
   if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); }
   else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); }
   else { updateMhsChip(); showPage('mahasiswa'); }
@@ -835,6 +1033,7 @@ function updateMhsChip() {
   document.getElementById('m-nama-chip').textContent=u.nama;
   document.getElementById('m-avatar-wrap').innerHTML=renderAvatar(u.foto, u.nama, 28);
 }
+
 function updateDosenChip() {
   const u=state.user;
   document.getElementById('d-nama-chip').textContent=u.nama;
@@ -853,18 +1052,26 @@ function doLogout() {
   if(t&&u) try{ onLogin(t,JSON.parse(u)); }catch(e){}
 })();
 
-// ================= MAHASISWA FUNCTIONS =================
+// ============================================================
+// MAHASISWA — RESERVASI
+// ============================================================
 function selectType(type) {
   state.selectedType=type;
-  ['offline','online'].forEach(t=>{ document.getElementById('type-'+t).classList.toggle('selected',t===type); document.getElementById('type-'+t).classList.add(t); });
+  ['offline','online'].forEach(t=>{
+    document.getElementById('type-'+t).classList.toggle('selected',t===type);
+    document.getElementById('type-'+t).classList.add(t);
+  });
   loadSlots(type);
 }
 
 async function loadSlots(tipe) {
-  const c=document.getElementById('slots-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
-  const res=await api('getSlots',{tipe, token:state.token});
+  const c=document.getElementById('slots-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat sesi dari dosen pembimbing...</div>';
+  const params={tipe, token:state.token};
+  const res=await api('getSlots',params);
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.slots=res.slots; renderSlots(res.slots);
+  state.slots=res.slots;
+  renderSlots(res.slots);
   
   if (state.user?.dosenKode1 || state.user?.dosenKode2) {
     const dr=await api('getDosenList');
@@ -877,11 +1084,13 @@ async function loadSlots(tipe) {
 
 function renderSlots(slots) {
   const c=document.getElementById('slots-container');
-  if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia</p></div>'; return; }
-  const byDate={}; slots.forEach(s=>{ const k=s.tanggal||'lainnya'; if(!byDate[k]) byDate[k]=[]; byDate[k].push(s); });
+  if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi tersedia dari dosen pembimbingmu</p></div>'; return; }
+  const byDate={};
+  slots.forEach(s=>{ const k=s.tanggal||'lainnya'; if(!byDate[k]) byDate[k]=[]; byDate[k].push(s); });
   let html='';
   Object.keys(byDate).sort().forEach(tgl=>{
-    html+=`<div style="margin-bottom:24px"><div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">📅 ${fmtTgl(tgl,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    html+=`<div style="margin-bottom:24px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">📅 ${fmtTgl(tgl,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
       <div class="slot-grid">${byDate[tgl].map(renderSlotCard).join('')}</div></div>`;
   });
   c.innerHTML=html;
@@ -895,388 +1104,919 @@ function renderSlotCard(s) {
   else if (taken) { badge=`<span class="badge badge-rose">Terisi</span>`; btn=`<span class="badge badge-slate">Tidak tersedia</span>`; }
   else { badge=`<span class="badge badge-green">Tersedia</span>`; btn=`<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify(s).replace(/'/g,"\\'")})'>Reservasi</button>`; }
   return `<div class="slot-card ${taken&&!isMe?'full':''}" style="${isMe?'border-color:var(--blue);background:rgba(37,99,235,0.07)':''}">
-    <div class="slot-card-header"><div><div class="slot-type-badge ${s.tipe}">${s.tipe.toUpperCase()}</div>
+    <div class="slot-card-header">
+      <div>
+        <div class="slot-type-badge ${s.tipe}">${s.tipe.toUpperCase()}</div>
         <div style="margin-top:10px;font-size:1.35rem;font-weight:700;font-family:var(--font2);line-height:1">${s.jamMulai} <span style="font-size:0.9rem;color:var(--text2);font-weight:400">–</span> ${s.jamSelesai}</div>
         <div style="font-size:0.75rem;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:4px">👨‍🏫 ${s.dosenNama||s.dosenKode}</div>
-      </div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${badge}</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${badge}</div>
+    </div>
     <div class="slot-quota-bar"><div class="slot-quota-fill ${taken?'high':'low'}" style="width:${taken?100:0}%"></div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <span style="font-size:0.78rem;color:var(--text3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.catatan||''}</span>${btn}
-    </div></div>`;
+      <span style="font-size:0.78rem;color:var(--text3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.catatan||''}</span>
+      ${btn}
+    </div>
+  </div>`;
 }
 
 function openBookingModal(slot) {
   state.pendingSlot=slot;
   document.getElementById('modal-booking-content').innerHTML=`
-    <div class="card" style="margin-bottom:0;background:var(--card2)"><div style="display:grid;gap:12px">
+    <div class="card" style="margin-bottom:0;background:var(--card2)">
+      <div style="display:grid;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Dosen</span><span style="font-weight:600;font-size:0.85rem">${slot.dosenNama||slot.dosenKode}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe.toUpperCase()}</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Tanggal</span><b>${fmtTgl(slot.tanggal,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</b></div>
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Sesi</span><b style="font-family:var(--font2)">${slot.jamMulai} – ${slot.jamSelesai}</b></div>
-      </div></div>`;
+        ${slot.catatan?`<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Lokasi</span><span>${slot.catatan}</span></div>`:''}
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:10px 12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:0.85rem;color:var(--text2)">
+      ✅ Sesi ini masih <b style="color:var(--green)">tersedia</b>. Setelah reservasi, sesi terkunci untukmu.
+    </div>`;
   openModal('modal-booking');
 }
 
 async function confirmBooking() {
   if (!state.pendingSlot) return;
-  const btn=document.getElementById('modal-booking-btn'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+  const btn=document.getElementById('modal-booking-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
   const res=await api('bookSlot',{slotId:state.pendingSlot.id,token:state.token},'POST');
   btn.disabled=false; btn.textContent='Konfirmasi Reservasi';
   if (!res.success) return toast(res.message,'error');
-  toast('Reservasi berhasil! 🎉','success'); closeModal('modal-booking'); state.pendingSlot=null; loadSlots(state.selectedType);
+  toast('Reservasi berhasil! 🎉','success');
+  closeModal('modal-booking'); state.pendingSlot=null;
+  loadSlots(state.selectedType);
 }
 
+// ============================================================
+// MAHASISWA — RIWAYAT
+// ============================================================
 async function loadMyHistory() {
-  const c=document.getElementById('history-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
+  const c=document.getElementById('history-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat...</div>';
   const [hRes, bRes]=await Promise.all([api('getMyHistory',{token:state.token}), api('getMyBookings',{token:state.token})]);
-  const all=[ ...(hRes.history||[]).map(h=>({...h,_type:'history'})), ...(bRes.bookings||[]).map(b=>({...b,_type:'booking'})) ].sort((a,b)=>(b.createdAt||b.tanggal||'').localeCompare(a.createdAt||a.tanggal||''));
+  const all=[
+    ...(hRes.history||[]).map(h=>({...h,_type:'history'})),
+    ...(bRes.bookings||[]).map(b=>({...b,_type:'booking'})),
+  ].sort((a,b)=>(b.createdAt||b.tanggal||'').localeCompare(a.createdAt||a.tanggal||''));
   if (!all.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada riwayat bimbingan</p></div>'; return; }
   const sm={menunggu:{cls:'amber',icon:'⏳',label:'Menunggu'},terselenggara:{cls:'green',icon:'✓',label:'Terselenggara'},tidak_terselenggara:{cls:'rose',icon:'✕',label:'Tidak terjadi'},dibatalkan:{cls:'slate',icon:'–',label:'Dibatalkan'}};
   c.innerHTML=`<div class="timeline">${all.map(item=>{
-    const s=sm[item.status]||{cls:'slate',icon:'?',label:item.status}, slot=item.slot||{}, dosen=item.dosen||{};
+    const s=sm[item.status]||{cls:'slate',icon:'?',label:item.status};
+    const slot=item.slot||{}; const dosen=item.dosen||{};
     const tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'long',year:'numeric'});
     const sesi=slot.jamMulai?`${slot.jamMulai}–${slot.jamSelesai}`:'';
-    return `<div class="timeline-item"><div class="timeline-dot ${s.cls}">${s.icon}</div>
-      <div class="timeline-body"><div style="font-weight:600">${slot.tipe?slot.tipe.toUpperCase():'Bimbingan'} — ${tgl}</div>
+    return `<div class="timeline-item">
+      <div class="timeline-dot ${s.cls}">${s.icon}</div>
+      <div class="timeline-body">
+        <div style="font-weight:600">${slot.tipe?slot.tipe.charAt(0).toUpperCase()+slot.tipe.slice(1):'Bimbingan'} — ${tgl}</div>
         <div style="font-size:0.85rem;color:var(--text2)">⏰ ${sesi}${dosen.nama?' · '+dosen.nama:''}</div>
         <div class="meta">${s.label}${item.catatan?' · '+item.catatan:''}</div>
-        ${item._type==='booking'&&item.status==='menunggu'?`<button class="btn btn-rose btn-sm" style="margin-top:8px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`:''}
+        ${item._type==='booking'&&item.status==='menunggu'?(()=>{
+          const sisa = sisaJamBimbingan(slot.tanggal, slot.jamMulai);
+          const bisaBatal = sisa >= 24;
+          const warnaInfo = sisa < 24 ? 'var(--rose)' : sisa < 48 ? 'var(--amber)' : 'var(--slate)';
+          return `<div style="font-size:0.78rem;color:${warnaInfo};margin-top:4px">${labelSisaWaktu(sisa)}</div>
+            ${bisaBatal
+              ? `<button class="btn btn-rose btn-sm" style="margin-top:8px" onclick="cancelMyBooking('${item.id}')">Batalkan</button>`
+              : `<button class="btn btn-rose btn-sm" style="margin-top:8px;opacity:0.4;cursor:not-allowed" disabled title="Pembatalan harus dilakukan minimal 24 jam sebelum bimbingan">Tidak bisa dibatalkan</button>`
+            }`;
+        })():''}
       </div></div>`;
   }).join('')}</div>`;
 }
+
+// ── Helper batas batal ────────────────────────────────────────
+function sisaJamBimbingan(tanggal, jamMulai) {
+  if (!tanggal || !jamMulai) return 9999;
+  return (new Date(tanggal + 'T' + jamMulai + ':00').getTime() - Date.now()) / 3600000;
+}
+
+function labelSisaWaktu(jam) {
+  if (jam <= 0)  return '⏱ Sudah lewat';
+  if (jam < 1)   return '⏱ Kurang dari 1 jam lagi';
+  if (jam < 24)  return '⏱ ' + Math.floor(jam) + ' jam lagi';
+  return '⏱ ' + Math.floor(jam / 24) + ' hari lagi';
+}
+// ─────────────────────────────────────────────────────────────
 
 async function cancelMyBooking(bookId) {
   if (!confirm('Batalkan reservasi ini?')) return;
   const res = await api('cancelBooking', {bookId, token: state.token}, 'POST');
   if (!res.success) return toast(res.message, 'error');
-  toast('Reservasi berhasil dibatalkan', 'info'); loadMyHistory();
+  toast('Reservasi berhasil dibatalkan', 'info');
+  loadMyHistory();
 }
 
+// ============================================================
+// MAHASISWA — PROGRES
+// ============================================================
 async function loadMyProgress() {
-  const c=document.getElementById('progres-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('progres-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getMyProgress',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   const babs=['Bab 1','Bab 2','Bab 3','Bab 4','Bab 5','Revisi'];
   const pm={}; (res.progress||[]).forEach(p=>pm[p.bab]=p);
   const avg=Math.round(babs.reduce((s,b)=>s+(pm[b]?.persentase||0),0)/babs.length);
-  c.innerHTML=`<div class="card" style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div><div style="font-size:0.85rem;color:var(--text2)">Keseluruhan Progress</div><div style="font-size:2rem;font-weight:700;font-family:var(--font2);color:var(--blue2)">${avg}%</div></div>
+  c.innerHTML=`<div class="card" style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div><div style="font-size:0.85rem;color:var(--text2)">Keseluruhan Progress</div>
+        <div style="font-size:2rem;font-weight:700;font-family:var(--font2);color:var(--blue2)">${avg}%</div></div>
       <div style="text-align:right;color:var(--text2);font-size:0.85rem">${babs.filter(b=>(pm[b]?.persentase||0)>=100).length}/${babs.length} bab selesai</div>
     </div><div class="prog-bar"><div class="prog-fill" style="width:${avg}%"></div></div></div>
   <div class="prog-bab-grid">${babs.map(bab=>{
-    const p=pm[bab], pct=p?.persentase||0;
-    return `<div class="prog-bab-item"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600;font-size:0.88rem">${bab}</div>${pct>=100?'<span class="badge badge-green">✓ Selesai</span>':''}</div>
+    const p=pm[bab]; const pct=p?.persentase||0;
+    return `<div class="prog-bab-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:600;font-size:0.88rem">${bab}</div>
+        ${pct>=100?'<span class="badge badge-green">✓ Selesai</span>':''}
+      </div>
       <div style="font-size:1.2rem;font-weight:700;color:${pct>=100?'var(--green)':pct>=50?'var(--blue2)':'var(--text2)'}">${pct}%</div>
       <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
       ${p?.catatan?`<div style="font-size:0.78rem;color:var(--text3)">${p.catatan}</div>`:''}
-      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:6px" onclick="openProgresModal('${bab}','${pct}','${(p?.catatan||'').replace(/'/g,"\\'")}')">Edit</button></div>`;
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:6px" onclick="openProgresModal('${bab}','${pct}','${(p?.catatan||'').replace(/'/g,"\\'")}')">Edit</button>
+    </div>`;
   }).join('')}</div>`;
 }
 
 function openProgresModal(bab='',pct=50,catatan='') {
   if (bab) { const s=document.getElementById('prog-bab'); for(let i=0;i<s.options.length;i++) if(s.options[i].value===bab) s.selectedIndex=i; }
-  document.getElementById('prog-pct').value=pct; document.getElementById('prog-pct-label').textContent=pct+'%';
-  document.getElementById('prog-catatan').value=catatan; openModal('modal-progres');
+  document.getElementById('prog-pct').value=pct;
+  document.getElementById('prog-pct-label').textContent=pct+'%';
+  document.getElementById('prog-catatan').value=catatan;
+  openModal('modal-progres');
 }
+
 async function saveProgress() {
-  const bab=document.getElementById('prog-bab').value, persentase=document.getElementById('prog-pct').value, catatan=document.getElementById('prog-catatan').value;
+  const bab=document.getElementById('prog-bab').value;
+  const persentase=document.getElementById('prog-pct').value;
+  const catatan=document.getElementById('prog-catatan').value;
   const res=await api('updateProgress',{bab,persentase,catatan,token:state.token},'POST');
   if (!res.success) return toast(res.message,'error');
   toast('Progress diperbarui!','success'); closeModal('modal-progres'); loadMyProgress();
 }
 
+// ============================================================
+// MAHASISWA — PROFIL & FOTO
+// ============================================================
 async function fillProfil() {
   const u=state.user;
-  document.getElementById('profil-kode').value=u.kode||''; document.getElementById('profil-nama').value=u.nama||''; document.getElementById('profil-email').value=u.email||'';
+  document.getElementById('profil-kode').value=u.kode||'';
+  document.getElementById('profil-nama').value=u.nama||'';
+  document.getElementById('profil-email').value=u.email||'';
+  
   document.getElementById('profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
+  
   if (u.dosenKode1 || u.dosenKode2) {
     const dr=await api('getDosenList');
-    const d1=(dr.dosen||[]).find(x=>x.kode===u.dosenKode1), d2=(dr.dosen||[]).find(x=>x.kode===u.dosenKode2);
-    document.getElementById('profil-dosen1').value=d1?d1.nama:'—'; document.getElementById('profil-dosen2').value=d2?d2.nama:'—';
+    const d1=(dr.dosen||[]).find(x=>x.kode===u.dosenKode1);
+    const d2=(dr.dosen||[]).find(x=>x.kode===u.dosenKode2);
+    document.getElementById('profil-dosen1').value=d1?d1.nama:'—';
+    document.getElementById('profil-dosen2').value=d2?d2.nama:'—';
+  } else { 
+    document.getElementById('profil-dosen1').value='Belum dipilih'; 
+    document.getElementById('profil-dosen2').value='Belum dipilih'; 
   }
 }
-async function previewFoto(event) {
-  const file = event.target.files[0]; if(!file) return;
-  try { toast('Memproses gambar...', 'info'); pendingMhsFoto = await compressImage(file, 256); document.getElementById('foto-preview').src = pendingMhsFoto; document.getElementById('foto-preview-wrap').style.display = 'flex'; document.getElementById('profil-foto-wrap').style.display = 'none'; } catch(err) { toast(err, 'error'); }
-}
-async function uploadFoto() {
-  if(!pendingMhsFoto) return; toast('Mengupload foto...', 'info');
-  const res = await api('uploadPhoto', {base64: pendingMhsFoto.split(',')[1], mimeType: 'image/jpeg', token: state.token}, 'POST');
-  if (!res.success) return toast(res.message, 'error');
-  toast('Foto diupload!', 'success'); state.user.foto = res.url; localStorage.setItem('lytana_user', JSON.stringify(state.user));
-  document.getElementById('foto-preview-wrap').style.display = 'none'; document.getElementById('profil-foto-wrap').style.display = 'flex'; fillProfil(); updateMhsChip(); 
+
+function previewFoto(event) {
+  const file=event.target.files[0]; if(!file) return;
+  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
+  const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; document.getElementById('profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
 }
 
-const STATUS_CONFIG = { aktif_bimbingan:{label:'Aktif Bimbingan',emoji:'✅',cls:'aktif_bimbingan'}, tidak_aktif:{label:'Tidak Aktif',emoji:'⏸',cls:'tidak_aktif'}, revisi:{label:'Revisi',emoji:'✏️',cls:'revisi'}, menunggu_sidang:{label:'Menunggu Sidang',emoji:'🏛',cls:'menunggu_sidang'}, lulus:{label:'Lulus / Wisuda',emoji:'🎓',cls:'lulus'} };
-function statusBadge(status) { const c = STATUS_CONFIG[status] || { label: status||'—', emoji:'?', cls:'tidak_aktif' }; return `<span class="status-badge status-${c.cls}">${c.emoji} ${c.label}</span>`; }
-function daysSinceStr(isoStr) { if (!isoStr) return 'Belum ada aktivitas'; const d = Math.floor((Date.now() - new Date(isoStr).getTime()) / 86400000); return d===0?'Hari ini':d===1?'Kemarin':d+' hari yang lalu'; }
+async function uploadFoto() {
+  const file=document.getElementById('foto-input').files[0]; if(!file) return;
+  const r=new FileReader(); r.onload=async e=>{
+    toast('Mengupload foto...','info');
+    const res=await api('uploadPhoto',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
+    if (!res.success) return toast(res.message,'error');
+    toast('Foto berhasil diupload!','success');
+    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
+    document.getElementById('foto-preview-wrap').style.display='none'; document.getElementById('profil-foto-wrap').style.display='flex';
+    fillProfil(); updateMhsChip(); 
+  }; r.readAsDataURL(file);
+}
+
+// ============================================================
+// STATUS SKRIPSI HELPERS
+// ============================================================
+const STATUS_CONFIG = {
+  aktif_bimbingan : { label:'Aktif Bimbingan', emoji:'✅', cls:'aktif_bimbingan' },
+  tidak_aktif     : { label:'Tidak Aktif',     emoji:'⏸', cls:'tidak_aktif'     },
+  revisi          : { label:'Revisi',          emoji:'✏️', cls:'revisi'          },
+  menunggu_sidang : { label:'Menunggu Sidang', emoji:'🏛', cls:'menunggu_sidang' },
+  lulus           : { label:'Lulus / Wisuda',  emoji:'🎓', cls:'lulus'           },
+};
+
+function statusBadge(status) {
+  const c = STATUS_CONFIG[status] || { label: status||'—', emoji:'?', cls:'tidak_aktif' };
+  return `<span class="status-badge status-${c.cls}">${c.emoji} ${c.label}</span>`;
+}
+
+function daysSinceStr(isoStr) {
+  if (!isoStr) return 'Belum ada aktivitas';
+  const d = Math.floor((Date.now() - new Date(isoStr).getTime()) / 86400000);
+  if (d === 0) return 'Hari ini';
+  if (d === 1) return 'Kemarin';
+  return d + ' hari yang lalu';
+}
+
 function openSetStatus(kode, nama, currentStatus) {
   state.pendingSetStatus = kode;
-  document.getElementById('modal-set-status-content').innerHTML=`<div style="display:flex;align-items:center;gap:12px">${renderAvatar('', nama, 44)}<div><div style="font-weight:700">${nama}</div><div style="font-size:0.85rem;color:var(--text2);margin-top:4px">Status saat ini: ${statusBadge(currentStatus)}</div></div></div>`;
+  document.getElementById('modal-set-status-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px">
+      ${renderAvatar('', nama, 44)}
+      <div>
+        <div style="font-weight:700">${nama}</div>
+        <div style="font-size:0.85rem;color:var(--text2);margin-top:4px">Status saat ini: ${statusBadge(currentStatus)}</div>
+      </div>
+    </div>`;
   openModal('modal-set-status');
 }
+
 async function confirmSetStatus(status) {
   if (!state.pendingSetStatus) return;
   const res=await api('setStudentStatus',{kode:state.pendingSetStatus,status,token:state.token},'POST');
   if (!res.success) return toast(res.message,'error');
-  toast('Status diperbarui: '+STATUS_CONFIG[status].label,'success'); closeModal('modal-set-status'); state.pendingSetStatus=null; loadDosenStudents();
+  toast('Status diperbarui: '+STATUS_CONFIG[status].label,'success');
+  closeModal('modal-set-status');
+  state.pendingSetStatus=null;
+  loadDosenStudents();
 }
 
-// ================= DOSEN FUNCTIONS =================
+// ============================================================
+// DOSEN — DASHBOARD
+// ============================================================
 async function loadDosenDashboard() {
   const res=await api('getDosenDashboard',{token:state.token});
   if (res.success) {
     const s=res.stats;
-    document.getElementById('d-stat-mhs').textContent=s.totalMahasiswa; document.getElementById('d-stat-sesi').textContent=s.totalSesi; document.getElementById('d-stat-pending').textContent=s.pendingCount; document.getElementById('d-stat-tersedia').textContent=s.sesiTersedia; document.getElementById('d-stat-terisi').textContent=s.sesiTerisi; document.getElementById('d-stat-done').textContent=s.terselenggaraCount;
-    if (s.statusCount) { document.getElementById('d-s-aktif').textContent=s.statusCount.aktif_bimbingan||0; document.getElementById('d-s-inaktif').textContent=s.statusCount.tidak_aktif||0; document.getElementById('d-s-revisi').textContent=s.statusCount.revisi||0; document.getElementById('d-s-sidang').textContent=s.statusCount.menunggu_sidang||0; document.getElementById('d-s-lulus').textContent=s.statusCount.lulus||0; }
+    document.getElementById('d-stat-mhs').textContent=s.totalMahasiswa;
+    document.getElementById('d-stat-sesi').textContent=s.totalSesi;
+    document.getElementById('d-stat-pending').textContent=s.pendingCount;
+    document.getElementById('d-stat-tersedia').textContent=s.sesiTersedia;
+    document.getElementById('d-stat-terisi').textContent=s.sesiTerisi;
+    document.getElementById('d-stat-done').textContent=s.terselenggaraCount;
+    if (s.statusCount) {
+      document.getElementById('d-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
+      document.getElementById('d-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
+      document.getElementById('d-s-revisi').textContent=s.statusCount.revisi||0;
+      document.getElementById('d-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
+      document.getElementById('d-s-lulus').textContent=s.statusCount.lulus||0;
+    }
   }
   const bRes=await api('getMyBookingsAll',{token:state.token});
-  const c=document.getElementById('d-recent-bookings'); const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
-  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu</p></div>'; return; }
+  const c=document.getElementById('d-recent-bookings');
+  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
+  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu konfirmasi</p></div>'; return; }
   c.innerHTML=bookingTable(pending,false);
 }
 
+// ============================================================
+// DOSEN — SESI
+// ============================================================
 async function loadDosenSlots() {
-  const c=document.getElementById('d-slots-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('d-slots-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getMySlots',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.dosenSlots=res.slots; renderDosenSlots(state.dosenSlots);
+  state.dosenSlots=res.slots;
+  renderDosenSlots(state.dosenSlots);
 }
+
 function renderDosenSlots(slots) {
   const c = document.getElementById('d-slots-container');
-  if (!slots.length) { c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi.</p></div>'; return; }
-  const now = new Date(), todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  if (!slots.length) { 
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi. Klik "+ Tambah Sesi".</p></div>'; 
+    return; 
+  }
+
+  // PERBAIKAN: Ambil tanggal lokal sesuai zona waktu perangkat
+  const now = new Date();
+  const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
   c.innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th><th>Aksi</th></tr></thead>
     <tbody>${slots.map(s => {
-      const terisi = s.bookedBy && s.bookedBy !== '', isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
-      let badgeStatus = terisi ? '<span class="badge badge-rose">Terisi</span>' : isHangus ? '<span class="badge badge-slate" style="opacity:0.7">Hangus</span>' : '<span class="badge badge-green">Tersedia</span>';
-      let aksiHTML = isHangus ? '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Kadaluarsa</small></span>' : `<button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button> <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>`;
-      return `<tr style="${isHangus ? 'background:var(--card);opacity:0.65' : ''}"><td><span class="badge badge-${s.tipe === 'offline' ? 'blue' : 'teal'}">${s.tipe}</span></td><td>${fmtTgl(s.tanggal, {day: 'numeric', month: 'short', year: 'numeric'})}</td><td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td><td>${badgeStatus}</td><td style="font-size:0.82rem">${terisi ? `<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>` : '—'}</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan || '—'}</td><td style="display:flex;gap:6px">${aksiHTML}</td></tr>`;
+      const terisi = s.bookedBy && s.bookedBy !== '';
+      
+      // LOGIKA HANGUS: Jika ditandai hangus dari database ATAU jika (belum dipesan + lewat tanggal lokal)
+      const isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
+      
+      // Pengaturan Badge Status
+      let badgeStatus = '';
+      if (terisi) badgeStatus = '<span class="badge badge-rose">Terisi</span>';
+      else if (isHangus) badgeStatus = '<span class="badge badge-slate" style="opacity:0.7">Hangus</span>';
+      else badgeStatus = '<span class="badge badge-green">Tersedia</span>';
+
+      // Pengaturan Tombol Aksi (Sembunyikan jika hangus)
+      let aksiHTML = '';
+      if (isHangus) {
+        // Teks ditambahkan sesuai permintaan
+        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Slot ini sudah kadaluarsa</small></span>';
+      } else {
+        aksiHTML = `
+          <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button>
+          <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>
+        `;
+      }
+
+      return `<tr style="${isHangus ? 'background:var(--card);opacity:0.65' : ''}">
+        <td><span class="badge badge-${s.tipe === 'offline' ? 'blue' : 'teal'}">${s.tipe}</span></td>
+        <td>${fmtTgl(s.tanggal, {day: 'numeric', month: 'short', year: 'numeric'})}</td>
+        <td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td>
+        <td>${badgeStatus}</td>
+        <td style="font-size:0.82rem">${terisi ? `<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>` : '—'}</td>
+        <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan || '—'}</td>
+        <td style="display:flex;gap:6px">${aksiHTML}</td>
+      </tr>`;
     }).join('')}</tbody></table></div>`;
 }
+
 function filterDosenSlots(f, btn) {
-  document.querySelectorAll('#d-sesi .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  document.querySelectorAll('#d-sesi .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
   let filtered=state.dosenSlots;
-  if (f==='offline') filtered=filtered.filter(s=>s.tipe==='offline'); else if (f==='online') filtered=filtered.filter(s=>s.tipe==='online'); else if (f==='tersedia') filtered=filtered.filter(s=>!s.bookedBy||s.bookedBy===''); else if (f==='terisi') filtered=filtered.filter(s=>s.bookedBy&&s.bookedBy!=='');
+  if (f==='offline') filtered=filtered.filter(s=>s.tipe==='offline');
+  else if (f==='online') filtered=filtered.filter(s=>s.tipe==='online');
+  else if (f==='tersedia') filtered=filtered.filter(s=>!s.bookedBy||s.bookedBy==='');
+  else if (f==='terisi') filtered=filtered.filter(s=>s.bookedBy&&s.bookedBy!=='');
   renderDosenSlots(filtered);
 }
+
 function openSlotModal() {
   document.getElementById('modal-slot-title').textContent='Tambah Sesi Baru';
   ['slot-edit-id','slot-tanggal','slot-jam-mulai','slot-jam-selesai','slot-catatan'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('slot-tipe').value='offline'; document.getElementById('slot-save-btn').textContent='Simpan Sesi'; openModal('modal-slot');
+  document.getElementById('slot-tipe').value='offline';
+  document.getElementById('slot-save-btn').textContent='Simpan Sesi';
+  openModal('modal-slot');
 }
+
 function editSlot(s) {
-  document.getElementById('modal-slot-title').textContent='Edit Sesi'; document.getElementById('slot-edit-id').value=s.id; document.getElementById('slot-tipe').value=s.tipe; document.getElementById('slot-tanggal').value=s.tanggal; document.getElementById('slot-jam-mulai').value=s.jamMulai||''; document.getElementById('slot-jam-selesai').value=s.jamSelesai||''; document.getElementById('slot-catatan').value=s.catatan||''; document.getElementById('slot-save-btn').textContent='Update Sesi'; openModal('modal-slot');
+  document.getElementById('modal-slot-title').textContent='Edit Sesi';
+  document.getElementById('slot-edit-id').value=s.id;
+  document.getElementById('slot-tipe').value=s.tipe;
+  document.getElementById('slot-tanggal').value=s.tanggal;
+  document.getElementById('slot-jam-mulai').value=s.jamMulai||'';
+  document.getElementById('slot-jam-selesai').value=s.jamSelesai||'';
+  document.getElementById('slot-catatan').value=s.catatan||'';
+  document.getElementById('slot-save-btn').textContent='Update Sesi';
+  openModal('modal-slot');
 }
+
 async function saveSlot() {
-  const id=document.getElementById('slot-edit-id').value, tipe=document.getElementById('slot-tipe').value, tanggal=document.getElementById('slot-tanggal').value, jamMulai=document.getElementById('slot-jam-mulai').value, jamSelesai=document.getElementById('slot-jam-selesai').value, catatan=document.getElementById('slot-catatan').value;
+  const id=document.getElementById('slot-edit-id').value;
+  const tipe=document.getElementById('slot-tipe').value;
+  const tanggal=document.getElementById('slot-tanggal').value;
+  const jamMulai=document.getElementById('slot-jam-mulai').value;
+  const jamSelesai=document.getElementById('slot-jam-selesai').value;
+  const catatan=document.getElementById('slot-catatan').value;
   if (!tanggal||!jamMulai||!jamSelesai) return toast('Tanggal dan jam wajib diisi','error');
   if (jamSelesai<=jamMulai) return toast('Jam selesai harus setelah jam mulai','error');
-  const btn=document.getElementById('slot-save-btn'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
-  const action=id?'updateSlot':'createSlot', params={tipe,tanggal,jamMulai,jamSelesai,catatan,token:state.token}; if (id) params.id=id;
+  const btn=document.getElementById('slot-save-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+  const action=id?'updateSlot':'createSlot';
+  const params={tipe,tanggal,jamMulai,jamSelesai,catatan,token:state.token};
+  if (id) params.id=id;
   const res=await api(action,params,'POST');
   btn.disabled=false; btn.textContent=id?'Update Sesi':'Simpan Sesi';
   if (!res.success) return toast(res.message,'error');
-  toast(id?'Sesi diperbarui!':'Sesi ditambahkan!','success'); closeModal('modal-slot'); loadDosenSlots();
+  toast(id?'Sesi diperbarui!':'Sesi ditambahkan!','success');
+  closeModal('modal-slot'); loadDosenSlots();
 }
+
 async function deleteSlotConfirm(id) {
   if (!confirm('Hapus sesi ini?')) return;
   const res=await api('deleteSlot',{id,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error'); toast('Sesi dihapus','info'); loadDosenSlots();
+  if (!res.success) return toast(res.message,'error');
+  toast('Sesi dihapus','info'); loadDosenSlots();
 }
 
+// ============================================================
+// DOSEN — RESERVASI & VALIDASI
+// ============================================================
 async function loadDosenBookings() {
-  const c=document.getElementById('d-bookings-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('d-bookings-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getMyBookingsAll',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.dosenBookings=res.bookings; renderDosenBookings(state.dosenBookings);
+  state.dosenBookings=res.bookings;
+  renderDosenBookings(state.dosenBookings);
 }
+
 function renderDosenBookings(bookings) {
   const c=document.getElementById('d-bookings-container');
   if (!bookings.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada reservasi</p></div>'; return; }
   c.innerHTML=bookingTable(bookings, true);
 }
+
 function filterDosenBookings(status, btn) {
-  document.querySelectorAll('#d-reservasi .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-  const f=status==='all'?state.dosenBookings:state.dosenBookings.filter(b=>b.status===status); renderDosenBookings(f);
+  document.querySelectorAll('#d-reservasi .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const f=status==='all'?state.dosenBookings:state.dosenBookings.filter(b=>b.status===status);
+  renderDosenBookings(f);
 }
 
+// ============================================================
+// DOSEN — MAHASISWA
+// ============================================================
 async function loadDosenStudents() {
-  const c=document.getElementById('d-students-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('d-students-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getMyStudents',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.dosenStudents=res.students; renderDosenStudents(state.dosenStudents);
+  state.dosenStudents=res.students;
+  renderDosenStudents(state.dosenStudents);
 }
+
 function renderDosenStudents(students) {
   const c=document.getElementById('d-students-container');
-  if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa</p></div>'; return; }
+  if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa bimbingan</p></div>'; return; }
   c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
-    const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999, warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
-    return `<div class="student-card" style="position:relative"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">${renderAvatar(s.foto, s.nama, 48)}<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div><code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code></div></div><div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px"><span style="color:var(--text2)">Progress</span><span style="font-weight:700;color:${s.avgProgress>=75?'var(--green)':s.avgProgress>=40?'var(--amber)':'var(--rose)'}">${s.avgProgress}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${s.avgProgress}%"></div></div></div><div style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">Aktif ${daysSinceStr(s.lastActivity)}</div><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\\'")})'>Detail</button><button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button></div></div>`;
+    const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
+    const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
+    return `<div class="student-card" style="position:relative">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        ${renderAvatar(s.foto, s.nama, 48)}
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
+          <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
+      ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
+          <span style="color:var(--text2)">Progress</span>
+          <span style="font-weight:700;color:${s.avgProgress>=75?'var(--green)':s.avgProgress>=40?'var(--amber)':'var(--rose)'}">${s.avgProgress}%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${s.avgProgress}%"></div></div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">
+        ✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\\'")})'>Detail</button>
+        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
+      </div>
+    </div>`;
   }).join('')}</div>`;
 }
-function filterDosenStudents(q) { renderDosenStudents(state.dosenStudents.filter(s=>s.nama.toLowerCase().includes(q.toLowerCase())||s.kode.toLowerCase().includes(q.toLowerCase()))); }
+
+function filterDosenStudents(q) {
+  const f=state.dosenStudents.filter(s=>s.nama.toLowerCase().includes(q.toLowerCase())||s.kode.toLowerCase().includes(q.toLowerCase()));
+  renderDosenStudents(f);
+}
+
 function openStudentDetail(s) {
   document.getElementById('modal-student-title').textContent='Detail — '+s.nama;
-  const babs=['Bab 1','Bab 2','Bab 3','Bab 4','Bab 5','Revisi'], pm={}; (s.progress||[]).forEach(p=>pm[p.bab]=p);
-  document.getElementById('modal-student-content').innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">${renderAvatar(s.foto, s.nama, 64)}<div><div style="font-weight:700;font-size:1.1rem">${s.nama}</div><div style="color:var(--text2);font-size:0.85rem">${s.email}</div><code style="font-size:0.78rem;color:var(--text3);background:var(--card2);padding:2px 6px;border-radius:4px">${s.kode}</code></div></div><h3 style="margin-bottom:12px;font-size:0.95rem">Progress per Bab</h3><div class="prog-bab-grid" style="margin-bottom:20px">${babs.map(bab=>{ const p=pm[bab], pct=p?.persentase||0; return `<div class="prog-bab-item"><div style="font-weight:600;font-size:0.85rem">${bab}</div><div style="font-size:1.1rem;font-weight:700;color:${pct>=100?'var(--green)':pct>=50?'var(--blue2)':'var(--text2)'}">${pct}%</div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>${p?.catatan?`<div style="font-size:0.75rem;color:var(--text3)">${p.catatan}</div>`:''}</div>`; }).join('')}</div>`;
+  const babs=['Bab 1','Bab 2','Bab 3','Bab 4','Bab 5','Revisi'];
+  const pm={}; (s.progress||[]).forEach(p=>pm[p.bab]=p);
+  document.getElementById('modal-student-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      ${renderAvatar(s.foto, s.nama, 64)}
+      <div>
+        <div style="font-weight:700;font-size:1.1rem">${s.nama}</div>
+        <div style="color:var(--text2);font-size:0.85rem">${s.email}</div>
+        <code style="font-size:0.78rem;color:var(--text3);background:var(--card2);padding:2px 6px;border-radius:4px">${s.kode}</code>
+      </div>
+    </div>
+    <h3 style="margin-bottom:12px;font-size:0.95rem">Progress per Bab</h3>
+    <div class="prog-bab-grid" style="margin-bottom:20px">${babs.map(bab=>{
+      const p=pm[bab]; const pct=p?.persentase||0;
+      return `<div class="prog-bab-item">
+        <div style="font-weight:600;font-size:0.85rem">${bab}</div>
+        <div style="font-size:1.1rem;font-weight:700;color:${pct>=100?'var(--green)':pct>=50?'var(--blue2)':'var(--text2)'}">${pct}%</div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+        ${p?.catatan?`<div style="font-size:0.75rem;color:var(--text3)">${p.catatan}</div>`:''}
+      </div>`;
+    }).join('')}</div>
+    <div style="display:flex;gap:8px;font-size:0.85rem;color:var(--text2)">
+      <span>✓ ${s.bimbinganCount}x bimbingan terselenggara</span>
+    </div>`;
   openModal('modal-student-detail');
 }
 
+// ============================================================
+// DOSEN — PROFIL & FOTO
+// ============================================================
 function fillDosenProfil() {
   const u=state.user;
-  document.getElementById('d-profil-kode').value=u.kode||''; document.getElementById('d-profil-nama').value=u.nama||''; document.getElementById('d-profil-email').value=u.email||''; document.getElementById('d-profil-prodi').value=u.prodi||'';
+  document.getElementById('d-profil-kode').value=u.kode||'';
+  document.getElementById('d-profil-nama').value=u.nama||'';
+  document.getElementById('d-profil-email').value=u.email||'';
+  document.getElementById('d-profil-prodi').value=u.prodi||'';
   document.getElementById('d-profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
 }
-async function previewDosenFoto(event) {
-  const file = event.target.files[0]; if(!file) return;
-  try { toast('Memproses gambar...', 'info'); pendingDosenFoto = await compressImage(file, 256); document.getElementById('d-foto-preview').src = pendingDosenFoto; document.getElementById('d-foto-preview-wrap').style.display = 'flex'; document.getElementById('d-profil-foto-wrap').style.display = 'none'; } catch(err) { toast(err, 'error'); }
-}
-async function uploadDosenFoto() {
-  if(!pendingDosenFoto) return; toast('Mengupload foto...', 'info');
-  const res = await api('uploadPhotoDosen', {base64: pendingDosenFoto.split(',')[1], mimeType: 'image/jpeg', token: state.token}, 'POST');
-  if (!res.success) return toast(res.message, 'error');
-  toast('Foto diupload!', 'success'); state.user.foto = res.url; localStorage.setItem('lytana_user', JSON.stringify(state.user));
-  document.getElementById('d-foto-preview-wrap').style.display = 'none'; document.getElementById('d-profil-foto-wrap').style.display = 'flex'; fillDosenProfil(); updateDosenChip(); 
-}
-async function simpanProfilDosen() {
-  const kodeLama = state.user.kode, kodeBaru = document.getElementById('d-profil-kode').value.trim(), nama = document.getElementById('d-profil-nama').value.trim(), email = document.getElementById('d-profil-email').value.trim();
-  if(!kodeBaru || !nama || !email) return toast('Kode, Nama, dan Email tidak boleh kosong', 'error');
-  toast('Menyimpan perubahan...', 'info');
-  const res = await api('updateProfilDosen', {kodeLama, kodeBaru, nama, email, token: state.token}, 'POST');
-  if(!res.success) return toast(res.message, 'error');
-  state.user.kode = kodeBaru; state.user.nama = nama; state.user.email = email; localStorage.setItem('lytana_user', JSON.stringify(state.user));
-  updateDosenChip(); toast('Profil berhasil diperbarui!', 'success');
+
+function previewDosenFoto(event) {
+  const file=event.target.files[0]; if(!file) return;
+  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
+  const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; document.getElementById('d-profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
 }
 
+async function uploadDosenFoto() {
+  const file=document.getElementById('d-foto-input').files[0]; if(!file) return;
+  const r=new FileReader(); r.onload=async e=>{
+    toast('Mengupload foto...','info');
+    const res=await api('uploadPhotoDosen',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
+    if (!res.success) return toast(res.message,'error');
+    toast('Foto berhasil diupload!','success');
+    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
+    document.getElementById('d-foto-preview-wrap').style.display='none'; document.getElementById('d-profil-foto-wrap').style.display='flex';
+    fillDosenProfil(); updateDosenChip(); 
+  }; r.readAsDataURL(file);
+}
+
+// ============================================================
+// SHARED — BOOKING TABLE + VALIDASI
+// ============================================================
 function bookingTable(bookings, withFoto=false) {
-  const sl={menunggu:'badge-amber',terselenggara:'badge-green',tidak_terselenggara:'badge-rose',dibatalkan:'badge-slate'}, ll={menunggu:'Menunggu',terselenggara:'Terselenggara',tidak_terselenggara:'Tidak Terjadi',dibatalkan:'Dibatalkan'};
-  return `<div class="table-wrap"><table><thead><tr><th>Mahasiswa</th>${withFoto?'<th>Foto</th>':''}<th>Sesi</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${bookings.map(b=>{
-      const slot=b.slot||{}, mhs=b.mahasiswa||{}, tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'short'});
-      return `<tr><td><div style="font-weight:600">${mhs.nama||b.kode}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>${withFoto?`<td>${renderAvatar(mhs.foto, mhs.nama, 36)}</td>`:''}<td><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span><div style="font-size:0.82rem">${tgl} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td><td><span class="badge ${sl[b.status]||'badge-slate'}">${ll[b.status]||b.status}</span></td><td>${b.status==='menunggu'?`<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Validasi</button>`:`<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`}</td></tr>`;
+  const sl={menunggu:'badge-amber',terselenggara:'badge-green',tidak_terselenggara:'badge-rose',dibatalkan:'badge-slate'};
+  const ll={menunggu:'Menunggu',terselenggara:'Terselenggara',tidak_terselenggara:'Tidak Terjadi',dibatalkan:'Dibatalkan'};
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Mahasiswa</th>${withFoto?'<th>Foto</th>':''}<th>Sesi</th><th>Status</th><th>Aksi</th></tr></thead>
+    <tbody>${bookings.map(b=>{
+      const slot=b.slot||{}; const mhs=b.mahasiswa||{};
+      const tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'short'});
+      const fotoCell=withFoto?`<td>${renderAvatar(mhs.foto, mhs.nama, 36)}</td>`:'';
+      return `<tr>
+        <td><div style="font-weight:600">${mhs.nama||b.kode}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>
+        ${fotoCell}
+        <td><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span>
+          <div style="font-size:0.82rem">${tgl} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td>
+        <td><span class="badge ${sl[b.status]||'badge-slate'}">${ll[b.status]||b.status}</span></td>
+        <td>${b.status==='menunggu'
+          ?`<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Validasi</button>`
+          :`<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`}</td>
+      </tr>`;
     }).join('')}</tbody></table></div>`;
 }
+
 function openValidasi(b) {
-  state.pendingValidateId=b.id; const slot=b.slot||{}, mhs=b.mahasiswa||{}, tgl=fmtTgl(slot.tanggal,{weekday:'long',day:'numeric',month:'long'}), sesi=slot.jamMulai?`${slot.jamMulai} – ${slot.jamSelesai}`:'—';
-  document.getElementById('validasi-content').innerHTML=`<div class="card" style="background:var(--card2);margin-bottom:0"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">${renderAvatar(mhs.foto, mhs.nama, 48)}<div><div style="font-weight:700">${mhs.nama||b.kode}</div><div style="font-size:0.82rem;color:var(--text2)">${b.kode}</div></div></div><div style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe||'—'}</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span><b>${tgl}</b></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sesi</span><b style="font-family:var(--font2)">${sesi}</b></div></div></div>`;
-  document.getElementById('validasi-catatan').value=''; openModal('modal-validasi');
-}
-async function doValidate(status) {
-  const res=await api('validateBooking',{bookId:state.pendingValidateId,status,catatan:document.getElementById('validasi-catatan').value,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error');
-  toast('Reservasi divalidasi: '+status.replace('_',' '),'success'); closeModal('modal-validasi'); state.pendingValidateId=null;
-  if (state.user?.role==='dosen') { loadDosenBookings(); loadDosenDashboard(); } else { loadAdminBookings(); loadAdminDashboard(); }
+  state.pendingValidateId=b.id;
+  const slot=b.slot||{}; const mhs=b.mahasiswa||{};
+  const tgl=fmtTgl(slot.tanggal,{weekday:'long',day:'numeric',month:'long'});
+  const sesi=slot.jamMulai?`${slot.jamMulai} – ${slot.jamSelesai}`:'—';
+  document.getElementById('validasi-content').innerHTML=`
+    <div class="card" style="background:var(--card2);margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        ${renderAvatar(mhs.foto, mhs.nama, 48)}
+        <div><div style="font-weight:700">${mhs.nama||b.kode}</div><div style="font-size:0.82rem;color:var(--text2)">${b.kode}</div></div>
+      </div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Jenis</span><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}">${slot.tipe||'—'}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Tanggal</span><b>${tgl}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sesi</span><b style="font-family:var(--font2)">${sesi}</b></div>
+      </div>
+    </div>`;
+  document.getElementById('validasi-catatan').value='';
+  openModal('modal-validasi');
 }
 
-// ================= ADMIN FUNCTIONS =================
+async function doValidate(status) {
+  const catatan=document.getElementById('validasi-catatan').value;
+  const res=await api('validateBooking',{bookId:state.pendingValidateId,status,catatan,token:state.token},'POST');
+  if (!res.success) return toast(res.message,'error');
+  toast('Reservasi divalidasi: '+status.replace('_',' '),'success');
+  closeModal('modal-validasi'); state.pendingValidateId=null;
+  if (state.user?.role==='dosen') { loadDosenBookings(); loadDosenDashboard(); }
+  else { loadAdminBookings(); loadAdminDashboard(); }
+}
+
+// ============================================================
+// ADMIN — DASHBOARD
+// ============================================================
 async function loadAdminDashboard() {
   const res=await api('getDashboardStats',{token:state.token});
   if (res.success) {
     const s=res.stats;
-    document.getElementById('a-stat-dosen').textContent=s.totalDosen; document.getElementById('a-stat-mhs').textContent=s.totalMahasiswa; document.getElementById('a-stat-sesi').textContent=s.totalSlots; document.getElementById('a-stat-book').textContent=s.totalBookings; document.getElementById('a-stat-pending').textContent=s.pendingCount; document.getElementById('a-stat-done').textContent=s.confirmedCount;
+    document.getElementById('a-stat-dosen').textContent=s.totalDosen;
+    document.getElementById('a-stat-mhs').textContent=s.totalMahasiswa;
+    document.getElementById('a-stat-sesi').textContent=s.totalSlots;
+    document.getElementById('a-stat-book').textContent=s.totalBookings;
+    document.getElementById('a-stat-pending').textContent=s.pendingCount;
+    document.getElementById('a-stat-done').textContent=s.confirmedCount;
+    if (s.statusCount) {
+      document.getElementById('a-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
+      document.getElementById('a-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
+      document.getElementById('a-s-revisi').textContent=s.statusCount.revisi||0;
+      document.getElementById('a-s-sidang').textContent=s.statusCount.menunggu_sidang||0;
+      document.getElementById('a-s-lulus').textContent=s.statusCount.lulus||0;
+    }
   }
   const bRes=await api('getAllBookings',{token:state.token});
-  const c=document.getElementById('a-recent-bookings'), pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
+  const c=document.getElementById('a-recent-bookings');
+  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
   if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu</p></div>'; return; }
   c.innerHTML=bookingTable(pending,true);
 }
+
+// ============================================================
+// ADMIN — DOSEN
+// ============================================================
 async function loadAdminDosen() {
-  const c=document.getElementById('a-dosen-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('a-dosen-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getAllDosen',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.allDosen=res.dosen;
-  if (!state.allDosen.length) { c.innerHTML='<div class="empty-state"><p>Belum ada dosen</p></div>'; return; }
-  c.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Prodi</th><th>Aksi</th></tr></thead><tbody>${state.allDosen.map(d=>`<tr><td>${renderAvatar(d.foto, d.nama, 36)}</td><td style="font-weight:600">${d.nama}</td><td><code>${d.kode}</code></td><td>${d.prodi||'—'}</td><td><button class="btn btn-rose btn-sm" onclick="deleteDosenConfirm('${d.kode}','${d.nama.replace(/'/g,"\\'")}')">Hapus</button></td></tr>`).join('')}</tbody></table></div>`;
+  if (!state.allDosen.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👨‍🏫</div><p>Belum ada dosen terdaftar</p></div>'; return; }
+  c.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Prodi</th><th>Email</th><th>Terdaftar</th><th>Aksi</th></tr></thead>
+    <tbody>${state.allDosen.map(d=>`<tr>
+      <td>${renderAvatar(d.foto, d.nama, 36)}</td>
+      <td style="font-weight:600">${d.nama}</td>
+      <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${d.kode}</code></td>
+      <td style="color:var(--text2)">${d.prodi||'—'}</td>
+      <td style="color:var(--text2)">${d.email}</td>
+      <td style="color:var(--text3);font-size:0.8rem">${d.createdAt?new Date(d.createdAt).toLocaleDateString('id-ID'):'—'}</td>
+      <td><button class="btn btn-rose btn-sm" onclick="deleteDosenConfirm('${d.kode}','${d.nama.replace(/'/g,"\\'")}')">Hapus</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
 }
+
 async function deleteDosenConfirm(kode, nama) {
-  if (!confirm(`Hapus dosen "${nama}"?`)) return;
+  if (!confirm(`Hapus dosen "${nama}" (${kode})?\n\nSemua slot dan datanya tetap ada di spreadsheet.`)) return;
   const res=await api('deleteDosen',{kode,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error'); toast('Dosen dihapus','info'); loadAdminDosen();
+  if (!res.success) return toast(res.message,'error');
+  toast('Dosen dihapus','info'); loadAdminDosen();
 }
+
+// ============================================================
+// ADMIN — MAHASISWA
+// ============================================================
 async function loadAdminUsers() {
-  const c=document.getElementById('a-users-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('a-users-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getAllUsers',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.allUsers=res.users; renderAdminUsers(state.allUsers);
+  state.allUsers=res.users;
+  renderAdminUsers(state.allUsers);
 }
+
 function renderAdminUsers(users) {
   const c=document.getElementById('a-users-container');
-  if (!users.length) { c.innerHTML='<div class="empty-state"><p>Belum ada mahasiswa</p></div>'; return; }
-  c.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Status Skripsi</th><th>Aksi</th></tr></thead><tbody>${users.map(u=>`<tr><td>${renderAvatar(u.foto, u.nama, 36)}</td><td style="font-weight:600">${u.nama}</td><td><code>${u.kode}</code></td><td>${statusBadge(u.statusSkripsi)}</td><td><button class="btn btn-amber btn-sm" onclick="openResetKode('${u.kode}')">Reset Kode</button> <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}','${u.nama.replace(/'/g,"\\'")}')">Hapus</button></td></tr>`).join('')}</tbody></table></div>`;
+  if (!users.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa</p></div>'; return; }
+  c.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Foto</th><th>Nama</th><th>Kode</th><th>Status Skripsi</th><th>Pembimbing 1 & 2</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
+    <tbody>${users.map(u=>`<tr>
+      <td>${renderAvatar(u.foto, u.nama, 36)}</td>
+      <td style="font-weight:600">${u.nama}</td>
+      <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:0.8rem">${u.kode}</code></td>
+      <td>${statusBadge(u.statusSkripsi)}</td>
+      <td style="font-size:0.85rem;color:var(--text2)">
+        <div style="margin-bottom:2px"><span style="color:var(--text3)">1:</span> ${u.dosenNama1||'<span style="color:var(--text3)">Belum dipilih</span>'}</div>
+        <div><span style="color:var(--text3)">2:</span> ${u.dosenNama2||'<span style="color:var(--text3)">Belum dipilih</span>'}</div>
+      </td>
+      <td style="font-size:0.78rem;color:var(--text3)">${daysSinceStr(u.lastActivity)}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-amber btn-sm" onclick="openResetKode('${u.kode}')">Reset Kode</button>
+        <button class="btn btn-rose btn-sm" onclick="deleteUserConfirm('${u.kode}','${u.nama.replace(/'/g,"\\'")}')">Hapus</button>
+      </td>
+    </tr>`).join('')}</tbody></table></div>`;
 }
-function filterAdminUsers(q) { renderAdminUsers(state.allUsers.filter(u=>u.nama.toLowerCase().includes(q.toLowerCase()) || u.kode.toLowerCase().includes(q.toLowerCase()))); }
+
+function filterAdminUsers(q) {
+  const f=state.allUsers.filter(u=>
+    u.nama.toLowerCase().includes(q.toLowerCase()) || 
+    u.kode.toLowerCase().includes(q.toLowerCase()) ||
+    (u.dosenNama1||'').toLowerCase().includes(q.toLowerCase()) ||
+    (u.dosenNama2||'').toLowerCase().includes(q.toLowerCase())
+  );
+  renderAdminUsers(f);
+}
+
 async function deleteUserConfirm(kode, nama) {
-  if (!confirm(`Hapus mahasiswa "${nama}"?`)) return;
+  if (!confirm(`Hapus mahasiswa "${nama}" (${kode})? Tindakan tidak dapat dibatalkan.`)) return;
   const res=await api('deleteUser',{kode,token:state.token},'POST');
-  if (!res.success) return toast(res.message,'error'); toast('Mahasiswa dihapus','info'); loadAdminUsers();
+  if (!res.success) return toast(res.message,'error');
+  toast('Mahasiswa dihapus','info'); loadAdminUsers();
 }
-function openResetKode(kode) { state.pendingResetKode=kode; document.getElementById('reset-kode-lama').value=kode; document.getElementById('reset-kode-baru').value=''; openModal('modal-reset-kode'); }
+
+function openResetKode(kode) {
+  state.pendingResetKode=kode;
+  document.getElementById('reset-kode-lama').value=kode;
+  document.getElementById('reset-kode-baru').value='';
+  openModal('modal-reset-kode');
+}
+
 async function doResetKode() {
   const newKode=document.getElementById('reset-kode-baru').value.trim();
   if (!newKode) return toast('Masukkan kode baru','error');
   const res=await api('resetStudentCode',{kode:state.pendingResetKode,newKode,token:state.token},'POST');
   if (!res.success) return toast(res.message,'error');
-  toast('Kode berhasil direset!','success'); closeModal('modal-reset-kode'); loadAdminUsers();
+  toast('Kode berhasil direset! Mahasiswa harus login ulang.','success');
+  closeModal('modal-reset-kode'); state.pendingResetKode=null; loadAdminUsers();
 }
+
+// ============================================================
+// ADMIN — BOOKINGS & SLOTS
+// ============================================================
 async function loadAdminBookings() {
-  const c=document.getElementById('a-bookings-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('a-bookings-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getAllBookings',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.allBookings=res.bookings; renderAdminBookings(state.allBookings);
+  state.allBookings=res.bookings;
+  renderAdminBookings(state.allBookings);
 }
+
 function renderAdminBookings(bookings) {
   const c=document.getElementById('a-bookings-container');
-  if (!bookings.length) { c.innerHTML='<div class="empty-state"><p>Belum ada reservasi</p></div>'; return; }
+  if (!bookings.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada reservasi</p></div>'; return; }
   c.innerHTML=bookingTable(bookings,true);
 }
-function filterAdminBookings(status, btn) { document.querySelectorAll('#a-bookings .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderAdminBookings(status==='all'?state.allBookings:state.allBookings.filter(b=>b.status===status)); }
+
+function filterAdminBookings(status, btn) {
+  document.querySelectorAll('#a-bookings .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const f=status==='all'?state.allBookings:state.allBookings.filter(b=>b.status===status);
+  renderAdminBookings(f);
+}
+
 async function loadAdminSlots() {
-  const c=document.getElementById('a-slots-container'); c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
+  const c=document.getElementById('a-slots-container');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>';
   const res=await api('getAllSlots',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   state.allSlots=res.slots;
-  if (!state.allSlots.length) { c.innerHTML='<div class="empty-state"><p>Belum ada sesi</p></div>'; return; }
-  const dr=await api('getAllDosen',{token:state.token}), dm={}; (dr.dosen||[]).forEach(d=>dm[d.kode]=d.nama);
-  c.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Dosen</th><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th></tr></thead><tbody>${state.allSlots.map(s=>{ const terisi=s.bookedBy&&s.bookedBy!==''; return `<tr><td style="font-size:0.82rem;color:var(--text2)">${dm[s.dosenKode]||s.dosenKode||'—'}</td><td><span class="badge badge-${s.tipe==='offline'?'blue':'teal'}">${s.tipe}</span></td><td>${fmtTgl(s.tanggal,{day:'numeric',month:'short',year:'numeric'})}</td><td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td><td>${terisi?'<span class="badge badge-rose">Terisi</span>':'<span class="badge badge-green">Tersedia</span>'}</td></tr>`; }).join('')}</tbody></table></div>`;
+  if (!state.allSlots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi</p></div>'; return; }
+  
+  const dr=await api('getAllDosen',{token:state.token});
+  const dm={}; (dr.dosen||[]).forEach(d=>dm[d.kode]=d.nama);
+  
+  c.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Dosen</th><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th></tr></thead>
+    <tbody>${state.allSlots.map(s=>{
+      const terisi=s.bookedBy&&s.bookedBy!=='';
+      return `<tr>
+        <td style="font-size:0.82rem;color:var(--text2)">${dm[s.dosenKode]||s.dosenKode||'—'}</td>
+        <td><span class="badge badge-${s.tipe==='offline'?'blue':'teal'}">${s.tipe}</span></td>
+        <td>${fmtTgl(s.tanggal,{day:'numeric',month:'short',year:'numeric'})}</td>
+        <td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td>
+        <td>${terisi?'<span class="badge badge-rose">Terisi</span>':'<span class="badge badge-green">Tersedia</span>'}</td>
+        <td style="font-size:0.82rem">${terisi?`<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>`:'—'}</td>
+        <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan||'—'}</td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
 }
 
-// ================= REKAP AKADEMIK =================
-let rekapData=null;
+// ============================================================
+// EXPORT REKAP (Dosen)
+// ============================================================
 async function doExportRekap() {
   toast('Menyiapkan data rekap...','info');
   const res=await api('exportRekap',{token:state.token});
   if (!res.success) return toast(res.message,'error');
-  const csv=[['Rekap Bimbingan Skripsi — Lytana'],['Dicetak:',new Date(res.generatedAt).toLocaleString('id-ID')],[],['Kode','Nama','Email','Status Skripsi','Progress (%)','Terakhir Aktif'],...res.rekap.map(m=>[m.kode,m.nama,m.email,STATUS_CONFIG[m.statusSkripsi]?.label||m.statusSkripsi,m.avgProgress,m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—'])].map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'})); a.download='Rekap_Lytana.csv'; a.click();
+  const data=res.rekap;
+  const rows=[
+    ['Rekap Bimbingan Skripsi — Lytana'],
+    ['Dicetak:',new Date(res.generatedAt).toLocaleString('id-ID')],
+    [],
+    ['Kode','Nama','Email','Pembimbing 1','Pembimbing 2','Prodi Dosen','Status Skripsi','Progress (%)','Bimbingan Terselenggara','Bimbingan Dibatalkan','Terakhir Bimbingan','Hari Sejak Bimbingan','Terakhir Aktif','Terdaftar'],
+    ...data.map(m=>[
+      m.kode,m.nama,m.email,m.dosenNama1,m.dosenNama2,m.dosenProdi,
+      STATUS_CONFIG[m.statusSkripsi]?.label||m.statusSkripsi,
+      m.avgProgress,m.bimbinganTerselenggara,m.bimbinganDibatalkan,
+      m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
+      m.daysSinceLastBimbingan!==null?m.daysSinceLastBimbingan+' hari':'—',
+      m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
+      m.createdAt?new Date(m.createdAt).toLocaleDateString('id-ID'):'—',
+    ])
+  ];
+  const csv=rows.map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='Rekap_Bimbingan_Lytana_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Rekap berhasil diexport!','success');
 }
+
+// ============================================================
+// REKAP AKADEMIK (Admin)
+// ============================================================
+let rekapData=null;
 async function loadAkademikRekap() {
-  const c=document.getElementById('a-rekap-container'), s=document.getElementById('a-rekap-summary');
-  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div></div>'; s.innerHTML='';
+  const c=document.getElementById('a-rekap-container');
+  const s=document.getElementById('a-rekap-summary');
+  c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat rekap akademik...</div>';
+  s.innerHTML='';
   const res=await api('getAkademikRekap',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   rekapData=res;
-  s.innerHTML=[{n:res.summary.total,l:'Total Mahasiswa',c:'var(--blue2)'},{n:res.summary.aktif_bimbingan,l:'Aktif Bimbingan',c:'var(--green)'},{n:res.summary.tidak_aktif,l:'Tidak Aktif',c:'var(--slate)'},{n:res.summary.revisi,l:'Revisi',c:'var(--amber)'},{n:res.summary.menunggu_sidang,l:'Menunggu Sidang',c:'var(--purple)'},{n:res.summary.lulus,l:'Lulus / Wisuda',c:'var(--sky)'}].map(i=>`<div class="rekap-stat"><div class="num" style="color:${i.c}">${i.n||0}</div><div class="lbl">${i.l}</div></div>`).join('');
+  renderAkademikSummary(res.summary);
   renderAkademikTable(res.perDosen, 'semua');
 }
+
+function renderAkademikSummary(sum) {
+  const s=document.getElementById('a-rekap-summary');
+  const items=[
+    {n:sum.total,l:'Total Mahasiswa',c:'var(--blue2)'},
+    {n:sum.aktif_bimbingan,l:'Aktif Bimbingan',c:'var(--green)'},
+    {n:sum.tidak_aktif,l:'Tidak Aktif',c:'var(--slate)'},
+    {n:sum.revisi,l:'Revisi',c:'var(--amber)'},
+    {n:sum.menunggu_sidang,l:'Menunggu Sidang',c:'var(--purple)'},
+    {n:sum.lulus,l:'Lulus / Wisuda',c:'var(--sky)'},
+  ];
+  s.innerHTML=items.map(i=>`<div class="rekap-stat"><div class="num" style="color:${i.c}">${i.n||0}</div><div class="lbl">${i.l}</div></div>`).join('');
+}
+
 function renderAkademikTable(perDosen, filterStatus) {
   const c=document.getElementById('a-rekap-container');
-  if (!perDosen||!perDosen.length) { c.innerHTML='<div class="empty-state"><p>Belum ada data</p></div>'; return; }
+  if (!perDosen||!perDosen.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada data</p></div>'; return; }
   let html='';
   perDosen.forEach(d=>{
-    let mhsList=filterStatus==='semua'?d.mhs:d.mhs.filter(m=>m.status===filterStatus);
+    let mhsList=d.mhs;
+    if (filterStatus!=='semua') mhsList=mhsList.filter(m=>m.status===filterStatus);
     if (!mhsList.length) return;
-    html+=`<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;margin-bottom:14px"><div><div style="font-weight:700">${d.nama||d.kode}</div><div style="font-size:0.82rem;color:var(--text2)">${mhsList.length} mahasiswa</div></div></div><div class="table-wrap"><table><thead><tr><th>Nama</th><th>Kode</th><th>Status</th></tr></thead><tbody>${mhsList.map(m=>`<tr><td><div style="display:flex;align-items:center;gap:8px">${renderAvatar(m.foto, m.nama, 28)}<span style="font-weight:600">${m.nama}</span></div></td><td><code>${m.kode}</code></td><td>${statusBadge(m.status)}</td></tr>`).join('')}</tbody></table></div></div>`;
+    html+=`<div class="card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-weight:700;font-size:1rem">${d.nama||d.kode}</div>
+          <div style="font-size:0.82rem;color:var(--text2)">${d.prodi||''} · ${mhsList.length} mahasiswa (P1 / P2)</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${['aktif_bimbingan','tidak_aktif','revisi','menunggu_sidang','lulus'].map(st=>{
+            const count=d.mhs.filter(m=>m.status===st).length;
+            return count>0?statusBadge(st).replace('</span>',` (${count})</span>`):'';
+          }).join('')}
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nama</th><th>Kode</th><th>Status</th><th>Bimbingan</th><th>Terakhir Bimbingan</th><th>Terakhir Aktif</th></tr></thead>
+        <tbody>${mhsList.map(m=>{
+          const days=m.lastActivity?Math.floor((Date.now()-new Date(m.lastActivity).getTime())/86400000):999;
+          return `<tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                ${renderAvatar(m.foto, m.nama, 28)}
+                <span style="font-weight:600">${m.nama}</span>
+              </div>
+            </td>
+            <td><code style="font-size:0.78rem;background:var(--card2);padding:2px 6px;border-radius:4px">${m.kode}</code></td>
+            <td>${statusBadge(m.status)}</td>
+            <td style="text-align:center">${m.bimbinganOk}</td>
+            <td style="font-size:0.82rem;color:var(--text2)">${m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'short',year:'numeric'}):'Belum ada'}</td>
+            <td style="font-size:0.82rem;${days>=14?'color:var(--rose)':days>=10?'color:var(--amber)':'color:var(--text2)'}">${daysSinceStr(m.lastActivity)}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
   });
-  c.innerHTML=html||'<div class="empty-state"><p>Tidak ada mahasiswa dengan filter ini</p></div>';
+  c.innerHTML=html||'<div class="empty-state"><div class="empty-icon">🔍</div><p>Tidak ada mahasiswa dengan filter ini</p></div>';
 }
-function filterRekap(status, btn) { document.querySelectorAll('#a-rekap-filter .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); if (rekapData) renderAkademikTable(rekapData.perDosen, status); }
+
+function filterRekap(status, btn) {
+  document.querySelectorAll('#a-rekap-filter .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (rekapData) renderAkademikTable(rekapData.perDosen, status);
+}
+
 async function exportAkademikCSV() {
-  if (!rekapData) return;
-  const dr = await api('getAllDosen', {token:state.token}), dNameMap = {};
+  if (!rekapData) { toast('Muat data rekap dulu','error'); return; }
+  const allMhs=rekapData.mahasiswa;
+  const dosenList=rekapData.perDosen;
+  const dosenMap={};
+  dosenList.forEach(d=>{ d.mhs.forEach(m=>dosenMap[m.kode]={dosenNama:d.nama,prodi:d.prodi}); });
+  
+  const dr = await api('getAllDosen', {token:state.token});
+  const dNameMap = {};
   if(dr.success) { dr.dosen.forEach(d => dNameMap[d.kode] = d.nama); }
-  let allMhs = []; rekapData.perDosen.forEach(d=>d.mhs.forEach(m=>allMhs.push(m))); // Sederhana
-  const csv=[['REKAP AKADEMIK Lytana'],[],['Nama','Kode','Status Skripsi'],...allMhs.map((m)=>[m.nama, m.kode, STATUS_CONFIG[m.status]?.label||m.status])].map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'})); a.download='Rekap_Akademik_Lytana.csv'; a.click();
+
+  const rows=[
+    ['REKAP AKADEMIK BIMBINGAN SKRIPSI — LYTANA'],
+    ['Dicetak:',new Date(rekapData.generatedAt).toLocaleString('id-ID')],
+    [],
+    ['RINGKASAN'],
+    ['Total Mahasiswa',rekapData.summary.total],
+    ['Aktif Bimbingan',rekapData.summary.aktif_bimbingan],
+    ['Tidak Aktif',rekapData.summary.tidak_aktif],
+    ['Revisi',rekapData.summary.revisi],
+    ['Menunggu Sidang',rekapData.summary.menunggu_sidang],
+    ['Lulus / Wisuda',rekapData.summary.lulus],
+    [],
+    ['DETAIL MAHASISWA'],
+    ['No','Nama','Kode','Pembimbing 1','Pembimbing 2','Status Skripsi','Jumlah Bimbingan','Terakhir Bimbingan','Terakhir Aktif'],
+    ...allMhs.map((m,i)=>[
+      i+1, m.nama, m.kode,
+      dNameMap[m.dosenKode1] || m.dosenKode1 || '—',
+      dNameMap[m.dosenKode2] || m.dosenKode2 || '—',
+      STATUS_CONFIG[m.status]?.label||m.status,
+      m.bimbinganOk,
+      m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
+      m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
+    ])
+  ];
+  const csv=rows.map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='Rekap_Akademik_Lytana_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Rekap Akademik berhasil diexport!','success');
 }
 </script>
 </body>
