@@ -1389,23 +1389,48 @@ async function loadDosenSlots() {
 }
 
 function renderDosenSlots(slots) {
-  const c=document.getElementById('d-slots-container');
-  if (!slots.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi. Klik "+ Tambah Sesi".</p></div>'; return; }
-  c.innerHTML=`<div class="table-wrap"><table>
+  const c = document.getElementById('d-slots-container');
+  if (!slots.length) { 
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Belum ada sesi. Klik "+ Tambah Sesi".</p></div>'; 
+    return; 
+  }
+
+  const todayStr = new Date().toISOString().split('T')[0]; // Mendapatkan YYYY-MM-DD hari ini
+
+  c.innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th><th>Aksi</th></tr></thead>
-    <tbody>${slots.map(s=>{
-      const terisi=s.bookedBy&&s.bookedBy!=='';
-      return `<tr>
-        <td><span class="badge badge-${s.tipe==='offline'?'blue':'teal'}">${s.tipe}</span></td>
-        <td>${fmtTgl(s.tanggal,{day:'numeric',month:'short',year:'numeric'})}</td>
-        <td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td>
-        <td>${terisi?'<span class="badge badge-rose">Terisi</span>':'<span class="badge badge-green">Tersedia</span>'}</td>
-        <td style="font-size:0.82rem">${terisi?`<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>`:'—'}</td>
-        <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan||'—'}</td>
-        <td style="display:flex;gap:6px">
+    <tbody>${slots.map(s => {
+      const terisi = s.bookedBy && s.bookedBy !== '';
+      
+      // LOGIKA HANGUS: Jika ditandai hangus dari database ATAU jika (belum dipesan + lewat tanggal)
+      const isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
+      
+      // Pengaturan Badge Status
+      let badgeStatus = '';
+      if (terisi) badgeStatus = '<span class="badge badge-rose">Terisi</span>';
+      else if (isHangus) badgeStatus = '<span class="badge badge-slate" style="opacity:0.7">Hangus</span>';
+      else badgeStatus = '<span class="badge badge-green">Tersedia</span>';
+
+      // Pengaturan Tombol Aksi (Sembunyikan jika hangus)
+      let aksiHTML = '';
+      if (isHangus) {
+        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic">Terkunci</span>';
+      } else {
+        aksiHTML = `
           <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button>
           <button class="btn btn-rose btn-sm" onclick="deleteSlotConfirm('${s.id}')">Hapus</button>
-        </td></tr>`;
+        `;
+      }
+
+      return `<tr style="${isHangus ? 'background:var(--card);opacity:0.65' : ''}">
+        <td><span class="badge badge-${s.tipe === 'offline' ? 'blue' : 'teal'}">${s.tipe}</span></td>
+        <td>${fmtTgl(s.tanggal, {day: 'numeric', month: 'short', year: 'numeric'})}</td>
+        <td style="font-family:var(--font2);font-weight:600">${s.jamMulai} – ${s.jamSelesai}</td>
+        <td>${badgeStatus}</td>
+        <td style="font-size:0.82rem">${terisi ? `<code style="background:var(--card2);padding:2px 7px;border-radius:4px">${s.bookedBy}</code>` : '—'}</td>
+        <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${s.catatan || '—'}</td>
+        <td style="display:flex;gap:6px">${aksiHTML}</td>
+      </tr>`;
     }).join('')}</tbody></table></div>`;
 }
 
