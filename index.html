@@ -240,7 +240,6 @@ tr:hover td{background:var(--card2)}
           🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b>.
         </div>
 
-        <!-- Input kode unik dan NIM terpisah, digabung otomatis -->
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">Kode Unik <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">min. 4 karakter</span></label>
@@ -252,7 +251,6 @@ tr:hover td{background:var(--card2)}
           </div>
         </div>
 
-        <!-- Preview kode login gabungan -->
         <div id="kode-login-preview" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem">
           <span style="color:var(--text2)">Kode login kamu: </span>
           <b id="kode-login-gabungan" style="color:var(--blue2);font-family:monospace;font-size:1rem;letter-spacing:0.02em"></b>
@@ -265,7 +263,6 @@ tr:hover td{background:var(--card2)}
         <div class="form-group"><label class="form-label">Email</label>
           <input id="reg-email" class="form-input" type="email" placeholder="email aktif kamu"/></div>
 
-        <!-- DROPDOWN DUAL PEMBIMBING -->
         <div class="grid-2">
           <div class="form-group"><label class="form-label">Pembimbing 1</label>
             <select id="reg-dosen1" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
@@ -284,13 +281,10 @@ tr:hover td{background:var(--card2)}
         <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
           👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
         </div>
-        
-        <!-- KOLOM TOKEN KEAMANAN -->
         <div class="form-group">
           <label class="form-label" style="color:var(--orange)">🔑 Token Keamanan</label>
           <input id="dreg-token" class="form-input" type="password" placeholder="Masukkan token dari Admin" style="border-color:var(--orange)"/>
         </div>
-        
         <div class="form-group"><label class="form-label">Kode Unik</label>
           <input id="dreg-kode" class="form-input" type="text" placeholder="Buat Kode Unik Untuk Login"/></div>
         <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
@@ -370,12 +364,10 @@ tr:hover td{background:var(--card2)}
             <div class="form-group"><label class="form-label">Kode Unik</label><input id="profil-kode" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="profil-nama" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Email</label><input id="profil-email" class="form-input" readonly style="opacity:.7"/></div>
-            
             <div class="grid-2">
               <div class="form-group"><label class="form-label">Pembimbing 1</label><input id="profil-dosen1" class="form-input" readonly style="opacity:.7"/></div>
               <div class="form-group"><label class="form-label">Pembimbing 2</label><input id="profil-dosen2" class="form-input" readonly style="opacity:.7"/></div>
             </div>
-
           </div>
         </div>
         <div class="card">
@@ -383,12 +375,12 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="previewFoto(event)"/></label>
+              <input type="file" id="foto-input" accept=".jpg, .jpeg, .png" style="display:none" onchange="previewFoto(event)"/></label>
             <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="foto-preview" src="" class="photo-preview"/>
               <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
             </div>
-            <small style="color:var(--text3);text-align:center">Maks 2MB. Foto dilihat oleh dosen.</small>
+            <small style="color:var(--text3);text-align:center">Hanya JPG/PNG. Otomatis dikompres & dipotong bulat.</small>
           </div>
         </div>
       </div>
@@ -488,15 +480,17 @@ tr:hover td{background:var(--card2)}
     </div>
 
     <div id="d-profil" class="page-section">
-      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2></div></div>
+      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2><p>Kelola data dan kredensial akun</p></div></div>
       <div class="grid-2">
         <div class="card">
           <h3 style="margin-bottom:16px">Informasi Akun</h3>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="form-group"><label class="form-label">Kode Dosen</label><input id="d-profil-kode" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" readonly style="opacity:.7"/></div>
-            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Kode Dosen (Login)</label><input id="d-profil-kode" class="form-input" /></div>
+            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" /></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" type="email" /></div>
+            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7; background:rgba(0,0,0,0.2); cursor:not-allowed"/></div>
+            
+            <button class="btn btn-primary" style="margin-top:8px" onclick="simpanProfilDosen()">Simpan Perubahan Profil</button>
           </div>
         </div>
         <div class="card">
@@ -504,11 +498,12 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="d-profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="d-foto-input" accept="image/*" style="display:none" onchange="previewDosenFoto(event)"/></label>
+              <input type="file" id="d-foto-input" accept=".jpg, .jpeg, .png" style="display:none" onchange="previewDosenFoto(event)"/></label>
             <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="d-foto-preview" src="" class="photo-preview"/>
-              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload Foto</button>
+              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload & Terapkan Foto</button>
             </div>
+            <small style="color:var(--text3);text-align:center">Hanya JPG/PNG. Otomatis dikompres & dipotong bulat.</small>
           </div>
         </div>
       </div>
@@ -773,15 +768,55 @@ let state = {
   pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null
 };
 
+let pendingDosenFoto = null;
+let pendingMhsFoto = null;
+
 // ============================================================
-// AVATAR FALLBACK HELPER (Anti Broken Image)
+// IMAGE COMPRESSION HELPER
+// ============================================================
+function compressImage(file, maxSize=256) {
+  return new Promise((resolve, reject) => {
+    if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+      return reject('Format tidak didukung. Hanya JPG/PNG.');
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width, height = img.height;
+        if (width > height) {
+          if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+        } else {
+          if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+        }
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#162336'; 
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = () => reject('Gagal memproses gambar');
+    };
+    reader.onerror = () => reject('Gagal membaca file');
+  });
+}
+
+// ============================================================
+// AVATAR FALLBACK HELPER (Anti Broken Image Layering)
 // ============================================================
 function renderAvatar(foto, nama, size=28) {
   const letter = (nama||'?').charAt(0).toUpperCase();
   const fz = size * 0.4;
-  const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}px;flex-shrink:0">${letter}</div>`;
-  if (!foto || foto.trim()==='') return fallback;
-  return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${fallback.replace(/'/g, "\\'")}'"/>`;
+  return `<div style="position:relative; width:${size}px; height:${size}px; flex-shrink:0; border-radius:50%; overflow:hidden; border:2px solid var(--border2); background:linear-gradient(135deg,var(--blue),var(--purple))">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:700;color:white;position:absolute;inset:0;z-index:1">${letter}</div>
+            ${foto && foto.trim() !== '' && foto !== 'null' ? 
+              `<img src="${foto}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:2" onerror="this.style.display='none'"/>` 
+              : ''}
+          </div>`;
 }
 
 // ============================================================
@@ -897,7 +932,6 @@ async function loadDosenDropdown() {
   sel1.innerHTML = optionsHTML1;
   sel2.innerHTML = optionsHTML2;
 
-  // Pasang validasi real-time setelah dropdown terisi
   sel1.addEventListener('change', validatePembimbing);
   sel2.addEventListener('change', validatePembimbing);
 }
@@ -922,8 +956,8 @@ async function doLogin() {
 }
 
 // ── Helper kode login = kode unik + NIM ──────────────────────
-const NIM_LENGTH   = 7;   // harus sama dengan CONFIG.NIM_LENGTH di backend
-const KODE_MIN_LEN = 4;   // harus sama dengan CONFIG.KODE_MIN_LENGTH di backend
+const NIM_LENGTH   = 7;   
+const KODE_MIN_LEN = 4;   
 
 function previewKodeLogin() {
   const kodeUnik = document.getElementById('reg-kode-unik').value.trim();
@@ -932,7 +966,6 @@ function previewKodeLogin() {
   const gabungan = document.getElementById('kode-login-gabungan');
   const warn     = document.getElementById('warn-kode-login');
 
-  // Hanya angka untuk NIM
   document.getElementById('reg-nim').value = nim.replace(/[^0-9]/g, '');
   const nimClean = document.getElementById('reg-nim').value;
 
@@ -968,17 +1001,12 @@ async function doRegister() {
   const dosenKode1 = document.getElementById('reg-dosen1').value;
   const dosenKode2 = document.getElementById('reg-dosen2').value;
 
-  // Validasi input terpisah
   if (!kodeUnik || !nim || !nama || !email) return toast('Semua field wajib diisi', 'error');
   if (kodeUnik.length < KODE_MIN_LEN) return toast('Kode unik minimal ' + KODE_MIN_LEN + ' karakter', 'error');
   if (!/^\d{7}$/.test(nim)) return toast('NIM harus tepat 7 digit angka. Contoh: 2311033', 'error');
-
-  // Validasi pembimbing tidak boleh sama
   if (dosenKode1 && dosenKode1 === dosenKode2) return toast('Pembimbing 1 dan Pembimbing 2 tidak boleh sama', 'error');
 
-  // Gabungkan kode unik + NIM sebagai kode login
   const kode = kodeUnik + nim;
-
   const btn = document.getElementById('reg-btn-text');
   btn.innerHTML = '<div class="spinner"></div>';
   const res = await api('register', {kode, nama, email, dosenKode1, dosenKode2}, 'POST');
@@ -993,9 +1021,8 @@ async function doRegisterDosen() {
   const nama = document.getElementById('dreg-nama').value.trim();
   const email = document.getElementById('dreg-email').value.trim();
   const prodi = document.getElementById('dreg-prodi').value;
-  const token = document.getElementById('dreg-token').value.trim(); // Ambil input token
+  const token = document.getElementById('dreg-token').value.trim(); 
   
-  // 1. Cek apakah ada field yang kosong
   if (!kode || !nama || !email || !token) {
     return toast('Semua field wajib diisi, termasuk Token!', 'error');
   }
@@ -1003,14 +1030,11 @@ async function doRegisterDosen() {
   const btn = document.getElementById('dreg-btn-text');
   btn.innerHTML = '<div class="spinner"></div>';
   
-  // 2. Kirim semua data beserta Token ke backend
   const res = await api('registerDosen', {kode, nama, email, prodi, token}, 'POST');
-  
   btn.textContent = 'Buat Akun Dosen';
   
-  // 3. Jika ditolak oleh backend (misal: token salah)
   if (!res.success) {
-    document.getElementById('dreg-token').value = ''; // Kosongkan field token jika salah
+    document.getElementById('dreg-token').value = ''; 
     return toast(res.message, 'error');
   }
   
@@ -1188,7 +1212,6 @@ async function loadMyHistory() {
   }).join('')}</div>`;
 }
 
-// ── Helper batas batal ────────────────────────────────────────
 function sisaJamBimbingan(tanggal, jamMulai) {
   if (!tanggal || !jamMulai) return 9999;
   return (new Date(tanggal + 'T' + jamMulai + ':00').getTime() - Date.now()) / 3600000;
@@ -1200,7 +1223,6 @@ function labelSisaWaktu(jam) {
   if (jam < 24)  return '⏱ ' + Math.floor(jam) + ' jam lagi';
   return '⏱ ' + Math.floor(jam / 24) + ' hari lagi';
 }
-// ─────────────────────────────────────────────────────────────
 
 async function cancelMyBooking(bookId) {
   if (!confirm('Batalkan reservasi ini?')) return;
@@ -1267,7 +1289,6 @@ async function fillProfil() {
   document.getElementById('profil-kode').value=u.kode||'';
   document.getElementById('profil-nama').value=u.nama||'';
   document.getElementById('profil-email').value=u.email||'';
-  
   document.getElementById('profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
   
   if (u.dosenKode1 || u.dosenKode2) {
@@ -1282,23 +1303,28 @@ async function fillProfil() {
   }
 }
 
-function previewFoto(event) {
-  const file=event.target.files[0]; if(!file) return;
-  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; document.getElementById('profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
+async function previewFoto(event) {
+  const file = event.target.files[0]; if(!file) return;
+  try {
+    toast('Memproses gambar...', 'info');
+    pendingMhsFoto = await compressImage(file, 256);
+    document.getElementById('foto-preview').src = pendingMhsFoto;
+    document.getElementById('foto-preview-wrap').style.display = 'flex';
+    document.getElementById('profil-foto-wrap').style.display = 'none';
+  } catch(err) { toast(err, 'error'); }
 }
 
 async function uploadFoto() {
-  const file=document.getElementById('foto-input').files[0]; if(!file) return;
-  const r=new FileReader(); r.onload=async e=>{
-    toast('Mengupload foto...','info');
-    const res=await api('uploadPhoto',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
-    if (!res.success) return toast(res.message,'error');
-    toast('Foto berhasil diupload!','success');
-    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    document.getElementById('foto-preview-wrap').style.display='none'; document.getElementById('profil-foto-wrap').style.display='flex';
-    fillProfil(); updateMhsChip(); 
-  }; r.readAsDataURL(file);
+  if(!pendingMhsFoto) return;
+  toast('Mengupload foto...', 'info');
+  const base64Data = pendingMhsFoto.split(',')[1];
+  const res = await api('uploadPhoto', {base64: base64Data, mimeType: 'image/jpeg', token: state.token}, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Foto berhasil diupload!', 'success');
+  state.user.foto = res.url; localStorage.setItem('lytana_user', JSON.stringify(state.user));
+  document.getElementById('foto-preview-wrap').style.display = 'none'; 
+  document.getElementById('profil-foto-wrap').style.display = 'flex';
+  fillProfil(); updateMhsChip(); 
 }
 
 // ============================================================
@@ -1402,9 +1428,7 @@ function renderDosenSlots(slots) {
     <thead><tr><th>Jenis</th><th>Tanggal</th><th>Sesi</th><th>Status</th><th>Dipesan Oleh</th><th>Catatan</th><th>Aksi</th></tr></thead>
     <tbody>${slots.map(s => {
       const terisi = s.bookedBy && s.bookedBy !== '';
-      
       const isHangus = s.statusSlot === 'hangus' || (!terisi && s.tanggal < todayStr);
-      
       let badgeStatus = '';
       if (terisi) badgeStatus = '<span class="badge badge-rose">Terisi</span>';
       else if (isHangus) badgeStatus = '<span class="badge badge-slate" style="opacity:0.7">Hangus</span>';
@@ -1474,17 +1498,12 @@ async function saveSlot() {
   if (!tanggal||!jamMulai||!jamSelesai) return toast('Tanggal dan jam wajib diisi','error');
   if (jamSelesai<=jamMulai) return toast('Jam selesai harus setelah jam mulai','error');
 
-  // --- TAMBAHAN VALIDASI: CEK DUPLIKASI JADWAL ---
-  // Mencegah pembuatan double slot karena salah klik atau jaringan lambat
   const isDuplicate = state.dosenSlots.some(s => 
-    s.tanggal === tanggal && 
-    s.jamMulai === jamMulai && 
-    s.id !== id // Abaikan diri sendiri kalau sedang edit slot
+    s.tanggal === tanggal && s.jamMulai === jamMulai && s.id !== id
   );
   if (isDuplicate) {
     return toast('Sesi pada Tanggal dan Jam Mulai ini sudah ada!', 'error');
   }
-  // ----------------------------------------------
 
   const btn=document.getElementById('slot-save-btn');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
@@ -1627,23 +1646,53 @@ function fillDosenProfil() {
   document.getElementById('d-profil-foto-wrap').innerHTML=renderAvatar(u.foto, u.nama, 80);
 }
 
-function previewDosenFoto(event) {
-  const file=event.target.files[0]; if(!file) return;
-  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; document.getElementById('d-profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
+async function previewDosenFoto(event) {
+  const file = event.target.files[0]; if(!file) return;
+  try {
+    toast('Memproses gambar...', 'info');
+    pendingDosenFoto = await compressImage(file, 256); 
+    document.getElementById('d-foto-preview').src = pendingDosenFoto;
+    document.getElementById('d-foto-preview-wrap').style.display = 'flex';
+    document.getElementById('d-profil-foto-wrap').style.display = 'none';
+  } catch(err) { toast(err, 'error'); }
 }
 
 async function uploadDosenFoto() {
-  const file=document.getElementById('d-foto-input').files[0]; if(!file) return;
-  const r=new FileReader(); r.onload=async e=>{
-    toast('Mengupload foto...','info');
-    const res=await api('uploadPhotoDosen',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
-    if (!res.success) return toast(res.message,'error');
-    toast('Foto berhasil diupload!','success');
-    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    document.getElementById('d-foto-preview-wrap').style.display='none'; document.getElementById('d-profil-foto-wrap').style.display='flex';
-    fillDosenProfil(); updateDosenChip(); 
-  }; r.readAsDataURL(file);
+  if(!pendingDosenFoto) return;
+  toast('Mengupload foto...', 'info');
+  const base64Data = pendingDosenFoto.split(',')[1];
+  
+  const res = await api('uploadPhotoDosen', {base64: base64Data, mimeType: 'image/jpeg', token: state.token}, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  
+  toast('Foto berhasil diupload!', 'success');
+  state.user.foto = res.url; 
+  localStorage.setItem('lytana_user', JSON.stringify(state.user));
+  document.getElementById('d-foto-preview-wrap').style.display = 'none'; 
+  document.getElementById('d-profil-foto-wrap').style.display = 'flex';
+  fillDosenProfil(); updateDosenChip(); 
+}
+
+async function simpanProfilDosen() {
+  const kodeLama = state.user.kode; 
+  const kodeBaru = document.getElementById('d-profil-kode').value.trim();
+  const nama = document.getElementById('d-profil-nama').value.trim();
+  const email = document.getElementById('d-profil-email').value.trim();
+
+  if(!kodeBaru || !nama || !email) return toast('Kode, Nama, dan Email tidak boleh kosong', 'error');
+
+  toast('Menyimpan perubahan...', 'info');
+  const res = await api('updateProfilDosen', {kodeLama, kodeBaru, nama, email, token: state.token}, 'POST');
+  
+  if(!res.success) return toast(res.message, 'error');
+
+  state.user.kode = kodeBaru;
+  state.user.nama = nama;
+  state.user.email = email;
+  localStorage.setItem('lytana_user', JSON.stringify(state.user));
+  
+  updateDosenChip();
+  toast('Profil berhasil diperbarui!', 'success');
 }
 
 // ============================================================
