@@ -166,7 +166,7 @@ tr:hover td{background:var(--card2)}
 /* Timeline */
 .timeline{display:flex;flex-direction:column;gap:0}
 .timeline-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
-.timeline-item:not(:last-child)::before{content:'absolute';left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
+.timeline-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
 .timeline-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700}
 .timeline-dot.green{background:rgba(16,185,129,0.2);color:var(--green);border:2px solid var(--green)}
 .timeline-dot.rose{background:rgba(244,63,94,0.2);color:var(--rose);border:2px solid var(--rose)}
@@ -383,7 +383,7 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="previewFoto(event)"/></label>
+              <input type="file" id="foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewFoto(event)"/></label>
             <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="foto-preview" src="" class="photo-preview"/>
               <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
@@ -423,13 +423,14 @@ tr:hover td{background:var(--card2)}
         <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
       </div>
-      <div class="grid-3" style="margin-bottom:24px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
         <div class="card stat-card"><div class="stat-label">Mahasiswa Bimbingan</div><div class="stat-number" id="d-stat-mhs" style="color:var(--blue2)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Sesi Aktif</div><div class="stat-number" id="d-stat-sesi" style="color:var(--teal2)">—</div></div>
-        <div class="card stat-card"><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-number" id="d-stat-pending" style="color:var(--amber)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Sesi Tersedia</div><div class="stat-number" id="d-stat-tersedia" style="color:var(--green)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Sesi Terisi</div><div class="stat-number" id="d-stat-terisi" style="color:var(--purple)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-number" id="d-stat-pending" style="color:var(--amber)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Terselenggara</div><div class="stat-number" id="d-stat-done" style="color:var(--green)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Sesi Hangus</div><div class="stat-number" id="d-stat-hangus" style="color:var(--rose)">—</div></div>
       </div>
       <div style="font-size:0.82rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Status Skripsi Mahasiswamu</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:24px">
@@ -493,7 +494,11 @@ tr:hover td{background:var(--card2)}
         <div class="card">
           <h3 style="margin-bottom:16px">Informasi Akun</h3>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="form-group"><label class="form-label">Kode Dosen</label><input id="d-profil-kode" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group">
+              <label class="form-label">Kode Dosen (Login)</label>
+              <input id="d-profil-kode" class="form-input"/>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:fit-content;margin-bottom:8px" onclick="updateKodeDosen(this)">Simpan Kode Baru</button>
             <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" readonly style="opacity:.7"/></div>
             <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7"/></div>
@@ -504,7 +509,7 @@ tr:hover td{background:var(--card2)}
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
             <div id="d-profil-foto-wrap"></div>
             <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
-              <input type="file" id="d-foto-input" accept="image/*" style="display:none" onchange="previewDosenFoto(event)"/></label>
+              <input type="file" id="d-foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewDosenFoto(event)"/></label>
             <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
               <img id="d-foto-preview" src="" class="photo-preview"/>
               <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload Foto</button>
@@ -782,6 +787,34 @@ function renderAvatar(foto, nama, size=28) {
   const fallback = `<div class="avatar-ph" style="width:${size}px;height:${size}px;border-radius:50%;font-size:${fz}px;flex-shrink:0">${letter}</div>`;
   if (!foto || foto.trim()==='') return fallback;
   return `<img src="${foto}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)" onerror="this.outerHTML='${fallback.replace(/'/g, "\\'")}'"/>`;
+}
+
+// ============================================================
+// IMAGE COMPRESSOR HELPER (Maks 400px, Kualitas 80%, JPG/PNG)
+// ============================================================
+function compressImage(file, maxSize, callback) {
+  if (!file.type.match(/image\/(jpeg|png)/)) {
+    return toast('Hanya file JPG dan PNG yang diperbolehkan', 'error');
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let width = img.width; let height = img.height;
+      if (width > height) {
+        if (width > maxSize) { height = Math.round(height *= maxSize / width); width = maxSize; }
+      } else {
+        if (height > maxSize) { width = Math.round(width *= maxSize / height); height = maxSize; }
+      }
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ============================================================
@@ -1284,21 +1317,23 @@ async function fillProfil() {
 
 function previewFoto(event) {
   const file=event.target.files[0]; if(!file) return;
-  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('foto-preview').src=e.target.result; document.getElementById('foto-preview-wrap').style.display='flex'; document.getElementById('profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
+  compressImage(file, 400, (dataUrl) => {
+    document.getElementById('foto-preview').src = dataUrl;
+    document.getElementById('foto-preview-wrap').style.display='flex';
+    document.getElementById('profil-foto-wrap').style.display='none';
+  });
 }
 
 async function uploadFoto() {
-  const file=document.getElementById('foto-input').files[0]; if(!file) return;
-  const r=new FileReader(); r.onload=async e=>{
-    toast('Mengupload foto...','info');
-    const res=await api('uploadPhoto',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
-    if (!res.success) return toast(res.message,'error');
-    toast('Foto berhasil diupload!','success');
-    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    document.getElementById('foto-preview-wrap').style.display='none'; document.getElementById('profil-foto-wrap').style.display='flex';
-    fillProfil(); updateMhsChip(); 
-  }; r.readAsDataURL(file);
+  const dataUrl = document.getElementById('foto-preview').src;
+  if(!dataUrl || !dataUrl.startsWith('data:')) return toast('Pilih foto dulu', 'error');
+  toast('Mengupload foto...','info');
+  const res=await api('uploadPhoto',{base64:dataUrl.split(',')[1],mimeType:'image/jpeg',token:state.token},'POST');
+  if (!res.success) return toast(res.message,'error');
+  toast('Foto berhasil diupload!','success');
+  state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
+  document.getElementById('foto-preview-wrap').style.display='none'; document.getElementById('profil-foto-wrap').style.display='flex';
+  fillProfil(); updateMhsChip(); 
 }
 
 // ============================================================
@@ -1361,6 +1396,12 @@ async function loadDosenDashboard() {
     document.getElementById('d-stat-tersedia').textContent=s.sesiTersedia;
     document.getElementById('d-stat-terisi').textContent=s.sesiTerisi;
     document.getElementById('d-stat-done').textContent=s.terselenggaraCount;
+    
+    // SESI HANGUS
+    if(document.getElementById('d-stat-hangus')) {
+      document.getElementById('d-stat-hangus').textContent = s.sesiHangus || 0;
+    }
+
     if (s.statusCount) {
       document.getElementById('d-s-aktif').textContent=s.statusCount.aktif_bimbingan||0;
       document.getElementById('d-s-inaktif').textContent=s.statusCount.tidak_aktif||0;
@@ -1412,7 +1453,7 @@ function renderDosenSlots(slots) {
 
       let aksiHTML = '';
       if (isHangus) {
-        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Slot ini sudah kadaluarsa</small></span>';
+        aksiHTML = '<span style="font-size:0.8rem;color:var(--text3);font-style:italic;line-height:1.2;display:inline-block">Terkunci<br><small style="color:var(--rose);font-weight:600">Slot kadaluarsa</small></span>';
       } else {
         aksiHTML = `
           <button class="btn btn-ghost btn-sm" onclick='editSlot(${JSON.stringify(s).replace(/'/g,"\\'")})'>Edit</button>
@@ -1474,17 +1515,15 @@ async function saveSlot() {
   if (!tanggal||!jamMulai||!jamSelesai) return toast('Tanggal dan jam wajib diisi','error');
   if (jamSelesai<=jamMulai) return toast('Jam selesai harus setelah jam mulai','error');
 
-  // --- TAMBAHAN VALIDASI: CEK DUPLIKASI JADWAL ---
-  // Mencegah pembuatan double slot karena salah klik atau jaringan lambat
+  // ANTI DUPLIKASI
   const isDuplicate = state.dosenSlots.some(s => 
     s.tanggal === tanggal && 
     s.jamMulai === jamMulai && 
-    s.id !== id // Abaikan diri sendiri kalau sedang edit slot
+    s.id !== id
   );
   if (isDuplicate) {
     return toast('Sesi pada Tanggal dan Jam Mulai ini sudah ada!', 'error');
   }
-  // ----------------------------------------------
 
   const btn=document.getElementById('slot-save-btn');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
@@ -1629,21 +1668,42 @@ function fillDosenProfil() {
 
 function previewDosenFoto(event) {
   const file=event.target.files[0]; if(!file) return;
-  if (file.size>2*1024*1024) return toast('Foto maksimal 2MB','error');
-  const r=new FileReader(); r.onload=e=>{ document.getElementById('d-foto-preview').src=e.target.result; document.getElementById('d-foto-preview-wrap').style.display='flex'; document.getElementById('d-profil-foto-wrap').style.display='none';}; r.readAsDataURL(file);
+  compressImage(file, 400, (dataUrl) => {
+    document.getElementById('d-foto-preview').src = dataUrl;
+    document.getElementById('d-foto-preview-wrap').style.display='flex';
+    document.getElementById('d-profil-foto-wrap').style.display='none';
+  });
 }
 
 async function uploadDosenFoto() {
-  const file=document.getElementById('d-foto-input').files[0]; if(!file) return;
-  const r=new FileReader(); r.onload=async e=>{
-    toast('Mengupload foto...','info');
-    const res=await api('uploadPhotoDosen',{base64:e.target.result.split(',')[1],mimeType:file.type,token:state.token},'POST');
-    if (!res.success) return toast(res.message,'error');
-    toast('Foto berhasil diupload!','success');
-    state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
-    document.getElementById('d-foto-preview-wrap').style.display='none'; document.getElementById('d-profil-foto-wrap').style.display='flex';
-    fillDosenProfil(); updateDosenChip(); 
-  }; r.readAsDataURL(file);
+  const dataUrl = document.getElementById('d-foto-preview').src;
+  if(!dataUrl || !dataUrl.startsWith('data:')) return toast('Pilih foto dulu', 'error');
+  toast('Mengupload foto...','info');
+  const res=await api('uploadPhotoDosen',{base64:dataUrl.split(',')[1],mimeType:'image/jpeg',token:state.token},'POST');
+  if (!res.success) return toast(res.message,'error');
+  toast('Foto berhasil diupload!','success');
+  state.user.foto=res.url; localStorage.setItem('lytana_user',JSON.stringify(state.user));
+  document.getElementById('d-foto-preview-wrap').style.display='none'; document.getElementById('d-profil-foto-wrap').style.display='flex';
+  fillDosenProfil(); updateDosenChip(); 
+}
+
+async function updateKodeDosen(btn) {
+  const newKode = document.getElementById('d-profil-kode').value.trim();
+  if(!newKode || newKode.length < 4) return toast('Kode Dosen minimal 4 karakter', 'error');
+  if(newKode === state.user.kode) return toast('Tidak ada perubahan kode', 'info');
+
+  if(!confirm('Yakin ingin merubah kode login Anda? Jika iya, Anda akan diminta login kembali.')) return;
+
+  const oldText = btn.textContent;
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>';
+
+  const res = await api('updateDosenProfile', {newKode, token: state.token}, 'POST');
+  btn.disabled = false; btn.textContent = oldText;
+
+  if(!res.success) return toast(res.message, 'error');
+  
+  toast('Kode berhasil diupdate! Silakan login kembali.', 'success');
+  setTimeout(() => doLogout(), 2500);
 }
 
 // ============================================================
