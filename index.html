@@ -171,6 +171,7 @@ tr:hover td{background:var(--card2)}
 .timeline-dot.green{background:rgba(16,185,129,0.2);color:var(--green);border:2px solid var(--green)}
 .timeline-dot.rose{background:rgba(244,63,94,0.2);color:var(--rose);border:2px solid var(--rose)}
 .timeline-dot.amber{background:rgba(245,158,11,0.2);color:var(--amber);border:2px solid var(--amber)}
+.timeline-dot.blue{background:rgba(37,99,235,0.2);color:var(--blue2);border:2px solid var(--blue2)}
 .timeline-dot.slate{background:rgba(148,163,184,0.15);color:var(--slate);border:2px solid var(--slate)}
 .timeline-body{flex:1;padding-top:4px}
 .timeline-body .meta{font-size:0.78rem;color:var(--text3);margin-top:4px}
@@ -469,7 +470,8 @@ tr:hover td{background:var(--card2)}
       </div>
       <div class="filter-row">
         <button class="filter-btn active" onclick="filterDosenBookings('all',this)">Semua</button>
-        <button class="filter-btn" onclick="filterDosenBookings('menunggu',this)">Menunggu</button>
+        <button class="filter-btn" onclick="filterDosenBookings('menunggu',this)">Menunggu ACC</button>
+        <button class="filter-btn" onclick="filterDosenBookings('disetujui',this)">Di-ACC</button>
         <button class="filter-btn" onclick="filterDosenBookings('terselenggara',this)">Terselenggara</button>
         <button class="filter-btn" onclick="filterDosenBookings('tidak_terselenggara',this)">Tidak Terjadi</button>
       </div>
@@ -597,7 +599,8 @@ tr:hover td{background:var(--card2)}
       </div>
       <div class="filter-row">
         <button class="filter-btn active" onclick="filterAdminBookings('all',this)">Semua</button>
-        <button class="filter-btn" onclick="filterAdminBookings('menunggu',this)">Menunggu</button>
+        <button class="filter-btn" onclick="filterAdminBookings('menunggu',this)">Menunggu ACC</button>
+        <button class="filter-btn" onclick="filterAdminBookings('disetujui',this)">Di-ACC</button>
         <button class="filter-btn" onclick="filterAdminBookings('terselenggara',this)">Terselenggara</button>
         <button class="filter-btn" onclick="filterAdminBookings('tidak_terselenggara',this)">Tidak Terjadi</button>
         <button class="filter-btn" onclick="filterAdminBookings('dibatalkan',this)">Dibatalkan</button>
@@ -706,7 +709,7 @@ tr:hover td{background:var(--card2)}
 <!-- Modal Validasi -->
 <div class="modal-overlay" id="modal-validasi">
   <div class="modal">
-    <div class="modal-header"><h3>Validasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-validasi')">×</button></div>
+    <div class="modal-header"><h3>Verifikasi Selesai Bimbingan</h3><button class="modal-close" onclick="closeModal('modal-validasi')">×</button></div>
     <div id="validasi-content"></div>
     <div style="margin-top:16px"><div class="form-group"><label class="form-label">Catatan (opsional)</label>
       <textarea id="validasi-catatan" class="form-textarea" placeholder="Topik yang dibahas, tindak lanjut, dsb."></textarea></div></div>
@@ -1195,7 +1198,16 @@ async function loadMyHistory() {
     ...(bRes.bookings||[]).map(b=>({...b,_type:'booking'})),
   ].sort((a,b)=>(b.createdAt||b.tanggal||'').localeCompare(a.createdAt||a.tanggal||''));
   if (!all.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada riwayat bimbingan</p></div>'; return; }
-  const sm={menunggu:{cls:'amber',icon:'⏳',label:'Menunggu'},terselenggara:{cls:'green',icon:'✓',label:'Terselenggara'},tidak_terselenggara:{cls:'rose',icon:'✕',label:'Tidak terjadi'},dibatalkan:{cls:'slate',icon:'–',label:'Dibatalkan'}};
+  
+  // Update status mapping dengan 'disetujui'
+  const sm={
+    menunggu:{cls:'amber',icon:'⏳',label:'Menunggu ACC'}, 
+    disetujui:{cls:'blue',icon:'👍',label:'Telah Di-ACC'}, 
+    terselenggara:{cls:'green',icon:'✓',label:'Terselenggara'}, 
+    tidak_terselenggara:{cls:'rose',icon:'✕',label:'Tidak terjadi'}, 
+    dibatalkan:{cls:'slate',icon:'–',label:'Dibatalkan/Ditolak'}
+  };
+  
   c.innerHTML=`<div class="timeline">${all.map(item=>{
     const s=sm[item.status]||{cls:'slate',icon:'?',label:item.status};
     const slot=item.slot||{}; const dosen=item.dosen||{};
@@ -1207,7 +1219,7 @@ async function loadMyHistory() {
         <div style="font-weight:600">${slot.tipe?slot.tipe.charAt(0).toUpperCase()+slot.tipe.slice(1):'Bimbingan'} — ${tgl}</div>
         <div style="font-size:0.85rem;color:var(--text2)">⏰ ${sesi}${dosen.nama?' · '+dosen.nama:''}</div>
         <div class="meta">${s.label}${item.catatan?' · '+item.catatan:''}</div>
-        ${item._type==='booking'&&item.status==='menunggu'?(()=>{
+        ${item._type==='booking'&&(item.status==='menunggu' || item.status==='disetujui')?(()=>{
           const sisa = sisaJamBimbingan(slot.tanggal, slot.jamMulai);
           const bisaBatal = sisa >= 24;
           const warnaInfo = sisa < 24 ? 'var(--rose)' : sisa < 48 ? 'var(--amber)' : 'var(--slate)';
@@ -1412,8 +1424,8 @@ async function loadDosenDashboard() {
   }
   const bRes=await api('getMyBookingsAll',{token:state.token});
   const c=document.getElementById('d-recent-bookings');
-  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
-  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu konfirmasi</p></div>'; return; }
+  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu' || b.status==='disetujui').slice(0,5);
+  if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu tindakan</p></div>'; return; }
   c.innerHTML=bookingTable(pending,false);
 }
 
@@ -1710,23 +1722,35 @@ async function updateKodeDosen(btn) {
 // SHARED — BOOKING TABLE + VALIDASI
 // ============================================================
 function bookingTable(bookings, withFoto=false) {
-  const sl={menunggu:'badge-amber',terselenggara:'badge-green',tidak_terselenggara:'badge-rose',dibatalkan:'badge-slate'};
-  const ll={menunggu:'Menunggu',terselenggara:'Terselenggara',tidak_terselenggara:'Tidak Terjadi',dibatalkan:'Dibatalkan'};
+  const sl={menunggu:'badge-amber', disetujui:'badge-blue', terselenggara:'badge-green', tidak_terselenggara:'badge-rose', dibatalkan:'badge-slate'};
+  const ll={menunggu:'Menunggu ACC', disetujui:'Di-ACC', terselenggara:'Terselenggara', tidak_terselenggara:'Tidak Terjadi', dibatalkan:'Dibatalkan'};
   return `<div class="table-wrap"><table>
     <thead><tr><th>Mahasiswa</th>${withFoto?'<th>Foto</th>':''}<th>Sesi</th><th>Status</th><th>Aksi</th></tr></thead>
     <tbody>${bookings.map(b=>{
       const slot=b.slot||{}; const mhs=b.mahasiswa||{};
       const tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'short'});
       const fotoCell=withFoto?`<td>${renderAvatar(mhs.foto, mhs.nama, 36)}</td>`:'';
+      
+      let aksiHTML = '';
+      if (b.status === 'menunggu') {
+        aksiHTML = `
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" style="background:var(--blue);color:white;border:none" onclick="doAcc('${b.id}')">✓ ACC</button>
+            <button class="btn btn-ghost btn-sm" onclick="doTolak('${b.id}')">Tolak</button>
+          </div>`;
+      } else if (b.status === 'disetujui') {
+        aksiHTML = `<button class="btn btn-teal btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Selesai Bimbingan</button>`;
+      } else {
+        aksiHTML = `<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`;
+      }
+
       return `<tr>
         <td><div style="font-weight:600">${mhs.nama||b.kode}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>
         ${fotoCell}
         <td><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span>
           <div style="font-size:0.82rem">${tgl} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td>
         <td><span class="badge ${sl[b.status]||'badge-slate'}">${ll[b.status]||b.status}</span></td>
-        <td>${b.status==='menunggu'
-          ?`<button class="btn btn-primary btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Validasi</button>`
-          :`<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`}</td>
+        <td>${aksiHTML}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
 }
@@ -1762,6 +1786,25 @@ async function doValidate(status) {
   else { loadAdminBookings(); loadAdminDashboard(); }
 }
 
+async function doAcc(bookId) {
+  if (!confirm('Setujui (ACC) reservasi ini?')) return;
+  const res = await api('validateBooking', {bookId, status:'disetujui', catatan:'', token:state.token}, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi berhasil di-ACC!', 'success');
+  if (state.user?.role==='dosen') { loadDosenBookings(); loadDosenDashboard(); }
+  else { loadAdminBookings(); loadAdminDashboard(); }
+}
+
+async function doTolak(bookId) {
+  const catatan = prompt('Alasan menolak (opsional):');
+  if (catatan === null) return; 
+  const res = await api('validateBooking', {bookId, status:'dibatalkan', catatan, token:state.token}, 'POST');
+  if (!res.success) return toast(res.message, 'error');
+  toast('Reservasi telah ditolak', 'info');
+  if (state.user?.role==='dosen') { loadDosenBookings(); loadDosenDashboard(); }
+  else { loadAdminBookings(); loadAdminDashboard(); }
+}
+
 // ============================================================
 // ADMIN — DASHBOARD
 // ============================================================
@@ -1785,7 +1828,7 @@ async function loadAdminDashboard() {
   }
   const bRes=await api('getAllBookings',{token:state.token});
   const c=document.getElementById('a-recent-bookings');
-  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu').slice(0,5);
+  const pending=(bRes.bookings||[]).filter(b=>b.status==='menunggu' || b.status==='disetujui').slice(0,5);
   if (!pending.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu</p></div>'; return; }
   c.innerHTML=bookingTable(pending,true);
 }
