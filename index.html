@@ -199,6 +199,32 @@ tr:hover td{background:var(--card2)}
 /* Inaktif warning pulse */
 @keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:0.6}}
 .inaktif-warn{animation:pulse-warn 2s ease-in-out infinite}
+/* KARTU MERAH */
+.kartu-merah{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:0.7rem;font-weight:800;background:linear-gradient(135deg,rgba(244,63,94,0.25),rgba(239,68,68,0.2));color:#fb7185;border:1px solid rgba(244,63,94,0.4);letter-spacing:0.04em;animation:kartu-pulse 1.5s ease-in-out infinite}
+@keyframes kartu-pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,0.3)}50%{box-shadow:0 0 0 4px rgba(244,63,94,0)}}
+/* CHAT */
+.chat-panel{display:flex;height:calc(100vh - 180px);min-height:400px;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)}
+.chat-sidebar{width:260px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--card2)}
+.chat-sidebar-header{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:0.9rem;font-family:var(--font2)}
+.chat-contact-list{flex:1;overflow-y:auto}
+.chat-contact{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+.chat-contact:hover{background:var(--card)}
+.chat-contact.active{background:rgba(37,99,235,0.12);border-left:3px solid var(--blue2)}
+.chat-contact-name{font-weight:600;font-size:0.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-contact-last{font-size:0.75rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.chat-unread-badge{background:var(--rose);color:white;border-radius:20px;padding:1px 7px;font-size:0.68rem;font-weight:800;flex-shrink:0}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-main-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--card2);font-weight:700}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chat-empty{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text3);font-size:0.85rem}
+.chat-bubble{max-width:72%;padding:10px 14px;border-radius:14px;font-size:0.875rem;line-height:1.5;word-break:break-word}
+.chat-bubble.mine{background:var(--blue);color:white;border-bottom-right-radius:4px;align-self:flex-end}
+.chat-bubble.theirs{background:var(--card2);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px;align-self:flex-start}
+.chat-time{font-size:0.7rem;opacity:0.65;margin-top:3px;text-align:right}
+.chat-input-area{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--card2)}
+.chat-input-area textarea{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:0.88rem;resize:none;min-height:40px;max-height:100px;outline:none}
+.chat-input-area textarea:focus{border-color:var(--blue2)}
+@media(max-width:600px){.chat-sidebar{width:200px}.chat-bubble{max-width:85%}}
   /* PASANG KODE LANGKAH 1 DI SINI (Sebelum penutup style) */
   .btn-announce {
     background: linear-gradient(135deg, var(--orange), var(--amber));
@@ -331,6 +357,7 @@ tr:hover td{background:var(--card2)}
       <button class="nav-tab active" onclick="mSwitch('reservasi')">Reservasi</button>
       <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
       <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
+      <button class="nav-tab" id="m-chat-tab" onclick="mSwitch('chat')">Chat <span id="m-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
     </div>
     <div class="topbar-right">
@@ -369,6 +396,33 @@ tr:hover td{background:var(--card2)}
         <button class="btn btn-primary btn-sm" onclick="openProgresModal()">+ Update Progres</button>
       </div>
       <div id="progres-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+    </div>
+
+    <div id="m-chat" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Chat dengan Dosen</h2><p>Kirim pesan atau tanya ke dosen pembimbing</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadChatList()">↻ Refresh</button>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">👨‍🏫 Dosen Pembimbing</div>
+          <div class="chat-contact-list" id="chat-contact-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-main-header" id="chat-main-header">
+            <span style="color:var(--text3)">← Pilih dosen untuk memulai chat</span>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-empty">Belum ada percakapan. Pilih dosen di kiri.</div>
+          </div>
+          <div class="chat-input-area" id="chat-input-area" style="display:none">
+            <textarea id="chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+            <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="m-profil" class="page-section">
@@ -415,6 +469,7 @@ tr:hover td{background:var(--card2)}
       <button class="nav-tab" onclick="dSwitch('sesi')">Sesi</button>
       <button class="nav-tab" onclick="dSwitch('reservasi')">Reservasi</button>
       <button class="nav-tab" onclick="dSwitch('mahasiswa')">Mahasiswa</button>
+      <button class="nav-tab" id="d-chat-tab" onclick="dSwitch('chat')">Chat <span id="d-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="dSwitch('profil')">Profil</button>
     </div>
     <div class="topbar-right">
@@ -460,7 +515,10 @@ tr:hover td{background:var(--card2)}
     <div id="d-sesi" class="page-section">
       <div class="section-header">
         <div class="section-title"><h2>Manajemen Sesi</h2><p>Buat dan kelola sesi bimbinganmu</p></div>
-        <button class="btn btn-orange" onclick="openSlotModal()">+ Tambah Sesi</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-announce btn-sm" onclick="kirimNotifKeSemuaMhs(this)" style="margin-bottom:0;padding:10px 16px;font-size:0.85rem">📢 Kirim Notif ke Semua</button>
+          <button class="btn btn-orange" onclick="openSlotModal()">+ Tambah Sesi</button>
+        </div>
       </div>
       <div class="filter-row">
         <button class="filter-btn active" onclick="filterDosenSlots('all',this)">Semua</button>
@@ -497,6 +555,33 @@ tr:hover td{background:var(--card2)}
         <input class="form-input" id="d-search-mhs" type="text" placeholder="Cari nama atau kode..." oninput="filterDosenStudents(this.value)"/>
       </div>
       <div id="d-students-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="d-chat" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Chat Personal</h2><p>Kirim pesan atau catatan ke mahasiswa bimbingan</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadChatList()">↻ Refresh</button>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">💬 Kontak</div>
+          <div class="chat-contact-list" id="chat-contact-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-main-header" id="chat-main-header">
+            <span style="color:var(--text3)">← Pilih mahasiswa untuk memulai chat</span>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-empty">Belum ada percakapan. Pilih kontak di kiri.</div>
+          </div>
+          <div class="chat-input-area" id="chat-input-area" style="display:none">
+            <textarea id="chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+            <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="d-profil" class="page-section">
@@ -787,7 +872,8 @@ let state = {
   user:null, token:null, selectedType:null,
   slots:[], allBookings:[], allSlots:[], allUsers:[], allDosen:[],
   dosenSlots:[], dosenBookings:[], dosenStudents:[],
-  pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null
+  pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null,
+  chatContacts:[], activeChatKode:null, chatAutoRefresh:null
 };
 
 // ============================================================
@@ -882,19 +968,21 @@ function showPage(id) {
 function mSwitch(s) {
   document.querySelectorAll('#page-mahasiswa .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('m-'+s).classList.add('active');
-  document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t,i)=>t.classList.toggle('active',['reservasi','riwayat','progres','profil'][i]===s));
+  document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t,i)=>t.classList.toggle('active',['reservasi','riwayat','progres','chat','profil'][i]===s));
   if(s==='riwayat') loadMyHistory();
   if(s==='progres') loadMyProgress();
+  if(s==='chat')    loadChatList();
   if(s==='profil')  fillProfil();
 }
 function dSwitch(s) {
   document.querySelectorAll('#page-dosen .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('d-'+s).classList.add('active');
-  document.querySelectorAll('#page-dosen .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','sesi','reservasi','mahasiswa','profil'][i]===s));
+  document.querySelectorAll('#page-dosen .nav-tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','sesi','reservasi','mahasiswa','chat','profil'][i]===s));
   if(s==='dashboard') loadDosenDashboard();
   if(s==='sesi')      loadDosenSlots();
   if(s==='reservasi') loadDosenBookings();
   if(s==='mahasiswa') loadDosenStudents();
+  if(s==='chat')      loadChatList();
   if(s==='profil')    fillDosenProfil();
 }
 function aSwitch(s) {
@@ -1623,6 +1711,7 @@ function renderDosenStudents(students) {
       </div>
       <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
       ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
+      ${s.kartuMerahCount>0?`<div style="margin-bottom:8px"><span class="kartu-merah">🔴 KARTU MERAH ×${s.kartuMerahCount}</span>${s.kartuMerahLastAt?`<span style="font-size:0.7rem;color:var(--text3);margin-left:6px">${daysSinceStr(s.kartuMerahLastAt)}</span>`:''}</div>`:''}
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
           <span style="color:var(--text2)">Progress</span>
@@ -1635,6 +1724,7 @@ function renderDosenStudents(students) {
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\\'")})'>Detail</button>
+        <button class="btn btn-sm" style="flex:1;background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\\'")}')">💬 Chat</button>
         <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
       </div>
     </div>`;
@@ -1733,12 +1823,19 @@ async function updateKodeDosen(btn) {
 function bookingTable(bookings, withFoto=false) {
   const sl={menunggu:'badge-amber', disetujui:'badge-blue', terselenggara:'badge-green', tidak_terselenggara:'badge-rose', dibatalkan:'badge-slate'};
   const ll={menunggu:'Menunggu ACC', disetujui:'Di-ACC', terselenggara:'Terselenggara', tidak_terselenggara:'Tidak Terjadi', dibatalkan:'Dibatalkan'};
+  // Urutkan berdasarkan tanggal slot (Fitur 5)
+  const sorted = [...bookings].sort((a,b) => {
+    const tA=(a.slot?.tanggal||'')+'T'+(a.slot?.jamMulai||'');
+    const tB=(b.slot?.tanggal||'')+'T'+(b.slot?.jamMulai||'');
+    return tA.localeCompare(tB);
+  });
   return `<div class="table-wrap"><table>
-    <thead><tr><th>Mahasiswa</th>${withFoto?'<th>Foto</th>':''}<th>Sesi</th><th>Status</th><th>Aksi</th></tr></thead>
-    <tbody>${bookings.map(b=>{
+    <thead><tr><th>Mahasiswa</th>${withFoto?'<th>Foto</th>':''}<th>Sesi ↑ Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+    <tbody>${sorted.map(b=>{
       const slot=b.slot||{}; const mhs=b.mahasiswa||{};
-      const tgl=fmtTgl(slot.tanggal,{day:'numeric',month:'short'});
+      const tgl=fmtTgl(slot.tanggal,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
       const fotoCell=withFoto?`<td>${renderAvatar(mhs.foto, mhs.nama, 36)}</td>`:'';
+      const kartuMerahBadge = (mhs.kartuMerahCount>0) ? `<span class="kartu-merah" style="font-size:0.65rem;margin-left:4px">🔴×${mhs.kartuMerahCount}</span>` : '';
       
       let aksiHTML = '';
       if (b.status === 'menunggu') {
@@ -1754,10 +1851,11 @@ function bookingTable(bookings, withFoto=false) {
       }
 
       return `<tr>
-        <td><div style="font-weight:600">${mhs.nama||b.kode}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>
+        <td><div style="font-weight:600;display:flex;align-items:center;gap:4px">${mhs.nama||b.kode}${kartuMerahBadge}</div><div style="font-size:0.78rem;color:var(--text3)">${b.kode}</div></td>
         ${fotoCell}
         <td><span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="margin-bottom:4px;display:inline-block">${slot.tipe||'—'}</span>
-          <div style="font-size:0.82rem">${tgl} ${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td>
+          <div style="font-size:0.82rem;font-weight:600">${tgl}</div>
+          <div style="font-size:0.78rem;color:var(--text3)">${slot.jamMulai||''}${slot.jamSelesai?'–'+slot.jamSelesai:''}</div></td>
         <td><span class="badge ${sl[b.status]||'badge-slate'}">${ll[b.status]||b.status}</span></td>
         <td>${aksiHTML}</td>
       </tr>`;
@@ -2100,6 +2198,134 @@ function filterRekap(status, btn) {
   document.querySelectorAll('#a-rekap-filter .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if (rekapData) renderAkademikTable(rekapData.perDosen, status);
+}
+
+// ============================================================
+// FITUR 1: KIRIM NOTIF EMAIL KE SEMUA MAHASISWA (Tombol Manual)
+// ============================================================
+async function kirimNotifKeSemuaMhs(btn) {
+  if (!confirm('Kirim notifikasi email jadwal terbaru ke semua mahasiswa bimbinganmu?')) return;
+  const oldText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Mengirim...';
+  const res = await api('kirim_notif_manual', {token: state.token}, 'POST');
+  btn.disabled = false;
+  btn.innerHTML = oldText;
+  if (res.success) toast(res.message, 'success');
+  else toast(res.message || 'Gagal mengirim notifikasi', 'error');
+}
+
+// ============================================================
+// FITUR 2: CHAT PERSONAL
+// ============================================================
+let chatActiveKode = null;
+let chatRefreshInterval = null;
+
+async function loadChatList() {
+  const listEl = document.getElementById('chat-contact-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+  const res = await api('getChatList', {token: state.token});
+  if (!res.success) { listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.85rem">${res.message}</div>`; return; }
+  state.chatContacts = res.contacts || [];
+  renderChatContactList(state.chatContacts);
+
+  // Update badge unread total
+  const totalUnread = state.chatContacts.reduce((s, c) => s + (c.unread||0), 0);
+  const dBadge = document.getElementById('d-chat-badge');
+  const mBadge = document.getElementById('m-chat-badge');
+  if (dBadge) { dBadge.textContent = totalUnread; dBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
+  if (mBadge) { mBadge.textContent = totalUnread; mBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
+}
+
+function renderChatContactList(contacts) {
+  const listEl = document.getElementById('chat-contact-list');
+  if (!listEl) return;
+  if (!contacts.length) { listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.82rem">Belum ada kontak</div>'; return; }
+  listEl.innerHTML = contacts.map(c => `
+    <div class="chat-contact ${chatActiveKode===c.kode?'active':''}" onclick="openChatWith('${c.kode}','${(c.nama||c.kode).replace(/'/g,"\\'")}')">
+      <div style="flex-shrink:0">${renderAvatar(c.foto, c.nama, 38)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="chat-contact-name">${c.nama||c.kode}</div>
+        <div class="chat-contact-last">${c.lastMessage||'Belum ada pesan'}</div>
+      </div>
+      ${c.unread>0?`<span class="chat-unread-badge">${c.unread}</span>`:''}
+    </div>
+  `).join('');
+}
+
+async function openChatWith(kode, nama) {
+  chatActiveKode = kode;
+  // Switch to chat section if not already there
+  const chatSection = document.getElementById('d-chat') || document.getElementById('m-chat');
+  if (chatSection && !chatSection.classList.contains('active')) {
+    if (state.user?.role === 'dosen') dSwitch('chat');
+    else mSwitch('chat');
+    return; // dSwitch will call loadChatList which re-renders
+  }
+  // Update header
+  const headerEl = document.getElementById('chat-main-header');
+  if (headerEl) headerEl.innerHTML = `${renderAvatar('', nama, 32)} <span style="font-weight:700">${nama}</span>`;
+  // Show input area
+  const inputArea = document.getElementById('chat-input-area');
+  if (inputArea) inputArea.style.display = 'flex';
+  // Mark active in sidebar
+  renderChatContactList(state.chatContacts);
+  // Load messages
+  await loadChatMessages(kode);
+  // Mark as read
+  await api('markChatRead', {withKode: kode, token: state.token}, 'POST');
+  // Auto-refresh every 8s
+  if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+  chatRefreshInterval = setInterval(() => loadChatMessages(kode), 8000);
+}
+
+async function loadChatMessages(kode) {
+  const messagesEl = document.getElementById('chat-messages');
+  if (!messagesEl) return;
+  const res = await api('getMyChats', {token: state.token, withKode: kode});
+  if (!res.success) return;
+  const chats = res.chats || [];
+  if (!chats.length) {
+    messagesEl.innerHTML = '<div class="chat-empty">Belum ada pesan. Mulai percakapan!</div>';
+    return;
+  }
+  const wasAtBottom = messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - 20;
+  messagesEl.innerHTML = chats.map(c => {
+    const time = c.createdAt ? new Date(c.createdAt).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) : '';
+    const date = c.createdAt ? new Date(c.createdAt).toLocaleDateString('id-ID', {day:'numeric',month:'short'}) : '';
+    return `<div style="display:flex;flex-direction:column;align-items:${c.isMine?'flex-end':'flex-start'}">
+      <div class="chat-bubble ${c.isMine?'mine':'theirs'}">${c.pesan.replace(/\n/g,'<br/>')}
+        <div class="chat-time">${date} ${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if (wasAtBottom || chats.length < 5) messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function sendChatMsg() {
+  if (!chatActiveKode) return;
+  const textEl = document.getElementById('chat-input-text');
+  const pesan = (textEl?.value||'').trim();
+  if (!pesan) return;
+  textEl.value = '';
+  textEl.style.height = 'auto';
+  const res = await api('sendChat', {toKode: chatActiveKode, pesan, token: state.token}, 'POST');
+  if (!res.success) { toast(res.message, 'error'); return; }
+  await loadChatMessages(chatActiveKode);
+  await loadChatList();
+}
+
+function chatInputKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
+  // Auto-resize textarea
+  e.target.style.height = 'auto';
+  e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+}
+
+// Quick access: from student card -> open chat
+function openChatWithFromCard(kode, nama) {
+  openChatWith(kode, nama);
 }
 
 async function exportAkademikCSV() {
