@@ -2225,8 +2225,17 @@ async function loadChatList() {
   const listEl = document.getElementById('chat-contact-list');
   if (!listEl) return;
   listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
-  const res = await api('getChatList', {token: state.token});
-  if (!res.success) { listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.85rem">${res.message}</div>`; return; }
+  
+  // getChatList harus POST karena butuh token di body
+  const res = await api('getChatList', {token: state.token}, 'POST');
+  
+  if (!res.success) {
+    listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
+      ⚠️ ${res.message || 'Gagal memuat kontak'}<br>
+      <small style="color:var(--text3)">Pastikan sheet Chat sudah dibuat (jalankan setupSpreadsheet di GAS)</small>
+    </div>`;
+    return;
+  }
   state.chatContacts = res.contacts || [];
   renderChatContactList(state.chatContacts);
 
@@ -2256,28 +2265,47 @@ function renderChatContactList(contacts) {
 
 async function openChatWith(kode, nama) {
   chatActiveKode = kode;
-  // Switch to chat section if not already there
-  const chatSection = document.getElementById('d-chat') || document.getElementById('m-chat');
-  if (chatSection && !chatSection.classList.contains('active')) {
-    if (state.user?.role === 'dosen') dSwitch('chat');
-    else mSwitch('chat');
-    return; // dSwitch will call loadChatList which re-renders
+
+  // Cek apakah section chat sudah aktif
+  const dChatSection = document.getElementById('d-chat');
+  const mChatSection = document.getElementById('m-chat');
+  const chatSectionActive = (dChatSection && dChatSection.classList.contains('active')) ||
+                            (mChatSection && mChatSection.classList.contains('active'));
+
+  if (!chatSectionActive) {
+    // Switch ke chat section dulu, lalu buka percakapan setelah load
+    if (state.user?.role === 'dosen') {
+      dSwitch('chat');
+    } else {
+      mSwitch('chat');
+    }
+    // dSwitch/mSwitch akan panggil loadChatList, setelah selesai baru buka chat
+    setTimeout(() => openChatWith(kode, nama), 1500);
+    return;
   }
+
   // Update header
   const headerEl = document.getElementById('chat-main-header');
-  if (headerEl) headerEl.innerHTML = `${renderAvatar('', nama, 32)} <span style="font-weight:700">${nama}</span>`;
+  if (headerEl) headerEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px">${renderAvatar('', nama, 32)} <span style="font-weight:700">${nama}</span></div>`;
+
   // Show input area
   const inputArea = document.getElementById('chat-input-area');
   if (inputArea) inputArea.style.display = 'flex';
+
   // Mark active in sidebar
   renderChatContactList(state.chatContacts);
+
   // Load messages
   await loadChatMessages(kode);
+
   // Mark as read
   await api('markChatRead', {withKode: kode, token: state.token}, 'POST');
-  // Auto-refresh every 8s
+
+  // Auto-refresh setiap 8 detik
   if (chatRefreshInterval) clearInterval(chatRefreshInterval);
-  chatRefreshInterval = setInterval(() => loadChatMessages(kode), 8000);
+  chatRefreshInterval = setInterval(async () => {
+    if (chatActiveKode === kode) await loadChatMessages(kode);
+  }, 8000);
 }
 
 async function loadChatMessages(kode) {
