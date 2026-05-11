@@ -405,7 +405,10 @@ tr:hover td{background:var(--card2)}
       </div>
       <div class="chat-panel">
         <div class="chat-sidebar">
-          <div class="chat-sidebar-header">👨‍🏫 Dosen Pembimbing</div>
+          <div class="chat-sidebar-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>👨‍🏫 Dosen Pembimbing</span>
+            <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
+          </div>
           <div class="chat-contact-list" id="chat-contact-list">
             <div class="loading-overlay"><div class="spinner"></div></div>
           </div>
@@ -564,7 +567,10 @@ tr:hover td{background:var(--card2)}
       </div>
       <div class="chat-panel">
         <div class="chat-sidebar">
-          <div class="chat-sidebar-header">💬 Kontak</div>
+        <div class="chat-sidebar-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>💬 Kontak</span>
+            <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
+          </div>
           <div class="chat-contact-list" id="chat-contact-list">
             <div class="loading-overlay"><div class="spinner"></div></div>
           </div>
@@ -1175,7 +1181,9 @@ function updateDosenChip() {
 }
 
 function doLogout() {
-  state={user:null,token:null,selectedType:null,slots:[],allBookings:[],allSlots:[],allUsers:[],allDosen:[],dosenSlots:[],dosenBookings:[],dosenStudents:[],pendingSlot:null,pendingValidateId:null,pendingResetKode:null, pendingSetStatus:null};
+  if (chatRefreshInterval) { clearInterval(chatRefreshInterval); chatRefreshInterval = null; }
+  chatActiveKode = null;
+  state={user:null,token:null,selectedType:null,slots:[],allBookings:[],allSlots:[],allUsers:[],allDosen:[],dosenSlots:[],dosenBookings:[],dosenStudents:[],pendingSlot:null,pendingValidateId:null,pendingResetKode:null,pendingSetStatus:null,chatContacts:[],activeChatKode:null,chatAutoRefresh:null};
   localStorage.removeItem('lytana_token'); localStorage.removeItem('lytana_user');
   showPage('login'); toast('Kamu telah keluar','info');
 }
@@ -2226,8 +2234,8 @@ async function loadChatList() {
   if (!listEl) return;
   listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
   
-  // getChatList harus POST karena butuh token di body
-  const res = await api('getChatList', {token: state.token}, 'POST');
+  // Gunakan GET — token di query string (sama seperti getMySlots, getMyStudents, dll)
+  const res = await api('getChatList', {token: state.token});
   
   if (!res.success) {
     listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
@@ -2239,7 +2247,6 @@ async function loadChatList() {
   state.chatContacts = res.contacts || [];
   renderChatContactList(state.chatContacts);
 
-  // Update badge unread total
   const totalUnread = state.chatContacts.reduce((s, c) => s + (c.unread||0), 0);
   const dBadge = document.getElementById('d-chat-badge');
   const mBadge = document.getElementById('m-chat-badge');
@@ -2354,6 +2361,29 @@ function chatInputKeydown(e) {
 // Quick access: from student card -> open chat
 function openChatWithFromCard(kode, nama) {
   openChatWith(kode, nama);
+}
+
+// Debug: test koneksi chat API
+async function testChatConnection() {
+  const listEl = document.getElementById('chat-contact-list');
+  if (listEl) listEl.innerHTML = '<div style="padding:16px;font-size:0.82rem;color:var(--text2)">🔍 Testing koneksi...</div>';
+  try {
+    const url = GAS_URL + '?' + new URLSearchParams({action:'getChatList', token: state.token}).toString();
+    const res = await fetch(url);
+    const text = await res.text();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch(e) { parsed = null; }
+    if (listEl) {
+      if (parsed && parsed.success) {
+        listEl.innerHTML = `<div style="padding:16px;font-size:0.82rem;color:var(--green)">✅ Koneksi OK! ${parsed.contacts?.length||0} kontak ditemukan.</div>`;
+        setTimeout(() => loadChatList(), 1000);
+      } else {
+        listEl.innerHTML = `<div style="padding:16px;font-size:0.82rem;color:var(--rose)">❌ Error: ${parsed?.message || text.substring(0,200)}</div>`;
+      }
+    }
+  } catch(e) {
+    if (listEl) listEl.innerHTML = `<div style="padding:16px;font-size:0.82rem;color:var(--rose)">❌ Fetch error: ${e.message}</div>`;
+  }
 }
 
 async function exportAkademikCSV() {
