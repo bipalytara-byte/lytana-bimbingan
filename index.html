@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Lytana — Linkage of Your Technical Appointment & Network Assistance</title>
+<title>Lytana v7 — Linkage of Your Technical Appointment & Network Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -2233,25 +2233,41 @@ async function loadChatList() {
   const listEl = document.getElementById('chat-contact-list');
   if (!listEl) return;
   listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
-  
-  // Gunakan GET — token di query string (sama seperti getMySlots, getMyStudents, dll)
-  const res = await api('getChatList', {token: state.token});
-  
-  if (!res.success) {
-    listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
-      ⚠️ ${res.message || 'Gagal memuat kontak'}<br>
-      <small style="color:var(--text3)">Pastikan sheet Chat sudah dibuat (jalankan setupSpreadsheet di GAS)</small>
-    </div>`;
-    return;
-  }
-  state.chatContacts = res.contacts || [];
-  renderChatContactList(state.chatContacts);
 
-  const totalUnread = state.chatContacts.reduce((s, c) => s + (c.unread||0), 0);
-  const dBadge = document.getElementById('d-chat-badge');
-  const mBadge = document.getElementById('m-chat-badge');
-  if (dBadge) { dBadge.textContent = totalUnread; dBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
-  if (mBadge) { mBadge.textContent = totalUnread; mBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
+  // Timeout 12 detik agar tidak loading selamanya
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const url = GAS_URL + '?' + new URLSearchParams({action:'getChatList', token: state.token}).toString();
+    const raw = await fetch(url, {signal: controller.signal});
+    clearTimeout(timeout);
+    const res = await raw.json();
+
+    if (!res.success) {
+      listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
+        ⚠️ ${res.message || 'Gagal memuat kontak'}<br>
+        <small style="color:var(--text3);margin-top:4px;display:block">Klik 🔄 untuk coba lagi</small>
+      </div>`;
+      return;
+    }
+    state.chatContacts = res.contacts || [];
+    renderChatContactList(state.chatContacts);
+
+    const totalUnread = state.chatContacts.reduce((s, c) => s + (c.unread||0), 0);
+    const dBadge = document.getElementById('d-chat-badge');
+    const mBadge = document.getElementById('m-chat-badge');
+    if (dBadge) { dBadge.textContent = totalUnread; dBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
+    if (mBadge) { mBadge.textContent = totalUnread; mBadge.style.display = totalUnread > 0 ? 'inline' : 'none'; }
+
+  } catch(err) {
+    clearTimeout(timeout);
+    const isTimeout = err.name === 'AbortError';
+    listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
+      ⚠️ ${isTimeout ? 'Timeout — GAS terlalu lama merespons' : 'Koneksi gagal: ' + err.message}<br>
+      <small style="color:var(--text3);margin-top:4px;display:block">Klik 🔄 untuk coba lagi</small>
+    </div>`;
+  }
 }
 
 function renderChatContactList(contacts) {
