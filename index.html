@@ -409,19 +409,19 @@ tr:hover td{background:var(--card2)}
             <span>👨‍🏫 Dosen Pembimbing</span>
             <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
           </div>
-          <div class="chat-contact-list" id="chat-contact-list">
+          <div class="chat-contact-list" id="m-chat-contact-list">
             <div class="loading-overlay"><div class="spinner"></div></div>
           </div>
         </div>
         <div class="chat-main">
-          <div class="chat-main-header" id="chat-main-header">
+          <div class="chat-main-header" id="m-chat-main-header">
             <span style="color:var(--text3)">← Pilih dosen untuk memulai chat</span>
           </div>
-          <div class="chat-messages" id="chat-messages">
+          <div class="chat-messages" id="m-chat-messages">
             <div class="chat-empty">Belum ada percakapan. Pilih dosen di kiri.</div>
           </div>
-          <div class="chat-input-area" id="chat-input-area" style="display:none">
-            <textarea id="chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+          <div class="chat-input-area" id="m-chat-input-area" style="display:none">
+            <textarea id="m-chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
             <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
           </div>
         </div>
@@ -571,19 +571,19 @@ tr:hover td{background:var(--card2)}
             <span>💬 Kontak</span>
             <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
           </div>
-          <div class="chat-contact-list" id="chat-contact-list">
+          <div class="chat-contact-list" id="d-chat-contact-list">
             <div class="loading-overlay"><div class="spinner"></div></div>
           </div>
         </div>
         <div class="chat-main">
-          <div class="chat-main-header" id="chat-main-header">
+          <div class="chat-main-header" id="d-chat-main-header">
             <span style="color:var(--text3)">← Pilih mahasiswa untuk memulai chat</span>
           </div>
-          <div class="chat-messages" id="chat-messages">
+          <div class="chat-messages" id="d-chat-messages">
             <div class="chat-empty">Belum ada percakapan. Pilih kontak di kiri.</div>
           </div>
-          <div class="chat-input-area" id="chat-input-area" style="display:none">
-            <textarea id="chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+          <div class="chat-input-area" id="d-chat-input-area" style="display:none">
+            <textarea id="d-chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
             <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
           </div>
         </div>
@@ -929,14 +929,28 @@ async function api(action, params={}, method='GET') {
     let url, options;
     if (method==='GET') {
       url = GAS_URL+'?'+new URLSearchParams({action,...params}).toString();
-      options = {method:'GET'};
+      options = {method:'GET', redirect:'follow'};
     } else {
       url = GAS_URL;
-      options = {method:'POST', body:JSON.stringify({action, token:state.token, ...params})};
+      options = {method:'POST', redirect:'follow', body:JSON.stringify({action, token:state.token, ...params})};
     }
-    const res  = await fetch(url, options);
-    return await res.json();
-  } catch(err) { return {success:false, message:'Koneksi gagal: '+err.message}; }
+    const res = await fetch(url, options);
+    const text = await res.text();
+    // GAS kadang return HTML error page — deteksi dini
+    if (text.trim().startsWith('<')) {
+      console.error('[API] GAS returned HTML instead of JSON for action:', action, text.substring(0,200));
+      return {success:false, message:'GAS error: response bukan JSON. Cek Execution log di GAS Editor.'};
+    }
+    try {
+      return JSON.parse(text);
+    } catch(e) {
+      console.error('[API] JSON parse error for action:', action, 'response:', text.substring(0,300));
+      return {success:false, message:'Parse error: '+text.substring(0,100)};
+    }
+  } catch(err) {
+    console.error('[API] Fetch error for action:', action, err);
+    return {success:false, message:'Koneksi gagal: '+err.message};
+  }
 }
 
 // ============================================================
@@ -2229,8 +2243,14 @@ async function kirimNotifKeSemuaMhs(btn) {
 let chatActiveKode = null;
 let chatRefreshInterval = null;
 
+// Helper: ambil elemen chat sesuai role user aktif
+function chatEl(id) {
+  const prefix = (state.user && state.user.role === 'dosen') ? 'd-' : 'm-';
+  return document.getElementById(prefix + id);
+}
+
 async function loadChatList() {
-  const listEl = document.getElementById('chat-contact-list');
+  const listEl = chatEl('chat-contact-list');
   if (!listEl) return;
   listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
 
@@ -2240,9 +2260,19 @@ async function loadChatList() {
 
   try {
     const url = GAS_URL + '?' + new URLSearchParams({action:'getChatList', token: state.token}).toString();
-    const raw = await fetch(url, {signal: controller.signal});
+    const raw = await fetch(url, {signal: controller.signal, redirect: 'follow'});
     clearTimeout(timeout);
-    const res = await raw.json();
+    const text = await raw.text();
+    let res;
+    try { res = JSON.parse(text); }
+    catch(e) {
+      console.error('[Chat] Parse error:', text.substring(0,300));
+      listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
+        ⚠️ Response tidak valid dari GAS<br>
+        <small style="color:var(--text3);margin-top:4px;display:block">Buka Console (F12) untuk detail. Klik 🔄 coba lagi.</small>
+      </div>`;
+      return;
+    }
 
     if (!res.success) {
       listEl.innerHTML = `<div style="padding:16px;color:var(--rose);font-size:0.82rem">
@@ -2271,7 +2301,7 @@ async function loadChatList() {
 }
 
 function renderChatContactList(contacts) {
-  const listEl = document.getElementById('chat-contact-list');
+  const listEl = chatEl('chat-contact-list');
   if (!listEl) return;
   if (!contacts.length) { listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.82rem">Belum ada kontak</div>'; return; }
   listEl.innerHTML = contacts.map(c => `
@@ -2308,11 +2338,11 @@ async function openChatWith(kode, nama) {
   }
 
   // Update header
-  const headerEl = document.getElementById('chat-main-header');
+  const headerEl = chatEl('chat-main-header');
   if (headerEl) headerEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px">${renderAvatar('', nama, 32)} <span style="font-weight:700">${nama}</span></div>`;
 
   // Show input area
-  const inputArea = document.getElementById('chat-input-area');
+  const inputArea = chatEl('chat-input-area');
   if (inputArea) inputArea.style.display = 'flex';
 
   // Mark active in sidebar
@@ -2332,7 +2362,7 @@ async function openChatWith(kode, nama) {
 }
 
 async function loadChatMessages(kode) {
-  const messagesEl = document.getElementById('chat-messages');
+  const messagesEl = chatEl('chat-messages');
   if (!messagesEl) return;
   const res = await api('getMyChats', {token: state.token, withKode: kode});
   if (!res.success) return;
@@ -2356,7 +2386,7 @@ async function loadChatMessages(kode) {
 
 async function sendChatMsg() {
   if (!chatActiveKode) return;
-  const textEl = document.getElementById('chat-input-text');
+  const textEl = chatEl('chat-input-text');
   const pesan = (textEl?.value||'').trim();
   if (!pesan) return;
   textEl.value = '';
@@ -2381,12 +2411,13 @@ function openChatWithFromCard(kode, nama) {
 
 // Debug: test koneksi chat API
 async function testChatConnection() {
-  const listEl = document.getElementById('chat-contact-list');
+  const listEl = chatEl('chat-contact-list');
   if (listEl) listEl.innerHTML = '<div style="padding:16px;font-size:0.82rem;color:var(--text2)">🔍 Testing koneksi...</div>';
   try {
     const url = GAS_URL + '?' + new URLSearchParams({action:'getChatList', token: state.token}).toString();
-    const res = await fetch(url);
+    const res = await fetch(url, {redirect: 'follow'});
     const text = await res.text();
+    console.log('[ChatTest] Raw response:', text.substring(0, 500));
     let parsed;
     try { parsed = JSON.parse(text); } catch(e) { parsed = null; }
     if (listEl) {
