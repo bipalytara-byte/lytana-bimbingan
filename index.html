@@ -1659,8 +1659,14 @@ async function loadSlots(tipe) {
   const params={tipe, token:state.token};
   const res=await api('getSlots',params);
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
-  state.slots=res.slots;
-  renderSlots(res.slots);
+  // Filter cadangan di sisi klien: hanya tampilkan slot hari ini ke depan,
+  // kecuali slot yang sudah di-booking oleh mahasiswa ini sendiri.
+  const today = new Date().toISOString().substring(0,10);
+  const filtered = (res.slots||[]).filter(s =>
+    s.tanggal >= today || (s.bookedBy && s.bookedBy === state.user?.kode)
+  );
+  state.slots = filtered;
+  renderSlots(filtered);
   
   if (state.user?.dosenKode1 || state.user?.dosenKode2) {
     const dr=await api('getDosenList');
