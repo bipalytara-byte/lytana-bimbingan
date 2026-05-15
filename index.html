@@ -92,6 +92,11 @@ p{color:var(--text2)}
 .modal-close:hover{color:var(--text)}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
 /* Slot cards */
+.type-card-meta { margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+.type-card-stat { font-size: 0.78rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.type-card-avail { font-weight: 700; }
+.type-card-next { font-size: 0.74rem; color: var(--text3); }
+.type-card-loading { font-size: 0.72rem; color: var(--text3); opacity: 0.6; margin-top: 10px; }
 .slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .slot-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .2s}
 .slot-card:hover{border-color:var(--border2);background:var(--card2)}
@@ -423,10 +428,20 @@ tr:hover td{background:var(--card2)}
 
       <div class="type-selector">
         <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
-          <div class="type-icon">🏢</div><div class="type-name">Offline</div><div class="type-desc">Tatap muka di kampus</div>
+          <div class="type-icon">🏢</div>
+          <div class="type-name">Offline</div>
+          <div class="type-desc">Tatap muka di kampus</div>
+          <div class="type-card-meta" id="preview-offline">
+            <div class="type-card-loading">⏳ Memuat info sesi...</div>
+          </div>
         </div>
         <div class="type-card online" id="type-online" onclick="selectType('online')">
-          <div class="type-icon">💻</div><div class="type-name">Online</div><div class="type-desc">Via Zoom / Google Meet</div>
+          <div class="type-icon">💻</div>
+          <div class="type-name">Online</div>
+          <div class="type-desc">Via Zoom / Google Meet</div>
+          <div class="type-card-meta" id="preview-online">
+            <div class="type-card-loading">⏳ Memuat info sesi...</div>
+          </div>
         </div>
       </div>
       <div id="slots-container"><div class="empty-state"><div class="empty-icon">👆</div><p>Pilih jenis bimbingan di atas</p></div></div>
@@ -1525,7 +1540,7 @@ function onLogin(token, user) {
   localStorage.setItem('lytana_user', JSON.stringify(user));
   if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); }
   else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllInfoPanels(); }
-  else { updateMhsChip(); showPage('mahasiswa'); renderAllInfoPanels(); }
+  else { updateMhsChip(); showPage('mahasiswa'); renderAllInfoPanels(); loadSlotPreviews(); }
   toast('Selamat datang, '+user.nama+'!','success');
 }
 
@@ -1558,6 +1573,77 @@ function doLogout() {
 // ============================================================
 // MAHASISWA — RESERVASI
 // ============================================================
+// ============================================================
+// SLOT PREVIEW — ringkasan di kartu Offline/Online
+// ============================================================
+async function loadSlotPreviews() {
+  // Fetch kedua tipe paralel, tanpa mengubah state.slots (itu khusus tipe yang sedang aktif)
+  const today = new Date().toISOString().substring(0, 10);
+
+  const render = (tipe, slots) => {
+    const el = document.getElementById('preview-' + tipe);
+    if (!el) return;
+
+    // Hanya slot yang belum lewat
+    const valid = (slots || []).filter(s => s.tanggal >= today);
+    const tersedia  = valid.filter(s => !s.bookedBy || s.bookedBy === '');
+    const sudahSaya = valid.find(s => s.bookedBy === state.user?.kode);
+
+    if (!valid.length) {
+      el.innerHTML = `<div class="type-card-stat">
+        <span style="color:var(--text3);font-size:0.76rem">Belum ada sesi terjadwal</span>
+      </div>`;
+      return;
+    }
+
+    // Sesi terdekat yang tersedia
+    const nearest = tersedia.sort((a, b) =>
+      (a.tanggal + a.jamMulai).localeCompare(b.tanggal + b.jamMulai)
+    )[0];
+
+    let html = '';
+
+    // Jika mahasiswa sudah booking salah satu
+    if (sudahSaya) {
+      const tgl = fmtTgl(sudahSaya.tanggal, { day: 'numeric', month: 'short' });
+      html += `<div class="type-card-stat">
+        <span style="color:var(--blue2);font-size:1rem">✓</span>
+        <span style="color:var(--blue2);font-weight:700;font-size:0.8rem">Sudah reservasi · ${tgl} ${sudahSaya.jamMulai}</span>
+      </div>`;
+    } else {
+      // Jumlah sesi tersedia
+      const warna = tersedia.length === 0 ? 'var(--rose)' : tersedia.length <= 2 ? 'var(--amber)' : 'var(--green)';
+      const label = tersedia.length === 0 ? 'Penuh' : tersedia.length + ' sesi tersedia';
+      html += `<div class="type-card-stat">
+        <span style="color:${warna};font-size:0.9rem">●</span>
+        <span class="type-card-avail" style="color:${warna}">${label}</span>
+      </div>`;
+
+      // Slot terdekat
+      if (nearest) {
+        const tglNearest = fmtTgl(nearest.tanggal, { weekday: 'short', day: 'numeric', month: 'short' });
+        html += `<div class="type-card-next">📅 Terdekat: ${tglNearest}, ${nearest.jamMulai}–${nearest.jamSelesai}</div>`;
+      }
+    }
+
+    el.innerHTML = html;
+  };
+
+  try {
+    const [resOff, resOn] = await Promise.all([
+      api('getSlots', { tipe: 'offline', token: state.token }),
+      api('getSlots', { tipe: 'online',  token: state.token }),
+    ]);
+    render('offline', resOff.slots || []);
+    render('online',  resOn.slots  || []);
+  } catch (e) {
+    ['offline','online'].forEach(t => {
+      const el = document.getElementById('preview-' + t);
+      if (el) el.innerHTML = '';
+    });
+  }
+}
+
 function selectType(type) {
   state.selectedType=type;
   ['offline','online'].forEach(t=>{
@@ -1651,6 +1737,7 @@ async function confirmBooking() {
   toast('Reservasi berhasil! 🎉','success');
   closeModal('modal-booking'); state.pendingSlot=null;
   loadSlots(state.selectedType);
+  loadSlotPreviews();
 }
 
 // ============================================================
