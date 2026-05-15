@@ -227,7 +227,45 @@ tr:hover td{background:var(--card2)}
 .chat-input-area textarea:focus{border-color:var(--blue2)}
 @media(max-width:600px){.chat-sidebar{width:200px}.chat-bubble{max-width:85%}}
   /* PASANG KODE LANGKAH 1 DI SINI (Sebelum penutup style) */
-  .btn-announce {
+  .info-bimbingan-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.info-bimbingan-panel .panel-title {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.info-bimbingan-panel .panel-title h3 {
+  font-size: 1rem; color: var(--text);
+}
+.info-metode-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.info-metode-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 0.85rem; line-height: 1.5; color: var(--text);
+}
+.info-metode-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
+.info-catatan-list { display: flex; flex-direction: column; gap: 7px; }
+.info-catatan-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 0.82rem; color: var(--text2); line-height: 1.5;
+}
+.info-catatan-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue2); flex-shrink: 0; margin-top: 6px; }
+.info-edit-btn {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 5px 12px; font-size: 0.78rem;
+  font-weight: 600; color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; gap: 5px; transition: all .2s;
+}
+.info-edit-btn:hover { color: var(--text); border-color: var(--blue2); }
+
+.btn-announce {
     background: linear-gradient(135deg, var(--orange), var(--amber));
     color: white; border: none; padding: 12px 20px; border-radius: 12px;
     font-weight: 700; display: inline-flex; align-items: center; gap: 10px;
@@ -372,6 +410,17 @@ tr:hover td{background:var(--card2)}
       <div class="section-header">
         <div class="section-title"><h2>Reservasi Bimbingan</h2><p id="m-dosen-label">Pilih jenis sesi bimbingan</p></div>
       </div>
+      <!-- Panel Info Metode Bimbingan (read-only untuk mahasiswa) -->
+      <div class="info-bimbingan-panel" id="m-info-panel">
+        <div class="panel-title">
+          <span style="font-size:1.3rem">📋</span>
+          <h3>Informasi Metode Bimbingan</h3>
+        </div>
+        <div class="info-metode-list" id="m-info-metode-list"><!-- rendered by JS --></div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
+        <div class="info-catatan-list" id="m-info-catatan-list"><!-- rendered by JS --></div>
+      </div>
+
       <div class="type-selector">
         <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
           <div class="type-icon">🏢</div><div class="type-name">Offline</div><div class="type-desc">Tatap muka di kampus</div>
@@ -492,6 +541,18 @@ tr:hover td{background:var(--card2)}
         <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
       </div>
+      <!-- Panel Info Metode Bimbingan (editable untuk dosen) -->
+      <div class="info-bimbingan-panel" id="d-info-panel">
+        <button class="info-edit-btn" onclick="openInfoEdit()" title="Edit informasi bimbingan">✏️ Edit</button>
+        <div class="panel-title">
+          <span style="font-size:1.3rem">📋</span>
+          <h3>Informasi Metode Bimbingan</h3>
+        </div>
+        <div class="info-metode-list" id="d-info-metode-list"><!-- rendered by JS --></div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
+        <div class="info-catatan-list" id="d-info-catatan-list"><!-- rendered by JS --></div>
+      </div>
+
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
         <div class="card stat-card"><div class="stat-label">Mahasiswa Bimbingan</div><div class="stat-number" id="d-stat-mhs" style="color:var(--blue2)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Sesi Aktif</div><div class="stat-number" id="d-stat-sesi" style="color:var(--teal2)">—</div></div>
@@ -889,6 +950,39 @@ tr:hover td{background:var(--card2)}
   </div>
 </div>
 
+<!-- ==================== MODAL EDIT INFO BIMBINGAN ==================== -->
+<div class="modal-overlay" id="modal-info-edit">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>✏️ Edit Informasi Bimbingan</h3>
+      <button class="modal-close" onclick="closeModal('modal-info-edit')">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.2);border-radius:9px;padding:11px 14px;font-size:0.83rem;color:var(--text2)">
+        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman home dosen maupun mahasiswa pada browser yang sama.
+      </div>
+
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Metode Bimbingan</div>
+        <div id="modal-metode-fields" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addMetodeField()">+ Tambah Metode</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border)"/>
+
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Catatan Penting</div>
+        <div id="modal-catatan-fields" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addCatatanField()">+ Tambah Catatan</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-info-edit')">Batal</button>
+      <button class="btn btn-primary" onclick="saveInfoBimbingan()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== MODAL BIMBINGAN MENDADAK ==================== -->
 <div class="modal-overlay" id="modal-mendadak">
   <div class="modal modal-lg">
@@ -961,6 +1055,180 @@ let state = {
   pendingSlot:null, pendingValidateId:null, pendingResetKode:null, pendingSetStatus:null,
   chatContacts:[], activeChatKode:null, chatAutoRefresh:null
 };
+
+// ============================================================
+// INFO BIMBINGAN — Default data, render, edit, localStorage
+// ============================================================
+const INFO_STORAGE_KEY = 'lytana_info_bimbingan';
+
+const INFO_DEFAULT = {
+  metode: [
+    {
+      icon: '🏢',
+      bg: 'rgba(139,92,246,0.10)',
+      border: 'rgba(139,92,246,0.22)',
+      judul: 'Bimbingan Tatap Muka (Luring)',
+      isi: 'Dilaksanakan langsung di kampus sesuai kesepakatan reservasi LYTANA.'
+    },
+    {
+      icon: '💻',
+      bg: 'rgba(56,189,248,0.10)',
+      border: 'rgba(56,189,248,0.22)',
+      judul: 'Daring Real-Time',
+      isi: 'Melalui media konferensi video (Zoom/Google Meet) + Bitrix.'
+    },
+    {
+      icon: '📧',
+      bg: 'rgba(16,185,129,0.10)',
+      border: 'rgba(16,185,129,0.22)',
+      judul: 'Daring via Email',
+      isi: 'Dengan ketentuan kuota maksimal 40% dari keseluruhan proses bimbingan.'
+    },
+    {
+      icon: '📌',
+      bg: 'rgba(245,158,11,0.10)',
+      border: 'rgba(245,158,11,0.22)',
+      judul: 'Wajib',
+      isi: 'Menggunakan LYTANA untuk reservasi dan Bitrix24 untuk bimbingan Online.'
+    }
+  ],
+  catatan: [
+    'Bagi teman-teman yang akan melakukan bimbingan, mohon melakukan reservasi terlebih dahulu via LYTANA. Hal ini diperlukan untuk memastikan jadwal, mengingat agenda dapat berubah sewaktu-waktu.',
+    'Saya terbuka untuk janji temu mendadak, asalkan ada slot waktu yang kosong di jadwal saya di luar Reservasi LYTANA. Mohon cek ketersediaan saya terlebih dahulu.',
+    'Mohon untuk membawa berkas bimbingan sebelumnya yang telah dikoreksi sebagai bahan tindak lanjut diskusi kita.',
+    'Bagi mahasiswa yang memilih bimbingan daring, silahkan gunakan Bitrix dan memilih reservasi dahulu di sistem LYTANA atau menghubungi via WhatsApp untuk konfirmasi waktu di luar jadwal reservasi.'
+  ]
+};
+
+function loadInfoBimbingan() {
+  try {
+    const raw = localStorage.getItem(INFO_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return INFO_DEFAULT;
+}
+
+function saveInfoBimbinganData(data) {
+  try { localStorage.setItem(INFO_STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function renderInfoPanel(metodeId, catatanId) {
+  const info = loadInfoBimbingan();
+  const mEl = document.getElementById(metodeId);
+  const cEl = document.getElementById(catatanId);
+  if (!mEl || !cEl) return;
+
+  mEl.innerHTML = info.metode.map(m => `
+    <div class="info-metode-item" style="background:${m.bg};border:1px solid ${m.border}">
+      <span class="info-metode-icon">${m.icon}</span>
+      <div><b>${m.judul}:</b> ${m.isi}</div>
+    </div>`).join('');
+
+  cEl.innerHTML = info.catatan.map(c => `
+    <div class="info-catatan-item">
+      <div class="info-catatan-dot"></div>
+      <span>${c}</span>
+    </div>`).join('');
+}
+
+function renderAllInfoPanels() {
+  renderInfoPanel('d-info-metode-list', 'd-info-catatan-list');
+  renderInfoPanel('m-info-metode-list', 'm-info-catatan-list');
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────
+const METODE_PRESETS = [
+  { icon:'🏢', bg:'rgba(139,92,246,0.10)', border:'rgba(139,92,246,0.22)' },
+  { icon:'💻', bg:'rgba(56,189,248,0.10)',  border:'rgba(56,189,248,0.22)' },
+  { icon:'📧', bg:'rgba(16,185,129,0.10)',  border:'rgba(16,185,129,0.22)' },
+  { icon:'📌', bg:'rgba(245,158,11,0.10)',  border:'rgba(245,158,11,0.22)' },
+  { icon:'📞', bg:'rgba(244,63,94,0.10)',   border:'rgba(244,63,94,0.22)'  },
+  { icon:'📝', bg:'rgba(37,99,235,0.10)',   border:'rgba(37,99,235,0.22)'  },
+];
+
+function openInfoEdit() {
+  const info = loadInfoBimbingan();
+  buildMetodeFields(info.metode);
+  buildCatatanFields(info.catatan);
+  openModal('modal-info-edit');
+}
+
+function buildMetodeFields(metodeArr) {
+  const c = document.getElementById('modal-metode-fields');
+  c.innerHTML = '';
+  metodeArr.forEach((m, i) => addMetodeField(m, i));
+}
+
+function addMetodeField(m, idx) {
+  const c = document.getElementById('modal-metode-fields');
+  const i = idx !== undefined ? idx : c.children.length;
+  const preset = m || METODE_PRESETS[i % METODE_PRESETS.length];
+  const div = document.createElement('div');
+  div.className = 'metode-field-row';
+  div.dataset.idx = i;
+  div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:12px;';
+  div.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
+      <div style="display:flex;gap:8px">
+        <input class="form-input" style="width:52px;text-align:center;font-size:1.2rem;padding:6px;flex-shrink:0"
+               placeholder="🏢" value="${preset.icon||''}"/>
+        <input class="form-input" style="flex:1" placeholder="Judul metode" value="${(m&&m.judul)||''}"/>
+      </div>
+      <textarea class="form-textarea" style="min-height:56px;font-size:0.85rem" placeholder="Deskripsi metode...">${(m&&m.isi)||''}</textarea>
+    </div>
+    <button onclick="removeField(this.parentElement,'modal-metode-fields')"
+            style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:1.2rem;padding:4px;flex-shrink:0;margin-top:2px" title="Hapus">✕</button>`;
+  c.appendChild(div);
+}
+
+function buildCatatanFields(catatanArr) {
+  const c = document.getElementById('modal-catatan-fields');
+  c.innerHTML = '';
+  catatanArr.forEach(ct => addCatatanField(ct));
+}
+
+function addCatatanField(val) {
+  const c = document.getElementById('modal-catatan-fields');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+  div.innerHTML = `
+    <textarea class="form-textarea" style="flex:1;min-height:54px;font-size:0.85rem" placeholder="Isi catatan...">${typeof val === 'string' ? val : ''}</textarea>
+    <button onclick="removeField(this.parentElement,'modal-catatan-fields')"
+            style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:1.2rem;padding:4px;flex-shrink:0;margin-top:6px" title="Hapus">✕</button>`;
+  c.appendChild(div);
+}
+
+function removeField(rowEl, containerId) {
+  document.getElementById(containerId).removeChild(rowEl);
+}
+
+function saveInfoBimbingan() {
+  // Kumpulkan metode
+  const metodeRows = document.querySelectorAll('#modal-metode-fields .metode-field-row');
+  const metode = Array.from(metodeRows).map((row, i) => {
+    const inputs   = row.querySelectorAll('input.form-input');
+    const textarea = row.querySelector('textarea');
+    const preset   = METODE_PRESETS[i % METODE_PRESETS.length];
+    return {
+      icon:   inputs[0]?.value.trim()    || preset.icon,
+      bg:     preset.bg,
+      border: preset.border,
+      judul:  inputs[1]?.value.trim()    || '',
+      isi:    textarea?.value.trim()      || ''
+    };
+  }).filter(m => m.judul || m.isi);
+
+  // Kumpulkan catatan
+  const catatanTextareas = document.querySelectorAll('#modal-catatan-fields textarea');
+  const catatan = Array.from(catatanTextareas)
+    .map(t => t.value.trim())
+    .filter(Boolean);
+
+  saveInfoBimbinganData({ metode, catatan });
+  renderAllInfoPanels();
+  closeModal('modal-info-edit');
+  toast('Informasi bimbingan berhasil disimpan!', 'success');
+}
 
 // ============================================================
 // AVATAR FALLBACK HELPER (Anti Broken Image)
@@ -1256,8 +1524,8 @@ function onLogin(token, user) {
   localStorage.setItem('lytana_token', token);
   localStorage.setItem('lytana_user', JSON.stringify(user));
   if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); }
-  else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); }
-  else { updateMhsChip(); showPage('mahasiswa'); }
+  else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllInfoPanels(); }
+  else { updateMhsChip(); showPage('mahasiswa'); renderAllInfoPanels(); }
   toast('Selamat datang, '+user.nama+'!','success');
 }
 
