@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1957,229 +1956,184 @@ function renderBelumBimbingan() {
 async function exportBelumBimbingan() {
   const students = state.dosenStudents || [];
   if (!students.length) { toast('Belum ada data mahasiswa.', 'error'); return; }
+
   const belum = students.filter(s => !s.bimbinganCount || s.bimbinganCount === 0);
   const sudah = students.filter(s => s.bimbinganCount && s.bimbinganCount > 0);
   const dosenNama = state.user?.nama || 'Dosen';
   const tglCetak = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   const total = students.length;
 
-  // Status breakdown
-  const statusCount = {};
-  students.forEach(s => { const st = s.statusSkripsi||'tidak_aktif'; statusCount[st] = (statusCount[st]||0)+1; });
-  const statusLabels = { aktif_bimbingan:'Aktif Bimbingan', tidak_aktif:'Tidak Aktif', revisi:'Revisi', menunggu_sidang:'Menunggu Sidang', lulus:'Lulus' };
-  const statusColors = { aktif_bimbingan:'#10b981', tidak_aktif:'#94a3b8', revisi:'#f59e0b', menunggu_sidang:'#8b5cf6', lulus:'#38bdf8' };
+  if (!window.jspdf) { toast('Library PDF sedang dimuat, coba lagi sebentar...', 'info'); return; }
 
-  if (!window.jspdf || !window.Chart) {
-    toast('Library PDF sedang dimuat, coba lagi sebentar...', 'info'); return;
-  }
-
-  // ── Buat pie chart di canvas tersembunyi ──
-  const cvs = document.createElement('canvas');
-  cvs.width = 400; cvs.height = 300;
-  cvs.style.display = 'none'; document.body.appendChild(cvs);
-
-  // Pie 1: Sudah vs Belum Bimbingan
-  const pie1 = new Chart(cvs.getContext('2d'), {
-    type: 'pie',
-    data: {
-      labels: ['Sudah Bimbingan', 'Belum Bimbingan'],
-      datasets: [{ data: [sudah.length, belum.length], backgroundColor: ['#10b981','#f43f5e'], borderWidth: 0 }]
-    },
-    options: { animation: false, plugins: { legend: { display: false } } }
-  });
-
-  await new Promise(r => setTimeout(r, 300));
-  const pie1Img = cvs.toDataURL('image/png');
-  pie1.destroy();
-
-  // Pie 2: Status skripsi
-  const statKeys = Object.keys(statusCount);
-  const pie2 = new Chart(cvs.getContext('2d'), {
-    type: 'doughnut',
-    data: {
-      labels: statKeys.map(k => statusLabels[k]||k),
-      datasets: [{ data: statKeys.map(k => statusCount[k]), backgroundColor: statKeys.map(k => statusColors[k]||'#64748b'), borderWidth: 0 }]
-    },
-    options: { animation: false, plugins: { legend: { display: false } } }
-  });
-
-  await new Promise(r => setTimeout(r, 300));
-  const pie2Img = cvs.toDataURL('image/png');
-  pie2.destroy();
-  document.body.removeChild(cvs);
-
-  // ── Generate PDF ──
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = 210, H = 297;
   const margin = 18;
-  let y = margin;
+  let y = 0;
 
-  // Header strip
+  // ── Header strip ──
   doc.setFillColor(15, 28, 46);
-  doc.rect(0, 0, W, 32, 'F');
+  doc.rect(0, 0, W, 34, 'F');
   doc.setFillColor(37, 99, 235);
-  doc.rect(0, 0, 5, 32, 'F');
+  doc.rect(0, 0, 5, 34, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('EVALUASI BIMBINGAN SKRIPSI', margin + 2, 12);
-  doc.setFontSize(9);
+  doc.setFontSize(15);
+  doc.text('EVALUASI BIMBINGAN SKRIPSI', margin + 2, 13);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184);
-  doc.text('Lytana — Linkage of Your Technical Appointment & Network Assistance', margin + 2, 19);
-  doc.setTextColor(255, 255, 255);
-  doc.text('Dosen: ' + dosenNama, margin + 2, 26);
-  doc.text('Dicetak: ' + tglCetak, W - margin - 2, 26, {align: 'right'});
+  doc.text('Lytana — Linkage of Your Technical Appointment & Network Assistance', margin + 2, 20);
+  doc.setTextColor(200, 215, 235);
+  doc.setFontSize(8.5);
+  doc.text('Dosen: ' + dosenNama, margin + 2, 28);
+  doc.text('Dicetak: ' + tglCetak, W - margin - 2, 28, { align: 'right' });
 
-  y = 40;
+  y = 42;
 
-  // ── Summary boxes ──
+  // ── Summary boxes (3 boxes: Total · Sudah · Belum) ──
   const boxes = [
-    { label: 'Total Mahasiswa', val: total, color: [37, 99, 235] },
-    { label: 'Sudah Bimbingan', val: sudah.length, color: [16, 185, 129] },
-    { label: 'Belum Bimbingan', val: belum.length, color: [244, 63, 94] },
-    { label: 'Persentase Belum', val: total ? Math.round(belum.length/total*100)+'%' : '0%', color: [245, 158, 11] },
+    { label: 'Total Mahasiswa Bimbingan', val: total,        color: [37, 99, 235]  },
+    { label: 'Sudah Pernah Bimbingan',    val: sudah.length, color: [16, 185, 129] },
+    { label: 'Belum Pernah Bimbingan',    val: belum.length, color: [244, 63, 94]  },
   ];
-  const bw = (W - margin*2 - 9) / 4;
+  const bw = (W - margin * 2 - 8) / 3;
   boxes.forEach((b, i) => {
-    const bx = margin + i * (bw + 3);
+    const bx = margin + i * (bw + 4);
     doc.setFillColor(b.color[0], b.color[1], b.color[2]);
-    doc.roundedRect(bx, y, bw, 18, 2, 2, 'F');
-    doc.setFillColor(255,255,255);
-    doc.setFillColor(b.color[0], b.color[1], b.color[2]);
-    doc.setDrawColor(255,255,255);
-    doc.setTextColor(255,255,255);
+    doc.roundedRect(bx, y, bw, 20, 2.5, 2.5, 'F');
+    doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text(String(b.val), bx + bw/2, y + 9, {align:'center'});
+    doc.setFontSize(18);
+    doc.text(String(b.val), bx + bw / 2, y + 11, { align: 'center' });
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(b.label, bx + bw/2, y + 15, {align:'center'});
+    doc.text(b.label, bx + bw / 2, y + 17, { align: 'center' });
   });
-  y += 24;
+  y += 28;
 
-  // ── Pie Charts side by side ──
-  doc.setTextColor(30, 48, 80);
+  // ── Section title ──
+  doc.setFillColor(244, 63, 94);
+  doc.rect(margin, y, W - margin * 2, 8, 'F');
+  doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text('Status Bimbingan', margin, y + 4);
-  doc.text('Distribusi Status Skripsi', W/2 + 3, y + 4);
-  y += 7;
+  doc.text(
+    'DAFTAR MAHASISWA BELUM PERNAH BIMBINGAN  (' + belum.length + ' orang)',
+    margin + 4, y + 5.5
+  );
+  y += 10;
 
-  const chartW = 70, chartH = 55;
-  doc.addImage(pie1Img, 'PNG', margin, y, chartW, chartH);
-  doc.addImage(pie2Img, 'PNG', W/2 + 3, y, chartW, chartH);
+  if (belum.length === 0) {
+    // Semua sudah bimbingan
+    doc.setFillColor(16, 185, 129);
+    doc.roundedRect(margin, y, W - margin * 2, 16, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Semua mahasiswamu sudah pernah bimbingan!', W / 2, y + 10, { align: 'center' });
+    y += 22;
+  } else {
+    // ── Table header ──
+    // Columns: No | Nama | Jumlah Bimbingan
+    const colNo   = 12;
+    const colNama = W - margin * 2 - colNo - 40;  // flexible
+    const colCount = 40;
 
-  // Legends
-  const pie1Legends = [
-    {label: 'Sudah Bimbingan (' + sudah.length + ')', color: '#10b981'},
-    {label: 'Belum Bimbingan (' + belum.length + ')', color: '#f43f5e'},
-  ];
-  let ly = y + 3;
-  pie1Legends.forEach(l => {
-    const rgb = l.color === '#10b981' ? [16,185,129] : [244,63,94];
-    doc.setFillColor(rgb[0],rgb[1],rgb[2]);
-    doc.roundedRect(margin + chartW + 4, ly, 3, 3, 0.5, 0.5, 'F');
-    doc.setTextColor(50,65,90);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7);
-    doc.text(l.label, margin + chartW + 9, ly + 2.5);
-    ly += 6;
-  });
-
-  let ly2 = y + 3;
-  statKeys.forEach(k => {
-    const hex = statusColors[k]||'#64748b';
-    const rgb = hex === '#10b981' ? [16,185,129] : hex === '#94a3b8' ? [148,163,184] : hex === '#f59e0b' ? [245,158,11] : hex === '#8b5cf6' ? [139,92,246] : [56,189,248];
-    doc.setFillColor(rgb[0],rgb[1],rgb[2]);
-    doc.roundedRect(W/2 + chartW + 6, ly2, 3, 3, 0.5, 0.5, 'F');
-    doc.setTextColor(50,65,90);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7);
-    doc.text((statusLabels[k]||k) + ' (' + statusCount[k] + ')', W/2 + chartW + 11, ly2 + 2.5);
-    ly2 += 6;
-  });
-
-  y += chartH + 8;
-
-  // ── Tabel mahasiswa belum bimbingan ──
-  if (belum.length > 0) {
-    doc.setFillColor(244, 63, 94);
-    doc.rect(margin, y, W - margin*2, 7, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(9);
-    doc.text('DAFTAR MAHASISWA BELUM BIMBINGAN (' + belum.length + ' orang)', margin + 3, y + 4.8);
-    y += 9;
-
-    // Table header
-    const cols = [8, 62, 28, 36, 30, 28];
-    const headers = ['No','Nama','Kode','Status','Terakhir Aktif','Terdaftar'];
-    doc.setFillColor(240, 245, 255);
-    doc.rect(margin, y, W - margin*2, 6, 'F');
+    doc.setFillColor(235, 241, 255);
+    doc.rect(margin, y, W - margin * 2, 7, 'F');
     doc.setTextColor(37, 99, 235);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(7);
-    let cx = margin + 1;
-    headers.forEach((h, i) => { doc.text(h, cx, y + 4.2); cx += cols[i]; });
-    y += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('No',              margin + 2,                        y + 4.8);
+    doc.text('Nama Mahasiswa',  margin + colNo + 2,                y + 4.8);
+    doc.text('Bimbingan (×)',   margin + colNo + colNama + 2,      y + 4.8);
+    // separator lines
+    doc.setDrawColor(200, 210, 235);
+    doc.setLineWidth(0.3);
+    doc.line(margin + colNo,            y, margin + colNo,            y + 7);
+    doc.line(margin + colNo + colNama,  y, margin + colNo + colNama,  y + 7);
+    y += 8;
 
     belum.forEach((s, idx) => {
+      // Page break
       if (y > H - 22) {
+        // Footer on this page
+        doc.setDrawColor(220, 225, 235);
+        doc.setLineWidth(0.4);
+        doc.line(margin, H - 16, W - margin, H - 16);
+        doc.setTextColor(160, 175, 195);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.text('Dokumen digenerate otomatis oleh Lytana. Harap segera menghubungi mahasiswa yang belum bimbingan.', W / 2, H - 11, { align: 'center' });
+        doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W / 2, H - 6, { align: 'center' });
         doc.addPage();
         y = margin;
+        // Repeat table header on new page
+        doc.setFillColor(235, 241, 255);
+        doc.rect(margin, y, W - margin * 2, 7, 'F');
+        doc.setTextColor(37, 99, 235);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('No',              margin + 2,                       y + 4.8);
+        doc.text('Nama Mahasiswa',  margin + colNo + 2,               y + 4.8);
+        doc.text('Bimbingan (×)',   margin + colNo + colNama + 2,     y + 4.8);
+        doc.setDrawColor(200, 210, 235);
+        doc.setLineWidth(0.3);
+        doc.line(margin + colNo,           y, margin + colNo,           y + 7);
+        doc.line(margin + colNo + colNama, y, margin + colNo + colNama, y + 7);
+        y += 8;
       }
-      const rowBg = idx % 2 === 0 ? [252,252,255] : [255,255,255];
+
+      const rowH = 7.5;
+      const rowBg = idx % 2 === 0 ? [250, 252, 255] : [255, 255, 255];
       doc.setFillColor(rowBg[0], rowBg[1], rowBg[2]);
-      doc.rect(margin, y, W - margin*2, 6.5, 'F');
-      doc.setTextColor(30, 48, 80);
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(7);
-      const rowVals = [
-        String(idx+1),
-        s.nama.length > 28 ? s.nama.substring(0,26)+'...' : s.nama,
-        s.kode,
-        statusLabels[s.statusSkripsi] || s.statusSkripsi || '—',
-        s.lastActivity ? new Date(s.lastActivity).toLocaleDateString('id-ID') : 'Belum aktif',
-        s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : '—',
-      ];
-      cx = margin + 1;
-      rowVals.forEach((v, i) => {
-        if (i === 0) { doc.setTextColor(244,63,94); doc.setFont('helvetica','bold'); }
-        else { doc.setTextColor(30,48,80); doc.setFont('helvetica','normal'); }
-        doc.text(v, cx, y + 4.2);
-        cx += cols[i];
-      });
-      // Garis bawah
-      doc.setDrawColor(220,225,235);
-      doc.setLineWidth(0.2);
-      doc.line(margin, y + 6.5, W - margin, y + 6.5);
-      y += 6.8;
+      doc.rect(margin, y, W - margin * 2, rowH, 'F');
+
+      // No — merah bold
+      doc.setTextColor(244, 63, 94);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text(String(idx + 1), margin + 2, y + 5);
+
+      // Nama — hitam gelap
+      doc.setTextColor(20, 30, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      const namaDisplay = s.nama.length > 38 ? s.nama.substring(0, 36) + '...' : s.nama;
+      doc.text(namaDisplay, margin + colNo + 2, y + 5);
+
+      // Jumlah bimbingan — center di kolom kanan, merah
+      doc.setTextColor(244, 63, 94);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('0', margin + colNo + colNama + colCount / 2, y + 5, { align: 'center' });
+
+      // Garis bawah baris
+      doc.setDrawColor(220, 228, 240);
+      doc.setLineWidth(0.15);
+      doc.line(margin, y + rowH, W - margin, y + rowH);
+
+      // Garis vertikal kolom
+      doc.setDrawColor(210, 220, 235);
+      doc.line(margin + colNo,           y, margin + colNo,           y + rowH);
+      doc.line(margin + colNo + colNama, y, margin + colNo + colNama, y + rowH);
+
+      y += rowH;
     });
-  } else {
-    doc.setFillColor(16, 185, 129);
-    doc.roundedRect(margin, y, W - margin*2, 14, 3, 3, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(10);
-    doc.text('Semua mahasiswamu sudah pernah bimbingan!', W/2, y + 9, {align:'center'});
-    y += 20;
   }
 
   // ── Footer ──
-  y = Math.max(y + 10, H - 22);
   doc.setDrawColor(220, 225, 235);
-  doc.setLineWidth(0.5);
-  doc.line(margin, H - 18, W - margin, H - 18);
-  doc.setTextColor(148, 163, 184);
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(7);
-  doc.text('Dokumen ini digenerate otomatis oleh Lytana. Harap segera menghubungi mahasiswa yang belum bimbingan.', W/2, H - 13, {align:'center'});
-  doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W/2, H - 8, {align:'center'});
+  doc.setLineWidth(0.4);
+  doc.line(margin, H - 16, W - margin, H - 16);
+  doc.setTextColor(160, 175, 195);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.text('Dokumen digenerate otomatis oleh Lytana. Harap segera menghubungi mahasiswa yang belum bimbingan.', W / 2, H - 11, { align: 'center' });
+  doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W / 2, H - 6, { align: 'center' });
 
-  // Simpan
-  const fname = 'Evaluasi_BelumBimbingan_' + (dosenNama||'Dosen').replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().substring(0,10) + '.pdf';
+  const fname = 'Evaluasi_BelumBimbingan_' + (dosenNama || 'Dosen').replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().substring(0, 10) + '.pdf';
   doc.save(fname);
   toast('PDF evaluasi berhasil diunduh! Kirim ke grup mahasiswa sebagai tindak lanjut.', 'success');
 }
