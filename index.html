@@ -6,6 +6,8 @@
 <title>Lytana v7 — Linkage of Your Technical Appointment & Network Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -553,9 +555,12 @@ tr:hover td{background:var(--card2)}
         <div class="section-title"><h2>Mahasiswa Bimbingan</h2><p>Lihat progress dan data mahasiswamu</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadDosenStudents()">&#8635; Refresh</button>
       </div>
-      <div class="filter-row" style="margin-bottom:12px">
-        <button class="filter-btn active" id="filter-mhs-semua" onclick="switchMhsFilter('semua',this)">Semua</button>
-        <button class="filter-btn" id="filter-mhs-belum" onclick="switchMhsFilter('belum',this)">&#128680; Belum Pernah Bimbingan</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <div class="filter-row" style="margin-bottom:0">
+          <button class="filter-btn active" id="filter-mhs-semua" onclick="switchMhsFilter('semua',this)">Semua</button>
+          <button class="filter-btn" id="filter-mhs-belum" onclick="switchMhsFilter('belum',this)">&#128680; Belum Pernah Bimbingan</button>
+        </div>
+        <button class="btn btn-amber btn-sm" onclick="openMendadakModal()" style="white-space:nowrap">&#9889; Catat Bimbingan Mendadak</button>
       </div>
       <div id="d-belum-bimbingan-panel" style="display:none;margin-bottom:20px">
         <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -878,6 +883,63 @@ tr:hover td{background:var(--card2)}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-set-status')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL BIMBINGAN MENDADAK ==================== -->
+<div class="modal-overlay" id="modal-mendadak">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>⚡ Catat Bimbingan Mendadak</h3>
+      <button class="modal-close" onclick="closeModal('modal-mendadak')">×</button>
+    </div>
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 14px;font-size:0.84rem;color:var(--text2);margin-bottom:18px">
+      ⚡ Fitur ini untuk mencatat bimbingan yang terjadi di luar sistem reservasi (bimbingan mendadak/tatap muka spontan). Bimbingan akan langsung masuk ke riwayat mahasiswa.
+    </div>
+    <div id="modal-mendadak-content">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label class="form-label">Mahasiswa</label>
+          <select id="mendadak-mhs" class="form-select">
+            <option value="">-- Pilih Mahasiswa --</option>
+          </select>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Jenis Bimbingan</label>
+            <select id="mendadak-tipe" class="form-select">
+              <option value="offline">🏢 Offline (Tatap Muka)</option>
+              <option value="online">💻 Online</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Bimbingan</label>
+            <input id="mendadak-tanggal" class="form-input" type="date"/>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Jam Mulai</label>
+            <input id="mendadak-jam-mulai" class="form-input" type="time"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jam Selesai</label>
+            <input id="mendadak-jam-selesai" class="form-input" type="time"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan / Topik Bimbingan</label>
+          <textarea id="mendadak-catatan" class="form-textarea" placeholder="Misal: Revisi BAB 2, diskusi metodologi, dst..."></textarea>
+        </div>
+        <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 13px;font-size:0.82rem;color:var(--text2)">
+          ✅ Bimbingan mendadak akan langsung tercatat sebagai <b style="color:var(--green)">Terselenggara</b> di riwayat mahasiswa.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-mendadak')">Batal</button>
+      <button class="btn btn-amber" id="mendadak-save-btn" onclick="saveBimbinganMendadak()">⚡ Catat Bimbingan</button>
     </div>
   </div>
 </div>
@@ -1404,12 +1466,18 @@ async function loadMyHistory() {
       const tipeColor = slot.tipe === 'online' ? 'var(--sky)' : 'var(--purple)';
       const tipeLabel = slot.tipe ? slot.tipe.charAt(0).toUpperCase() + slot.tipe.slice(1) : 'Bimbingan';
       const nomor = totalTerselenggara - idx;
-      html += `<div style="background:var(--card);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:12px;right:14px;font-size:2rem;font-weight:900;color:rgba(16,185,129,0.08);font-family:var(--font2);line-height:1">${nomor}</div>
+      const isMendadak = item.isMendadak || (item.slotId && item.slotId.startsWith && item.slotId.startsWith('MENDADAK_'));
+      const cardBorder = isMendadak ? 'rgba(245,158,11,0.35)' : 'rgba(16,185,129,0.25)';
+      const watermarkColor = isMendadak ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.08)';
+      const badgeBg = isMendadak ? 'rgba(245,158,11,0.18)' : 'rgba(16,185,129,0.15)';
+      const badgeColor = isMendadak ? 'var(--amber)' : 'var(--green)';
+      const badgeLabel = isMendadak ? '⚡ Mendadak · Ke-' + nomor : '✓ Ke-' + nomor;
+      html += `<div style="background:var(--card);border:1px solid ${cardBorder};border-radius:var(--radius);padding:18px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:12px;right:14px;font-size:2rem;font-weight:900;color:${watermarkColor};font-family:var(--font2);line-height:1">${nomor}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="font-size:1.1rem">${tipeIcon}</span>
           <span style="font-weight:700;color:${tipeColor};font-size:0.88rem;text-transform:uppercase;letter-spacing:0.05em">${tipeLabel}</span>
-          <span style="margin-left:auto;background:rgba(16,185,129,0.15);color:var(--green);padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:700">✓ Ke-${nomor}</span>
+          <span style="margin-left:auto;background:${badgeBg};color:${badgeColor};padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:700">${badgeLabel}</span>
         </div>
         <div style="font-weight:700;font-size:1rem;margin-bottom:6px">${fmtTgl(slot.tanggal,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
         <div style="font-size:0.85rem;color:var(--text2);margin-bottom:6px">⏰ ${slot.jamMulai||''}–${slot.jamSelesai||''}</div>
@@ -1887,38 +1955,233 @@ function renderBelumBimbingan() {
 }
 
 async function exportBelumBimbingan() {
-  const belum = (state.dosenStudents || []).filter(s => !s.bimbinganCount || s.bimbinganCount === 0);
-  if (!belum.length) { toast('Semua mahasiswamu sudah pernah bimbingan! Tidak ada yang perlu dievaluasi.', 'info'); return; }
+  const students = state.dosenStudents || [];
+  if (!students.length) { toast('Belum ada data mahasiswa.', 'error'); return; }
+  const belum = students.filter(s => !s.bimbinganCount || s.bimbinganCount === 0);
+  const sudah = students.filter(s => s.bimbinganCount && s.bimbinganCount > 0);
   const dosenNama = state.user?.nama || 'Dosen';
-  const tglCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-  const rows = [
-    ['EVALUASI BIMBINGAN SKRIPSI — LYTANA'],
-    ['Dosen:', dosenNama],
-    ['Dicetak:', tglCetak],
-    ['Keterangan:', 'Daftar mahasiswa yang BELUM PERNAH melakukan bimbingan terselenggara'],
-    [],
-    ['No', 'Nama', 'Kode', 'Status Skripsi', 'Terakhir Aktif', 'Terdaftar'],
-    ...belum.map((s, i) => [
-      i + 1,
-      s.nama,
-      s.kode,
-      STATUS_CONFIG[s.statusSkripsi]?.label || s.statusSkripsi,
-      s.lastActivity ? new Date(s.lastActivity).toLocaleDateString('id-ID') : 'Belum pernah aktif',
-      s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : '—',
-    ]),
-    [],
-    ['Total mahasiswa belum bimbingan:', belum.length],
-    ['Catatan:', 'Harap segera menghubungi mahasiswa di atas untuk menjadwalkan bimbingan pertama.'],
+  const tglCetak = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const total = students.length;
+
+  // Status breakdown
+  const statusCount = {};
+  students.forEach(s => { const st = s.statusSkripsi||'tidak_aktif'; statusCount[st] = (statusCount[st]||0)+1; });
+  const statusLabels = { aktif_bimbingan:'Aktif Bimbingan', tidak_aktif:'Tidak Aktif', revisi:'Revisi', menunggu_sidang:'Menunggu Sidang', lulus:'Lulus' };
+  const statusColors = { aktif_bimbingan:'#10b981', tidak_aktif:'#94a3b8', revisi:'#f59e0b', menunggu_sidang:'#8b5cf6', lulus:'#38bdf8' };
+
+  if (!window.jspdf || !window.Chart) {
+    toast('Library PDF sedang dimuat, coba lagi sebentar...', 'info'); return;
+  }
+
+  // ── Buat pie chart di canvas tersembunyi ──
+  const cvs = document.createElement('canvas');
+  cvs.width = 400; cvs.height = 300;
+  cvs.style.display = 'none'; document.body.appendChild(cvs);
+
+  // Pie 1: Sudah vs Belum Bimbingan
+  const pie1 = new Chart(cvs.getContext('2d'), {
+    type: 'pie',
+    data: {
+      labels: ['Sudah Bimbingan', 'Belum Bimbingan'],
+      datasets: [{ data: [sudah.length, belum.length], backgroundColor: ['#10b981','#f43f5e'], borderWidth: 0 }]
+    },
+    options: { animation: false, plugins: { legend: { display: false } } }
+  });
+
+  await new Promise(r => setTimeout(r, 300));
+  const pie1Img = cvs.toDataURL('image/png');
+  pie1.destroy();
+
+  // Pie 2: Status skripsi
+  const statKeys = Object.keys(statusCount);
+  const pie2 = new Chart(cvs.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: statKeys.map(k => statusLabels[k]||k),
+      datasets: [{ data: statKeys.map(k => statusCount[k]), backgroundColor: statKeys.map(k => statusColors[k]||'#64748b'), borderWidth: 0 }]
+    },
+    options: { animation: false, plugins: { legend: { display: false } } }
+  });
+
+  await new Promise(r => setTimeout(r, 300));
+  const pie2Img = cvs.toDataURL('image/png');
+  pie2.destroy();
+  document.body.removeChild(cvs);
+
+  // ── Generate PDF ──
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297;
+  const margin = 18;
+  let y = margin;
+
+  // Header strip
+  doc.setFillColor(15, 28, 46);
+  doc.rect(0, 0, W, 32, 'F');
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 0, 5, 32, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('EVALUASI BIMBINGAN SKRIPSI', margin + 2, 12);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text('Lytana — Linkage of Your Technical Appointment & Network Assistance', margin + 2, 19);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Dosen: ' + dosenNama, margin + 2, 26);
+  doc.text('Dicetak: ' + tglCetak, W - margin - 2, 26, {align: 'right'});
+
+  y = 40;
+
+  // ── Summary boxes ──
+  const boxes = [
+    { label: 'Total Mahasiswa', val: total, color: [37, 99, 235] },
+    { label: 'Sudah Bimbingan', val: sudah.length, color: [16, 185, 129] },
+    { label: 'Belum Bimbingan', val: belum.length, color: [244, 63, 94] },
+    { label: 'Persentase Belum', val: total ? Math.round(belum.length/total*100)+'%' : '0%', color: [245, 158, 11] },
   ];
-  const csv = rows.map(r => r.map(v => '"' + (String(v || '').replace(/"/g, '""')) + '"').join(',')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Evaluasi_BelumBimbingan_' + dosenNama.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().substring(0, 10) + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('CSV evaluasi ' + belum.length + ' mahasiswa berhasil diunduh! Kirim ke grup WhatsApp/Telegram untuk tindak lanjut.', 'success');
+  const bw = (W - margin*2 - 9) / 4;
+  boxes.forEach((b, i) => {
+    const bx = margin + i * (bw + 3);
+    doc.setFillColor(b.color[0], b.color[1], b.color[2]);
+    doc.roundedRect(bx, y, bw, 18, 2, 2, 'F');
+    doc.setFillColor(255,255,255);
+    doc.setFillColor(b.color[0], b.color[1], b.color[2]);
+    doc.setDrawColor(255,255,255);
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(String(b.val), bx + bw/2, y + 9, {align:'center'});
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(b.label, bx + bw/2, y + 15, {align:'center'});
+  });
+  y += 24;
+
+  // ── Pie Charts side by side ──
+  doc.setTextColor(30, 48, 80);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Status Bimbingan', margin, y + 4);
+  doc.text('Distribusi Status Skripsi', W/2 + 3, y + 4);
+  y += 7;
+
+  const chartW = 70, chartH = 55;
+  doc.addImage(pie1Img, 'PNG', margin, y, chartW, chartH);
+  doc.addImage(pie2Img, 'PNG', W/2 + 3, y, chartW, chartH);
+
+  // Legends
+  const pie1Legends = [
+    {label: 'Sudah Bimbingan (' + sudah.length + ')', color: '#10b981'},
+    {label: 'Belum Bimbingan (' + belum.length + ')', color: '#f43f5e'},
+  ];
+  let ly = y + 3;
+  pie1Legends.forEach(l => {
+    const rgb = l.color === '#10b981' ? [16,185,129] : [244,63,94];
+    doc.setFillColor(rgb[0],rgb[1],rgb[2]);
+    doc.roundedRect(margin + chartW + 4, ly, 3, 3, 0.5, 0.5, 'F');
+    doc.setTextColor(50,65,90);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.text(l.label, margin + chartW + 9, ly + 2.5);
+    ly += 6;
+  });
+
+  let ly2 = y + 3;
+  statKeys.forEach(k => {
+    const hex = statusColors[k]||'#64748b';
+    const rgb = hex === '#10b981' ? [16,185,129] : hex === '#94a3b8' ? [148,163,184] : hex === '#f59e0b' ? [245,158,11] : hex === '#8b5cf6' ? [139,92,246] : [56,189,248];
+    doc.setFillColor(rgb[0],rgb[1],rgb[2]);
+    doc.roundedRect(W/2 + chartW + 6, ly2, 3, 3, 0.5, 0.5, 'F');
+    doc.setTextColor(50,65,90);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.text((statusLabels[k]||k) + ' (' + statusCount[k] + ')', W/2 + chartW + 11, ly2 + 2.5);
+    ly2 += 6;
+  });
+
+  y += chartH + 8;
+
+  // ── Tabel mahasiswa belum bimbingan ──
+  if (belum.length > 0) {
+    doc.setFillColor(244, 63, 94);
+    doc.rect(margin, y, W - margin*2, 7, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    doc.text('DAFTAR MAHASISWA BELUM BIMBINGAN (' + belum.length + ' orang)', margin + 3, y + 4.8);
+    y += 9;
+
+    // Table header
+    const cols = [8, 62, 28, 36, 30, 28];
+    const headers = ['No','Nama','Kode','Status','Terakhir Aktif','Terdaftar'];
+    doc.setFillColor(240, 245, 255);
+    doc.rect(margin, y, W - margin*2, 6, 'F');
+    doc.setTextColor(37, 99, 235);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7);
+    let cx = margin + 1;
+    headers.forEach((h, i) => { doc.text(h, cx, y + 4.2); cx += cols[i]; });
+    y += 7;
+
+    belum.forEach((s, idx) => {
+      if (y > H - 22) {
+        doc.addPage();
+        y = margin;
+      }
+      const rowBg = idx % 2 === 0 ? [252,252,255] : [255,255,255];
+      doc.setFillColor(rowBg[0], rowBg[1], rowBg[2]);
+      doc.rect(margin, y, W - margin*2, 6.5, 'F');
+      doc.setTextColor(30, 48, 80);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7);
+      const rowVals = [
+        String(idx+1),
+        s.nama.length > 28 ? s.nama.substring(0,26)+'...' : s.nama,
+        s.kode,
+        statusLabels[s.statusSkripsi] || s.statusSkripsi || '—',
+        s.lastActivity ? new Date(s.lastActivity).toLocaleDateString('id-ID') : 'Belum aktif',
+        s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : '—',
+      ];
+      cx = margin + 1;
+      rowVals.forEach((v, i) => {
+        if (i === 0) { doc.setTextColor(244,63,94); doc.setFont('helvetica','bold'); }
+        else { doc.setTextColor(30,48,80); doc.setFont('helvetica','normal'); }
+        doc.text(v, cx, y + 4.2);
+        cx += cols[i];
+      });
+      // Garis bawah
+      doc.setDrawColor(220,225,235);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y + 6.5, W - margin, y + 6.5);
+      y += 6.8;
+    });
+  } else {
+    doc.setFillColor(16, 185, 129);
+    doc.roundedRect(margin, y, W - margin*2, 14, 3, 3, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(10);
+    doc.text('Semua mahasiswamu sudah pernah bimbingan!', W/2, y + 9, {align:'center'});
+    y += 20;
+  }
+
+  // ── Footer ──
+  y = Math.max(y + 10, H - 22);
+  doc.setDrawColor(220, 225, 235);
+  doc.setLineWidth(0.5);
+  doc.line(margin, H - 18, W - margin, H - 18);
+  doc.setTextColor(148, 163, 184);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
+  doc.text('Dokumen ini digenerate otomatis oleh Lytana. Harap segera menghubungi mahasiswa yang belum bimbingan.', W/2, H - 13, {align:'center'});
+  doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W/2, H - 8, {align:'center'});
+
+  // Simpan
+  const fname = 'Evaluasi_BelumBimbingan_' + (dosenNama||'Dosen').replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().substring(0,10) + '.pdf';
+  doc.save(fname);
+  toast('PDF evaluasi berhasil diunduh! Kirim ke grup mahasiswa sebagai tindak lanjut.', 'success');
 }
 
 function openStudentDetail(s) {
@@ -1948,6 +2211,55 @@ function openStudentDetail(s) {
       <span>✓ ${s.bimbinganCount}x bimbingan terselenggara</span>
     </div>`;
   openModal('modal-student-detail');
+}
+
+// ============================================================
+// DOSEN — BIMBINGAN MENDADAK
+// ============================================================
+function openMendadakModal() {
+  const students = state.dosenStudents || [];
+  if (!students.length) { toast('Muat data mahasiswa dulu (tab Mahasiswa)', 'error'); return; }
+  const sel = document.getElementById('mendadak-mhs');
+  sel.innerHTML = '<option value="">-- Pilih Mahasiswa --</option>' +
+    students.map(s => `<option value="${s.kode}">${s.nama} (${s.kode})</option>`).join('');
+  // Default: hari ini
+  const today = new Date().toISOString().substring(0,10);
+  document.getElementById('mendadak-tanggal').value = today;
+  document.getElementById('mendadak-jam-mulai').value = '';
+  document.getElementById('mendadak-jam-selesai').value = '';
+  document.getElementById('mendadak-catatan').value = '';
+  document.getElementById('mendadak-tipe').value = 'offline';
+  openModal('modal-mendadak');
+}
+
+async function saveBimbinganMendadak() {
+  const mhsKode = document.getElementById('mendadak-mhs').value;
+  const tipe = document.getElementById('mendadak-tipe').value;
+  const tanggal = document.getElementById('mendadak-tanggal').value;
+  const jamMulai = document.getElementById('mendadak-jam-mulai').value;
+  const jamSelesai = document.getElementById('mendadak-jam-selesai').value;
+  const catatan = document.getElementById('mendadak-catatan').value;
+
+  if (!mhsKode) return toast('Pilih mahasiswa dulu', 'error');
+  if (!tanggal) return toast('Tanggal wajib diisi', 'error');
+  if (!jamMulai || !jamSelesai) return toast('Jam mulai dan selesai wajib diisi', 'error');
+  if (jamSelesai <= jamMulai) return toast('Jam selesai harus setelah jam mulai', 'error');
+  if (tanggal > new Date().toISOString().substring(0,10)) return toast('Tanggal tidak boleh di masa depan', 'error');
+
+  const btn = document.getElementById('mendadak-save-btn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Menyimpan...';
+
+  const res = await api('addBimbinganMendadak', {
+    mahasiswaKode: mhsKode, tipe, tanggal, jamMulai, jamSelesai, catatan, token: state.token
+  }, 'POST');
+
+  btn.disabled = false; btn.innerHTML = '⚡ Catat Bimbingan';
+
+  if (!res.success) return toast(res.message, 'error');
+  toast('Bimbingan mendadak berhasil dicatat! Riwayat mahasiswa sudah diperbarui.', 'success');
+  closeModal('modal-mendadak');
+  // Refresh data mahasiswa agar bimbinganCount update
+  loadDosenStudents();
 }
 
 // ============================================================
