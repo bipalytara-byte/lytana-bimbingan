@@ -552,7 +552,10 @@ tr:hover td{background:var(--card2)}
     <div id="d-mahasiswa" class="page-section">
       <div class="section-header">
         <div class="section-title"><h2>Mahasiswa Bimbingan</h2><p>Lihat progress dan data mahasiswamu</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="loadDosenStudents()">&#8635; Refresh</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="loadDosenStudents()">&#8635; Refresh</button>
+          <button class="btn btn-sm" style="background:rgba(37,99,235,0.15);color:var(--blue2);border:1px solid rgba(37,99,235,0.3);white-space:nowrap" onclick="exportArsipMahasiswa()">&#128196; Export Arsip PDF</button>
+        </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
         <div class="filter-row" style="margin-bottom:0">
@@ -1951,6 +1954,232 @@ function renderBelumBimbingan() {
         }).join('')}</tbody>
       </table>
     </div>`;
+}
+
+// ============================================================
+// EXPORT ARSIP PDF — Semua Mahasiswa Bimbingan
+// ============================================================
+async function exportArsipMahasiswa() {
+  const students = state.dosenStudents || [];
+  if (!students.length) { toast('Muat data mahasiswa dulu.', 'error'); return; }
+  if (!window.jspdf) { toast('Library PDF sedang dimuat, coba lagi sebentar...', 'info'); return; }
+
+  const dosenNama  = state.user?.nama  || 'Dosen';
+  const dosenProdi = state.user?.prodi || '';
+  const tglCetak   = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const total      = students.length;
+
+  // Hitung ringkasan status
+  const STATUS_LABELS = { aktif_bimbingan:'Aktif Bimbingan', tidak_aktif:'Tidak Aktif', revisi:'Revisi', menunggu_sidang:'Menunggu Sidang', lulus:'Lulus' };
+  const statusCount = {};
+  students.forEach(s => { const st = s.statusSkripsi || 'tidak_aktif'; statusCount[st] = (statusCount[st]||0)+1; });
+
+  const { jsPDF } = window.jspdf;
+  const doc  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W    = 210, H = 297;
+  const mg   = 18;   // margin kiri/kanan
+  let   y    = 0;
+
+  // ─────────────────────────────────────────────────────────────
+  // HEADER
+  // ─────────────────────────────────────────────────────────────
+  doc.setFillColor(15, 28, 46);
+  doc.rect(0, 0, W, 36, 'F');
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 0, 5, 36, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text('ARSIP MAHASISWA BIMBINGAN SKRIPSI', mg + 2, 13);
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text('Lytana — Linkage of Your Technical Appointment & Network Assistance', mg + 2, 20);
+
+  doc.setTextColor(200, 215, 235);
+  doc.setFontSize(8.5);
+  doc.text('Dosen: ' + dosenNama + (dosenProdi ? '  |  ' + dosenProdi : ''), mg + 2, 28.5);
+  doc.text('Dicetak: ' + tglCetak, W - mg - 2, 28.5, { align: 'right' });
+
+  y = 44;
+
+  // ─────────────────────────────────────────────────────────────
+  // SUMMARY BOXES  (Total · Aktif · Tidak Aktif · Revisi · Sidang · Lulus)
+  // ─────────────────────────────────────────────────────────────
+  const boxes = [
+    { label: 'Total',          val: total,                                       color: [37,99,235]   },
+    { label: 'Aktif',          val: statusCount['aktif_bimbingan']  || 0,        color: [16,185,129]  },
+    { label: 'Tidak Aktif',    val: statusCount['tidak_aktif']      || 0,        color: [100,116,139] },
+    { label: 'Revisi',         val: statusCount['revisi']           || 0,        color: [245,158,11]  },
+    { label: 'Menunggu Sidang',val: statusCount['menunggu_sidang']  || 0,        color: [139,92,246]  },
+    { label: 'Lulus',          val: statusCount['lulus']            || 0,        color: [56,189,248]  },
+  ];
+  const bw = (W - mg * 2 - 5 * 3) / 6;
+  boxes.forEach((b, i) => {
+    const bx = mg + i * (bw + 3);
+    doc.setFillColor(b.color[0], b.color[1], b.color[2]);
+    doc.roundedRect(bx, y, bw, 20, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.text(String(b.val), bx + bw / 2, y + 11, { align: 'center' });
+    doc.setFontSize(5.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(b.label, bx + bw / 2, y + 17, { align: 'center' });
+  });
+  y += 28;
+
+  // ─────────────────────────────────────────────────────────────
+  // SECTION TITLE
+  // ─────────────────────────────────────────────────────────────
+  doc.setFillColor(37, 99, 235);
+  doc.rect(mg, y, W - mg * 2, 8, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('DAFTAR MAHASISWA BIMBINGAN  (' + total + ' orang)', mg + 4, y + 5.5);
+  y += 10;
+
+  // ─────────────────────────────────────────────────────────────
+  // TABLE — kolom: No | Nama | Tgl Daftar | Status | Bimbingan (×)
+  // ─────────────────────────────────────────────────────────────
+  const COL_NO    = 10;
+  const COL_DATE  = 26;
+  const COL_ST    = 34;
+  const COL_CNT   = 22;
+  const COL_NAMA  = W - mg * 2 - COL_NO - COL_DATE - COL_ST - COL_CNT;
+
+  // x start positions
+  const xNo   = mg;
+  const xNama = mg + COL_NO;
+  const xDate = mg + COL_NO + COL_NAMA;
+  const xSt   = mg + COL_NO + COL_NAMA + COL_DATE;
+  const xCnt  = mg + COL_NO + COL_NAMA + COL_DATE + COL_ST;
+
+  const drawTableHeader = (yy) => {
+    doc.setFillColor(235, 241, 255);
+    doc.rect(mg, yy, W - mg * 2, 7.5, 'F');
+    doc.setTextColor(37, 99, 235);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('No',          xNo   + 1.5,            yy + 5);
+    doc.text('Nama Mahasiswa', xNama + 1.5,          yy + 5);
+    doc.text('Tgl Daftar',  xDate + 1.5,            yy + 5);
+    doc.text('Status',      xSt   + 1.5,            yy + 5);
+    doc.text('Bimbingan',   xCnt  + COL_CNT / 2,    yy + 5, { align: 'center' });
+    // garis vertikal header
+    doc.setDrawColor(200, 210, 240);
+    doc.setLineWidth(0.25);
+    [xNama, xDate, xSt, xCnt].forEach(x => doc.line(x, yy, x, yy + 7.5));
+    return yy + 8.5;
+  };
+
+  // Status → warna teks singkat
+  const stColor = (st) => {
+    if (st === 'aktif_bimbingan')  return [16, 185, 129];
+    if (st === 'revisi')           return [245, 158, 11];
+    if (st === 'menunggu_sidang')  return [139, 92, 246];
+    if (st === 'lulus')            return [56, 189, 248];
+    return [100, 116, 139];
+  };
+  const stShort = (st) => {
+    if (st === 'aktif_bimbingan')  return 'Aktif';
+    if (st === 'tidak_aktif')      return 'Tdk Aktif';
+    if (st === 'revisi')           return 'Revisi';
+    if (st === 'menunggu_sidang')  return 'Menunggu Sidang';
+    if (st === 'lulus')            return 'Lulus';
+    return st || '—';
+  };
+
+  y = drawTableHeader(y);
+
+  students.forEach((s, idx) => {
+    const ROW_H = 7.5;
+
+    // Page break
+    if (y + ROW_H > H - 20) {
+      // footer halaman ini
+      doc.setDrawColor(220, 225, 235);
+      doc.setLineWidth(0.4);
+      doc.line(mg, H - 14, W - mg, H - 14);
+      doc.setTextColor(160, 175, 195);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.text('Arsip digenerate otomatis oleh Lytana — ' + dosenNama, W / 2, H - 9, { align: 'center' });
+      doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W / 2, H - 4.5, { align: 'center' });
+      doc.addPage();
+      y = mg;
+      y = drawTableHeader(y);
+    }
+
+    // Row background — zebra
+    const bg = idx % 2 === 0 ? [248, 250, 255] : [255, 255, 255];
+    doc.setFillColor(bg[0], bg[1], bg[2]);
+    doc.rect(mg, y, W - mg * 2, ROW_H, 'F');
+
+    // No
+    doc.setTextColor(37, 99, 235);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text(String(idx + 1), xNo + 1.5, y + 5);
+
+    // Nama
+    doc.setTextColor(20, 30, 50);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    const namaDisplay = s.nama.length > 36 ? s.nama.substring(0, 34) + '…' : s.nama;
+    doc.text(namaDisplay, xNama + 1.5, y + 5);
+
+    // Tgl Daftar
+    doc.setTextColor(80, 95, 120);
+    doc.setFontSize(7);
+    const tglDaftar = s.createdAt
+      ? new Date(s.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+    doc.text(tglDaftar, xDate + 1.5, y + 5);
+
+    // Status — berwarna
+    const [sr, sg, sb] = stColor(s.statusSkripsi);
+    doc.setTextColor(sr, sg, sb);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.8);
+    doc.text(stShort(s.statusSkripsi), xSt + 1.5, y + 5);
+
+    // Jumlah bimbingan — center
+    const cnt = s.bimbinganCount || 0;
+    const cntColor = cnt === 0 ? [244, 63, 94] : [16, 185, 129];
+    doc.setTextColor(cntColor[0], cntColor[1], cntColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text(String(cnt) + '×', xCnt + COL_CNT / 2, y + 5, { align: 'center' });
+
+    // Garis bawah baris + garis vertikal
+    doc.setDrawColor(215, 225, 240);
+    doc.setLineWidth(0.15);
+    doc.line(mg, y + ROW_H, W - mg, y + ROW_H);
+    doc.setDrawColor(210, 220, 240);
+    [xNama, xDate, xSt, xCnt].forEach(x => doc.line(x, y, x, y + ROW_H));
+
+    y += ROW_H;
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // FOOTER
+  // ─────────────────────────────────────────────────────────────
+  doc.setDrawColor(220, 225, 235);
+  doc.setLineWidth(0.4);
+  doc.line(mg, H - 14, W - mg, H - 14);
+  doc.setTextColor(160, 175, 195);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.text('Arsip digenerate otomatis oleh Lytana — ' + dosenNama, W / 2, H - 9, { align: 'center' });
+  doc.text('Lytana — Powered by Skuro Production ' + new Date().getFullYear(), W / 2, H - 4.5, { align: 'center' });
+
+  const fname = 'Arsip_Mahasiswa_' + (dosenNama || 'Dosen').replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().substring(0, 10) + '.pdf';
+  doc.save(fname);
+  toast('Arsip PDF ' + total + ' mahasiswa berhasil diunduh!', 'success');
 }
 
 async function exportBelumBimbingan() {
