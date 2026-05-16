@@ -270,6 +270,29 @@ tr:hover td{background:var(--card2)}
 }
 .info-edit-btn:hover { color: var(--text); border-color: var(--blue2); }
 
+/* Date range filter */
+.date-range-wrap {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 6px 12px;
+}
+.date-range-wrap label { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; }
+.date-range-input {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 5px 9px; color: var(--text);
+  font-family: var(--font); font-size: 0.82rem; outline: none;
+  cursor: pointer; transition: border-color .2s;
+}
+.date-range-input:focus { border-color: var(--blue2); }
+.date-range-sep { font-size: 0.78rem; color: var(--text3); }
+.date-range-clear {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 0.8rem; padding: 2px 6px;
+  border-radius: 5px; transition: color .15s;
+}
+.date-range-clear:hover { color: var(--rose); }
+.date-range-active { border-color: var(--blue2) !important; background: rgba(37,99,235,0.08) !important; }
+
 .btn-announce {
     background: linear-gradient(135deg, var(--orange), var(--amber));
     color: white; border: none; padding: 12px 20px; border-radius: 12px;
@@ -600,12 +623,22 @@ tr:hover td{background:var(--card2)}
           <button class="btn btn-orange" onclick="openSlotModal()">+ Tambah Sesi</button>
         </div>
       </div>
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="filterDosenSlots('all',this)">Semua</button>
-        <button class="filter-btn" onclick="filterDosenSlots('offline',this)">Offline</button>
-        <button class="filter-btn" onclick="filterDosenSlots('online',this)">Online</button>
-        <button class="filter-btn" onclick="filterDosenSlots('tersedia',this)">Tersedia</button>
-        <button class="filter-btn" onclick="filterDosenSlots('terisi',this)">Terisi</button>
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div class="filter-row" style="margin-bottom:0;flex-wrap:wrap">
+          <button class="filter-btn active" id="dslot-f-all"     onclick="filterDosenSlots('all',this)">Semua</button>
+          <button class="filter-btn"        id="dslot-f-offline"  onclick="filterDosenSlots('offline',this)">Offline</button>
+          <button class="filter-btn"        id="dslot-f-online"   onclick="filterDosenSlots('online',this)">Online</button>
+          <button class="filter-btn"        id="dslot-f-tersedia" onclick="filterDosenSlots('tersedia',this)">Tersedia</button>
+          <button class="filter-btn"        id="dslot-f-terisi"   onclick="filterDosenSlots('terisi',this)">Terisi</button>
+        </div>
+        <div class="date-range-wrap" id="dslot-date-wrap">
+          <label>📅 Dari</label>
+          <input type="date" id="dslot-date-from" class="date-range-input" onchange="applyDateRangeSlots()"/>
+          <span class="date-range-sep">—</span>
+          <label>Sampai</label>
+          <input type="date" id="dslot-date-to" class="date-range-input" onchange="applyDateRangeSlots()"/>
+          <button class="date-range-clear" onclick="clearDateRangeSlots()" title="Reset rentang tanggal">✕ Reset</button>
+        </div>
       </div>
       <div id="d-slots-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
@@ -2107,15 +2140,82 @@ function renderDosenSlots(slots) {
     }).join('')}</tbody></table></div>`;
 }
 
+// state filter aktif saat ini (tipe)
+let _slotFilterMode = 'all';
+
 function filterDosenSlots(f, btn) {
-  document.querySelectorAll('#d-sesi .filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#d-sesi .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  let filtered=state.dosenSlots;
-  if (f==='offline') filtered=filtered.filter(s=>s.tipe==='offline');
-  else if (f==='online') filtered=filtered.filter(s=>s.tipe==='online');
-  else if (f==='tersedia') filtered=filtered.filter(s=>!s.bookedBy||s.bookedBy==='');
-  else if (f==='terisi') filtered=filtered.filter(s=>s.bookedBy&&s.bookedBy!=='');
+  _slotFilterMode = f;
+  applyDateRangeSlots();   // selalu lewat date-range agar kombinasi filter bekerja
+}
+
+function applyDateRangeSlots() {
+  const from = document.getElementById('dslot-date-from')?.value || '';
+  const to   = document.getElementById('dslot-date-to')?.value   || '';
+  const wrap = document.getElementById('dslot-date-wrap');
+
+  // Visual indicator kalau range aktif
+  if (wrap) {
+    if (from || to) wrap.classList.add('date-range-active');
+    else            wrap.classList.remove('date-range-active');
+  }
+
+  let filtered = state.dosenSlots || [];
+
+  // Filter tipe
+  if      (_slotFilterMode === 'offline')  filtered = filtered.filter(s => s.tipe === 'offline');
+  else if (_slotFilterMode === 'online')   filtered = filtered.filter(s => s.tipe === 'online');
+  else if (_slotFilterMode === 'tersedia') filtered = filtered.filter(s => !s.bookedBy || s.bookedBy === '');
+  else if (_slotFilterMode === 'terisi')   filtered = filtered.filter(s => s.bookedBy && s.bookedBy !== '');
+
+  // Filter range tanggal (inklusif)
+  if (from) filtered = filtered.filter(s => s.tanggal >= from);
+  if (to)   filtered = filtered.filter(s => s.tanggal <= to);
+
+  // Validasi: jangan biarkan from > to
+  if (from && to && from > to) {
+    document.getElementById('dslot-date-from').style.borderColor = 'var(--rose)';
+    document.getElementById('dslot-date-to').style.borderColor   = 'var(--rose)';
+    return;
+  }
+  document.getElementById('dslot-date-from').style.borderColor = '';
+  document.getElementById('dslot-date-to').style.borderColor   = '';
+
   renderDosenSlots(filtered);
+
+  // Update label jumlah hasil filter
+  updateSlotFilterLabel(filtered.length, state.dosenSlots.length, from, to);
+}
+
+function clearDateRangeSlots() {
+  const fromEl = document.getElementById('dslot-date-from');
+  const toEl   = document.getElementById('dslot-date-to');
+  if (fromEl) { fromEl.value = ''; fromEl.style.borderColor = ''; }
+  if (toEl)   { toEl.value   = ''; toEl.style.borderColor   = ''; }
+  const wrap = document.getElementById('dslot-date-wrap');
+  if (wrap) wrap.classList.remove('date-range-active');
+  applyDateRangeSlots();
+}
+
+function updateSlotFilterLabel(shown, total, from, to) {
+  let el = document.getElementById('dslot-filter-info');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'dslot-filter-info';
+    el.style.cssText = 'font-size:0.78rem;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap';
+    const container = document.getElementById('d-slots-container');
+    if (container) container.parentNode.insertBefore(el, container);
+  }
+  if (from || to) {
+    const fmtFrom = from ? fmtTgl(from, {day:'numeric', month:'long', year:'numeric'}) : '—';
+    const fmtTo   = to   ? fmtTgl(to,   {day:'numeric', month:'long', year:'numeric'}) : '—';
+    el.innerHTML = `<span style="background:rgba(37,99,235,0.12);color:var(--blue2);padding:2px 10px;border-radius:20px;font-weight:600">
+      📅 ${fmtFrom} &nbsp;→&nbsp; ${fmtTo} &nbsp;·&nbsp; ${shown} dari ${total} sesi
+    </span>`;
+  } else {
+    el.innerHTML = '';
+  }
 }
 
 function openSlotModal() {
