@@ -679,8 +679,20 @@ tr:hover td{background:var(--card2)}
         <div class="filter-row" style="margin-bottom:0">
           <button class="filter-btn active" id="filter-mhs-semua" onclick="switchMhsFilter('semua',this)">Semua</button>
           <button class="filter-btn" id="filter-mhs-belum" onclick="switchMhsFilter('belum',this)">&#128680; Belum Pernah Bimbingan</button>
+          <button class="filter-btn" id="filter-mhs-perpanjangan" onclick="switchMhsFilter('perpanjangan',this)" style="border-color:rgba(239,68,68,0.4);color:#fb7185">&#9888;&#65039; Perpanjangan</button>
         </div>
         <button class="btn btn-amber btn-sm" onclick="openMendadakModal()" style="white-space:nowrap">&#9889; Catat Bimbingan Mendadak</button>
+      </div>
+      <!-- Panel perpanjangan -->
+      <div id="d-perpanjangan-panel" style="display:none;margin-bottom:20px">
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;color:#fb7185;margin-bottom:4px">&#9888;&#65039; Mahasiswa Perpanjangan Studi</div>
+            <div style="font-size:0.82rem;color:var(--text2)">Mahasiswa yang <b>belum lulus</b> padahal sudah <b>&#8805;4 tahun</b> sejak angkatan masuk.</div>
+          </div>
+          <div id="d-perpanjangan-count" style="font-size:1.6rem;font-weight:800;color:#fb7185;font-family:var(--font2)">—</div>
+        </div>
+        <div id="d-perpanjangan-container"></div>
       </div>
       <div id="d-belum-bimbingan-panel" style="display:none;margin-bottom:20px">
         <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -2510,18 +2522,40 @@ async function loadDosenStudents() {
 function renderDosenStudents(students) {
   const c=document.getElementById('d-students-container');
   if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa bimbingan</p></div>'; return; }
-  c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
+
+  // Banner perpanjangan
+  const allStudents = state.dosenStudents || [];
+  const perpanjCount = allStudents.filter(s => isPerpanjangan(s.kode, s.statusSkripsi)).length;
+  const isPerpanjMode = document.getElementById('filter-mhs-perpanjangan')?.classList.contains('active');
+  let summaryHtml = '';
+  if (perpanjCount > 0 && !isPerpanjMode) {
+    summaryHtml = `<div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:1.4rem">⚠️</span>
+      <div style="flex:1"><div style="font-weight:700;font-size:0.88rem;color:#fb7185">${perpanjCount} mahasiswa perpanjangan studi</div>
+        <div style="font-size:0.76rem;color:var(--text2);margin-top:2px">Belum lulus setelah ≥4 tahun sejak angkatan masuk</div></div>
+      <button class="btn btn-sm" style="background:rgba(239,68,68,0.12);color:#fb7185;border:1px solid rgba(239,68,68,0.35);white-space:nowrap"
+        onclick="switchMhsFilter('perpanjangan',document.getElementById('filter-mhs-perpanjangan'))">Lihat Detail ▶</button>
+    </div>`;
+  }
+
+  c.innerHTML = summaryHtml + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
     const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
     const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
-    return `<div class="student-card" style="position:relative">
+    const perp = isPerpanjangan(s.kode, s.statusSkripsi);
+    const angkatan = extractAngkatan(s.kode);
+    const angkatanLabel = angkatan ? labelTA(angkatan) : '';
+    return `<div class="student-card" style="position:relative;${perp?'border-color:rgba(239,68,68,0.4);':''}">
+      ${perp?'<div style="position:absolute;top:10px;right:10px;z-index:1"><span class="badge-perpanjangan" style="font-size:0.62rem;animation:none">⚠ Perpanj.</span></div>':''}
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
         ${renderAvatar(s.foto, s.nama, 48)}
         <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
+          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:${perp?'68px':'0'}">${s.nama}</div>
           <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
+          ${angkatanLabel?`<span style="font-size:0.7rem;color:${perp?'#fb7185':'var(--text3)'};margin-left:5px">📅 ${angkatanLabel}</span>`:''}
         </div>
       </div>
-      <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
+      <div style="margin-bottom:${perp?'6px':'10px'}">${statusBadge(s.statusSkripsi)}</div>
+      ${perp?`<div style="font-size:0.74rem;color:#fb7185;font-weight:700;margin-bottom:8px;padding:4px 10px;background:rgba(239,68,68,0.08);border-radius:6px">⚠️ Studi diperpanjang · masuk ${angkatan||'—'} (batas ${angkatan?angkatan+4:'—'})</div>`:''}
       ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
       ${s.kartuMerahCount>0?`<div style="margin-bottom:8px"><span class="kartu-merah">🔴 KARTU MERAH ×${s.kartuMerahCount}</span>${s.kartuMerahLastAt?`<span style="font-size:0.7rem;color:var(--text3);margin-left:6px">${daysSinceStr(s.kartuMerahLastAt)}</span>`:''}</div>`:''}
       <div style="margin-bottom:10px">
@@ -2535,31 +2569,36 @@ function renderDosenStudents(students) {
         ✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\\'")})'>Detail</button>
-        <button class="btn btn-sm" style="flex:1;background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\\'")}')">💬 Chat</button>
-        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\\'")}','${s.statusSkripsi}')">Set Status</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\'")})'  >Detail</button>
+        <button class="btn btn-sm" style="flex:1;background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\'")}')">💬 Chat</button>
+        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\'")}','${s.statusSkripsi}')">Set Status</button>
       </div>
     </div>`;
   }).join('')}</div>`;
 }
+
 
 function filterDosenStudents(q) {
   const f=state.dosenStudents.filter(s=>s.nama.toLowerCase().includes(q.toLowerCase())||s.kode.toLowerCase().includes(q.toLowerCase()));
   renderDosenStudents(f);
 }
 
-// ── Filter mahasiswa: semua / belum bimbingan ─────────────────
+// ── Filter mahasiswa: semua / belum bimbingan / perpanjangan ──
 function switchMhsFilter(mode, btn) {
   document.querySelectorAll('#d-mahasiswa .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   const semuaPanel = document.getElementById('d-semua-mhs-panel');
   const belumPanel = document.getElementById('d-belum-bimbingan-panel');
+  const perpanjPanel = document.getElementById('d-perpanjangan-panel');
+  // Sembunyikan semua dulu
+  [semuaPanel, belumPanel, perpanjPanel].forEach(p => { if(p) p.style.display='none'; });
   if (mode === 'belum') {
-    semuaPanel.style.display = 'none';
     belumPanel.style.display = 'block';
     renderBelumBimbingan();
+  } else if (mode === 'perpanjangan') {
+    perpanjPanel.style.display = 'block';
+    renderPerpanjangan();
   } else {
-    belumPanel.style.display = 'none';
     semuaPanel.style.display = 'block';
   }
 }
@@ -2602,6 +2641,48 @@ function renderBelumBimbingan() {
         }).join('')}</tbody>
       </table>
     </div>`;
+}
+
+// ── Render panel perpanjangan ────────────────────────────────
+function renderPerpanjangan() {
+  const c = document.getElementById('d-perpanjangan-container');
+  const countEl = document.getElementById('d-perpanjangan-count');
+  const perp = (state.dosenStudents || []).filter(s => isPerpanjangan(s.kode, s.statusSkripsi));
+  if (countEl) countEl.textContent = perp.length + ' mahasiswa';
+  if (!perp.length) {
+    c.innerHTML = '<div class="empty-state" style="padding:32px"><div class="empty-icon">🎉</div><p style="color:var(--green);font-weight:600">Tidak ada mahasiswa perpanjangan!</p></div>';
+    return;
+  }
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Nama</th><th>Angkatan</th><th>Batas Studi</th><th>Kode</th><th>Status Skripsi</th><th>Bimbingan</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
+    <tbody>${perp.map(s => {
+      const angkatan = extractAngkatan(s.kode);
+      const batasStudi = angkatan ? angkatan + 4 : '—';
+      const tahunLebih = angkatan ? new Date().getFullYear() - (angkatan + 4) : 0;
+      const days = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
+      return `<tr style="background:rgba(239,68,68,0.04)">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${renderAvatar(s.foto, s.nama, 36)}
+            <div>
+              <div style="font-weight:700;font-size:0.9rem">${s.nama}</div>
+              <div style="font-size:0.72rem;color:#fb7185;font-weight:600;margin-top:2px">⚠ Perpanjangan${tahunLebih>0?' +'+tahunLebih+' thn':''}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-weight:700;color:#fb7185">${angkatan ? labelTA(angkatan) : '—'}</td>
+        <td style="font-weight:700;color:var(--rose)">${batasStudi}</td>
+        <td><code style="font-size:0.78rem;background:var(--card2);padding:2px 6px;border-radius:4px">${s.kode}</code></td>
+        <td>${statusBadge(s.statusSkripsi)}</td>
+        <td style="text-align:center;font-weight:600">${s.bimbinganCount||0}x</td>
+        <td style="font-size:0.82rem;color:${days>=14?'var(--rose)':days>=7?'var(--amber)':'var(--text2)'}">${daysSinceStr(s.lastActivity)}</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-sm" style="background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\'")}')">💬</button>
+          <button class="btn btn-sm btn-ghost" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\'")})'  >Detail</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
 }
 
 // ============================================================
@@ -3577,7 +3658,7 @@ function renderAkademikSummary(sum, allMhs) {
       }
     });
   }
-  const taLabel = currentTaFilter === 'semua' ? '' : \` · TA ${labelTA(parseInt(currentTaFilter))}\`;
+  const taLabel = currentTaFilter === 'semua' ? '' : ` · TA ${labelTA(parseInt(currentTaFilter))}`;
   const items=[
     {n:sum.total,l:'Total Mahasiswa'+taLabel,c:'var(--blue2)'},
     {n:sum.aktif_bimbingan,l:'Aktif Bimbingan',c:'var(--green)'},
