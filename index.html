@@ -1852,23 +1852,29 @@ async function loadMyHistory() {
     api('getMyBookings', {token: state.token})
   ]);
 
-  // u2500u2500 Riwayat terselenggara: HANYA dari History sheet (deduplikasi berlapis) u2500u2500
-  // Deduplikasi lapisan 1: by slotId (mencegah duplikat karena validasi berulang)
-  // Deduplikasi lapisan 2: by tanggal+jam+dosenKode (mencegah duplikat sesi yang sama)
+  // ── Riwayat terselenggara: GAS sudah deduplikasi, frontend cukup filter status ──
+  // (deduplikasi tambahan di sini sebagai safety net)
   const seenSlotIds = new Set();
   const seenSessionKeys = new Set();
   const terselenggara = (hRes.history || [])
     .filter(h => h.status === 'terselenggara')
     .filter(h => {
+      // Layer 1: slotId unik
       if (seenSlotIds.has(h.slotId)) return false;
       seenSlotIds.add(h.slotId);
+      // Layer 2: tanggal bimbingan + jamMulai + dosenKode (dari slot)
       const slot = h.slot || {};
-      const sessionKey = (h.tanggal || slot.tanggal || '') + '_' + (slot.jamMulai || '') + '_' + (slot.dosenKode || '');
-      if (sessionKey !== '__' && seenSessionKeys.has(sessionKey)) return false;
-      if (sessionKey !== '__') seenSessionKeys.add(sessionKey);
+      const tgl = slot.tanggal || h.tanggal || '';
+      const jam = slot.jamMulai || '';
+      const dk  = slot.dosenKode || '';
+      if (tgl && jam && dk) {
+        const key = tgl + '_' + jam + '_' + dk;
+        if (seenSessionKeys.has(key)) return false;
+        seenSessionKeys.add(key);
+      }
       return true;
     })
-    .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+    .sort((a, b) => (b.slot?.tanggal || b.tanggal || '').localeCompare(a.slot?.tanggal || a.tanggal || ''));
 
   // ── Reservasi aktif (menunggu / disetujui): dari Bookings sheet saja ──
   const aktif = (bRes.bookings || [])
