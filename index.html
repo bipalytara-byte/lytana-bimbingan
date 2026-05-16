@@ -1018,6 +1018,34 @@ tr:hover td{background:var(--card2)}
   </div>
 </div>
 
+<!-- ==================== MODAL CANCEL BOOKING DOSEN ==================== -->
+<div class="modal-overlay" id="modal-dosen-cancel">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🚫 Batalkan Reservasi</h3>
+      <button class="modal-close" onclick="closeModal('modal-dosen-cancel')">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:10px;padding:12px 14px">
+        <div id="dosen-cancel-info" style="font-size:0.88rem;color:var(--text)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alasan Pembatalan <span style="color:var(--rose)">*</span></label>
+        <textarea id="dosen-cancel-alasan" class="form-textarea" rows="3"
+          placeholder="Contoh: Ada agenda mendadak dari kampus, rapat jurusan, kondisi kesehatan, dsb..."></textarea>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Alasan akan tercatat di riwayat mahasiswa sebagai keterangan pembatalan.</div>
+      </div>
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 13px;font-size:0.82rem;color:var(--text2)">
+        ⚡ Setelah dibatalkan, slot bimbingan akan <b style="color:var(--green)">kembali terbuka</b> dan bisa dipesan mahasiswa lain.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dosen-cancel')">Kembali</button>
+      <button class="btn btn-rose" id="dosen-cancel-confirm-btn" onclick="confirmDosenCancel()">🚫 Ya, Batalkan Reservasi</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== MODAL EDIT INFO BIMBINGAN ==================== -->
 <div class="modal-overlay" id="modal-info-edit">
   <div class="modal modal-lg">
@@ -3061,12 +3089,17 @@ function bookingTable(bookings, withFoto=false) {
       let aksiHTML = '';
       if (b.status === 'menunggu') {
         aksiHTML = `
-          <div style="display:flex;gap:6px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn btn-sm" style="background:var(--blue);color:white;border:none" onclick="doAcc('${b.id}')">✓ ACC</button>
             <button class="btn btn-ghost btn-sm" onclick="doTolak('${b.id}')">Tolak</button>
+            <button class="btn btn-rose btn-sm" onclick='openDosenCancel(${JSON.stringify(b).replace(/'/g,"\'")})'  title="Batalkan reservasi">🚫 Cancel</button>
           </div>`;
       } else if (b.status === 'disetujui') {
-        aksiHTML = `<button class="btn btn-teal btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\\'")})'>Selesai Bimbingan</button>`;
+        aksiHTML = `
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-teal btn-sm" onclick='openValidasi(${JSON.stringify(b).replace(/'/g,"\'")})'>Selesai Bimbingan</button>
+            <button class="btn btn-rose btn-sm" onclick='openDosenCancel(${JSON.stringify(b).replace(/'/g,"\'")})'  title="Batalkan reservasi">🚫 Cancel</button>
+          </div>`;
       } else {
         aksiHTML = `<span style="font-size:0.8rem;color:var(--text3)">Selesai</span>`;
       }
@@ -3081,6 +3114,69 @@ function bookingTable(bookings, withFoto=false) {
         <td>${aksiHTML}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
+}
+
+// ============================================================
+// DOSEN — CANCEL BOOKING
+// ============================================================
+let _dosenCancelBookId = null;
+
+function openDosenCancel(b) {
+  _dosenCancelBookId = b.id;
+  const slot = b.slot || {};
+  const mhs  = b.mahasiswa || {};
+  const tgl  = fmtTgl(slot.tanggal, {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const statusLabel = b.status === 'disetujui' ? '👍 Sudah Di-ACC' : '⏳ Menunggu ACC';
+
+  document.getElementById('dosen-cancel-info').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+        <b style="font-size:0.95rem">${mhs.nama || b.kode}</b>
+        <span style="font-size:0.75rem;background:rgba(244,63,94,0.12);color:var(--rose);padding:2px 8px;border-radius:20px">${statusLabel}</span>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text2)">📅 ${tgl}</div>
+      <div style="font-size:0.85rem;color:var(--text2)">⏰ ${slot.jamMulai||''}–${slot.jamSelesai||''} · <span class="badge badge-${slot.tipe==='offline'?'blue':'teal'}" style="font-size:0.7rem">${slot.tipe||''}</span></div>
+    </div>`;
+
+  document.getElementById('dosen-cancel-alasan').value = '';
+  const btn = document.getElementById('dosen-cancel-confirm-btn');
+  btn.disabled = false;
+  btn.textContent = '🚫 Ya, Batalkan Reservasi';
+  openModal('modal-dosen-cancel');
+}
+
+async function confirmDosenCancel() {
+  const bookId = _dosenCancelBookId;
+  if (!bookId) return;
+
+  const alasan = document.getElementById('dosen-cancel-alasan').value.trim();
+  if (!alasan) {
+    document.getElementById('dosen-cancel-alasan').style.borderColor = 'var(--rose)';
+    document.getElementById('dosen-cancel-alasan').placeholder = '⚠️ Alasan wajib diisi sebelum membatalkan...';
+    return;
+  }
+  document.getElementById('dosen-cancel-alasan').style.borderColor = '';
+
+  const btn = document.getElementById('dosen-cancel-confirm-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Membatalkan...';
+
+  const res = await api('dosenCancelBooking', { bookId, alasan, token: state.token }, 'POST');
+
+  btn.disabled = false;
+  btn.textContent = '🚫 Ya, Batalkan Reservasi';
+
+  if (!res.success) return toast(res.message, 'error');
+
+  toast(`✅ Reservasi ${res.mahasiswaNama || ''} berhasil dibatalkan. Slot kembali terbuka.`, 'success');
+  closeModal('modal-dosen-cancel');
+  _dosenCancelBookId = null;
+
+  // Refresh data
+  loadDosenBookings();
+  loadDosenSlots();
+  // Refresh preview mahasiswa juga
+  loadSlotPreviews();
 }
 
 function openValidasi(b) {
