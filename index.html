@@ -301,14 +301,6 @@ tr:hover td{background:var(--card2)}
   }
   .btn-announce:hover { transform: scale(1.02); filter: brightness(1.1); }
 
-/* Tahun Akademik & Perpanjangan */
-.status-perpanjangan{background:rgba(239,68,68,0.15);color:#fb7185;border:1px solid rgba(239,68,68,0.35)}
-.status-tepat_waktu{background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3)}
-.badge-perpanjangan{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.68rem;font-weight:800;background:rgba(239,68,68,0.18);color:#fb7185;border:1px solid rgba(239,68,68,0.4);letter-spacing:0.04em;animation:kartu-pulse 2s ease-in-out infinite}
-.ta-filter-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.ta-filter-wrap label{font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}
-.ta-select{background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--text);font-family:var(--font);font-size:0.82rem;outline:none;cursor:pointer}
-.ta-select:focus{border-color:var(--blue2)}
 
 </style>
 </head>
@@ -679,20 +671,8 @@ tr:hover td{background:var(--card2)}
         <div class="filter-row" style="margin-bottom:0">
           <button class="filter-btn active" id="filter-mhs-semua" onclick="switchMhsFilter('semua',this)">Semua</button>
           <button class="filter-btn" id="filter-mhs-belum" onclick="switchMhsFilter('belum',this)">&#128680; Belum Pernah Bimbingan</button>
-          <button class="filter-btn" id="filter-mhs-perpanjangan" onclick="switchMhsFilter('perpanjangan',this)" style="border-color:rgba(239,68,68,0.4);color:#fb7185">&#9888;&#65039; Perpanjangan</button>
         </div>
         <button class="btn btn-amber btn-sm" onclick="openMendadakModal()" style="white-space:nowrap">&#9889; Catat Bimbingan Mendadak</button>
-      </div>
-      <!-- Panel perpanjangan -->
-      <div id="d-perpanjangan-panel" style="display:none;margin-bottom:20px">
-        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div style="font-weight:700;font-size:0.95rem;color:#fb7185;margin-bottom:4px">&#9888;&#65039; Mahasiswa Perpanjangan Studi</div>
-            <div style="font-size:0.82rem;color:var(--text2)">Mahasiswa yang <b>belum lulus</b> padahal sudah <b>&#8805;4 tahun</b> sejak angkatan masuk.</div>
-          </div>
-          <div id="d-perpanjangan-count" style="font-size:1.6rem;font-weight:800;color:#fb7185;font-family:var(--font2)">—</div>
-        </div>
-        <div id="d-perpanjangan-container"></div>
       </div>
       <div id="d-belum-bimbingan-panel" style="display:none;margin-bottom:20px">
         <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -880,14 +860,6 @@ tr:hover td{background:var(--card2)}
       </div>
       <!-- Summary bar -->
       <div id="a-rekap-summary" class="rekap-summary"></div>
-      <!-- Tahun Akademik Filter -->
-      <div class="ta-filter-wrap">
-        <label>📅 Tahun Akademik:</label>
-        <select class="ta-select" id="ta-filter-select" onchange="onTaFilterChange()">
-          <option value="semua">Semua Angkatan</option>
-        </select>
-        <span id="ta-filter-info" style="font-size:0.78rem;color:var(--text2)"></span>
-      </div>
       <!-- Status Filter -->
       <div class="filter-row" id="a-rekap-filter">
         <button class="filter-btn active" onclick="filterRekap('semua',this)">Semua</button>
@@ -896,8 +868,6 @@ tr:hover td{background:var(--card2)}
         <button class="filter-btn" onclick="filterRekap('revisi',this)">Revisi</button>
         <button class="filter-btn" onclick="filterRekap('menunggu_sidang',this)">Menunggu Sidang</button>
         <button class="filter-btn" onclick="filterRekap('lulus',this)">Lulus</button>
-        <button class="filter-btn" onclick="filterRekap('perpanjangan',this)" style="border-color:rgba(239,68,68,0.4);color:#fb7185">⚠ Perpanjangan</button>
-        <button class="filter-btn" onclick="filterRekap('tepat_waktu',this)" style="border-color:rgba(56,189,248,0.4);color:var(--sky)">✓ Tepat Waktu</button>
       </div>
       <!-- Per-dosen breakdown -->
       <div id="a-rekap-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
@@ -2116,42 +2086,7 @@ const STATUS_CONFIG = {
   revisi          : { label:'Revisi',          emoji:'✏️', cls:'revisi'          },
   menunggu_sidang : { label:'Menunggu Sidang', emoji:'🏛', cls:'menunggu_sidang' },
   lulus           : { label:'Lulus / Wisuda',  emoji:'🎓', cls:'lulus'           },
-  perpanjangan    : { label:'Perpanjangan',    emoji:'⚠️', cls:'perpanjangan'    },
-  tepat_waktu     : { label:'Tepat Waktu',     emoji:'✓',  cls:'tepat_waktu'     },
 };
-
-// ── Tahun Akademik helpers ────────────────────────────────────
-// NIM format: 7 digit, 2 digit pertama = tahun angkatan (misal 2311033 → 2023)
-const NIM_LENGTH_FRONTEND = 7;
-
-function extractAngkatan(kode) {
-  if (!kode || kode.length < NIM_LENGTH_FRONTEND) return null;
-  const nim = kode.slice(-NIM_LENGTH_FRONTEND);
-  if (!/^\d{7}$/.test(nim)) return null;
-  const yearSuffix = nim.substring(0, 2); // "23" dari "2311033"
-  return parseInt('20' + yearSuffix); // → 2023
-}
-
-// Cek apakah mahasiswa sudah masuk masa perpanjangan
-// Logika: jika tahun sekarang >= angkatan + 4 DAN status belum lulus
-function isPerpanjangan(kode, statusSkripsi) {
-  if (statusSkripsi === 'lulus') return false;
-  const angkatan = extractAngkatan(kode);
-  if (!angkatan) return false;
-  const currentYear = new Date().getFullYear();
-  // Semester genap tahun ke-4 = angkatan + 4
-  return currentYear >= angkatan + 4;
-}
-
-// Label tahun akademik: "2023/2024"
-function labelTA(angkatan) {
-  if (!angkatan) return '—';
-  return angkatan + '/' + (angkatan + 1);
-}
-
-// Filter state untuk TA
-let currentTaFilter = 'semua';
-let currentStatusFilter = 'semua';
 
 function statusBadge(status) {
   const c = STATUS_CONFIG[status] || { label: status||'—', emoji:'?', cls:'tidak_aktif' };
@@ -2522,40 +2457,18 @@ async function loadDosenStudents() {
 function renderDosenStudents(students) {
   const c=document.getElementById('d-students-container');
   if (!students.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa bimbingan</p></div>'; return; }
-
-  // Banner perpanjangan
-  const allStudents = state.dosenStudents || [];
-  const perpanjCount = allStudents.filter(s => isPerpanjangan(s.kode, s.statusSkripsi)).length;
-  const isPerpanjMode = document.getElementById('filter-mhs-perpanjangan')?.classList.contains('active');
-  let summaryHtml = '';
-  if (perpanjCount > 0 && !isPerpanjMode) {
-    summaryHtml = `<div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <span style="font-size:1.4rem">⚠️</span>
-      <div style="flex:1"><div style="font-weight:700;font-size:0.88rem;color:#fb7185">${perpanjCount} mahasiswa perpanjangan studi</div>
-        <div style="font-size:0.76rem;color:var(--text2);margin-top:2px">Belum lulus setelah ≥4 tahun sejak angkatan masuk</div></div>
-      <button class="btn btn-sm" style="background:rgba(239,68,68,0.12);color:#fb7185;border:1px solid rgba(239,68,68,0.35);white-space:nowrap"
-        onclick="switchMhsFilter('perpanjangan',document.getElementById('filter-mhs-perpanjangan'))">Lihat Detail ▶</button>
-    </div>`;
-  }
-
-  c.innerHTML = summaryHtml + `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
+  c.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s=>{
     const daysSince = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
     const warnClass = daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?'inaktif-warn':'';
-    const perp = isPerpanjangan(s.kode, s.statusSkripsi);
-    const angkatan = extractAngkatan(s.kode);
-    const angkatanLabel = angkatan ? labelTA(angkatan) : '';
-    return `<div class="student-card" style="position:relative;${perp?'border-color:rgba(239,68,68,0.4);':''}">
-      ${perp?'<div style="position:absolute;top:10px;right:10px;z-index:1"><span class="badge-perpanjangan" style="font-size:0.62rem;animation:none">⚠ Perpanj.</span></div>':''}
+    return `<div class="student-card" style="position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
         ${renderAvatar(s.foto, s.nama, 48)}
         <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:${perp?'68px':'0'}">${s.nama}</div>
+          <div style="font-weight:700;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nama}</div>
           <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
-          ${angkatanLabel?`<span style="font-size:0.7rem;color:${perp?'#fb7185':'var(--text3)'};margin-left:5px">📅 ${angkatanLabel}</span>`:''}
         </div>
       </div>
-      <div style="margin-bottom:${perp?'6px':'10px'}">${statusBadge(s.statusSkripsi)}</div>
-      ${perp?`<div style="font-size:0.74rem;color:#fb7185;font-weight:700;margin-bottom:8px;padding:4px 10px;background:rgba(239,68,68,0.08);border-radius:6px">⚠️ Studi diperpanjang · masuk ${angkatan||'—'} (batas ${angkatan?angkatan+4:'—'})</div>`:''}
+      <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
       ${daysSince>=10&&s.statusSkripsi==='aktif_bimbingan'?`<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>`:''}
       ${s.kartuMerahCount>0?`<div style="margin-bottom:8px"><span class="kartu-merah">🔴 KARTU MERAH ×${s.kartuMerahCount}</span>${s.kartuMerahLastAt?`<span style="font-size:0.7rem;color:var(--text3);margin-left:6px">${daysSinceStr(s.kartuMerahLastAt)}</span>`:''}</div>`:''}
       <div style="margin-bottom:10px">
@@ -2583,22 +2496,18 @@ function filterDosenStudents(q) {
   renderDosenStudents(f);
 }
 
-// ── Filter mahasiswa: semua / belum bimbingan / perpanjangan ──
+// ── Filter mahasiswa: semua / belum bimbingan ─────────────────
 function switchMhsFilter(mode, btn) {
   document.querySelectorAll('#d-mahasiswa .filter-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  btn.classList.add('active');
   const semuaPanel = document.getElementById('d-semua-mhs-panel');
   const belumPanel = document.getElementById('d-belum-bimbingan-panel');
-  const perpanjPanel = document.getElementById('d-perpanjangan-panel');
-  // Sembunyikan semua dulu
-  [semuaPanel, belumPanel, perpanjPanel].forEach(p => { if(p) p.style.display='none'; });
   if (mode === 'belum') {
+    semuaPanel.style.display = 'none';
     belumPanel.style.display = 'block';
     renderBelumBimbingan();
-  } else if (mode === 'perpanjangan') {
-    perpanjPanel.style.display = 'block';
-    renderPerpanjangan();
   } else {
+    belumPanel.style.display = 'none';
     semuaPanel.style.display = 'block';
   }
 }
@@ -2641,48 +2550,6 @@ function renderBelumBimbingan() {
         }).join('')}</tbody>
       </table>
     </div>`;
-}
-
-// ── Render panel perpanjangan ────────────────────────────────
-function renderPerpanjangan() {
-  const c = document.getElementById('d-perpanjangan-container');
-  const countEl = document.getElementById('d-perpanjangan-count');
-  const perp = (state.dosenStudents || []).filter(s => isPerpanjangan(s.kode, s.statusSkripsi));
-  if (countEl) countEl.textContent = perp.length + ' mahasiswa';
-  if (!perp.length) {
-    c.innerHTML = '<div class="empty-state" style="padding:32px"><div class="empty-icon">🎉</div><p style="color:var(--green);font-weight:600">Tidak ada mahasiswa perpanjangan!</p></div>';
-    return;
-  }
-  c.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Nama</th><th>Angkatan</th><th>Batas Studi</th><th>Kode</th><th>Status Skripsi</th><th>Bimbingan</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
-    <tbody>${perp.map(s => {
-      const angkatan = extractAngkatan(s.kode);
-      const batasStudi = angkatan ? angkatan + 4 : '—';
-      const tahunLebih = angkatan ? new Date().getFullYear() - (angkatan + 4) : 0;
-      const days = s.lastActivity ? Math.floor((Date.now()-new Date(s.lastActivity).getTime())/86400000) : 999;
-      return `<tr style="background:rgba(239,68,68,0.04)">
-        <td>
-          <div style="display:flex;align-items:center;gap:10px">
-            ${renderAvatar(s.foto, s.nama, 36)}
-            <div>
-              <div style="font-weight:700;font-size:0.9rem">${s.nama}</div>
-              <div style="font-size:0.72rem;color:#fb7185;font-weight:600;margin-top:2px">⚠ Perpanjangan${tahunLebih>0?' +'+tahunLebih+' thn':''}</div>
-            </div>
-          </div>
-        </td>
-        <td style="font-weight:700;color:#fb7185">${angkatan ? labelTA(angkatan) : '—'}</td>
-        <td style="font-weight:700;color:var(--rose)">${batasStudi}</td>
-        <td><code style="font-size:0.78rem;background:var(--card2);padding:2px 6px;border-radius:4px">${s.kode}</code></td>
-        <td>${statusBadge(s.statusSkripsi)}</td>
-        <td style="text-align:center;font-weight:600">${s.bimbinganCount||0}x</td>
-        <td style="font-size:0.82rem;color:${days>=14?'var(--rose)':days>=7?'var(--amber)':'var(--text2)'}">${daysSinceStr(s.lastActivity)}</td>
-        <td style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="btn btn-sm" style="background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\'")}')">💬</button>
-          <button class="btn btn-sm btn-ghost" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g,"\'")})'  >Detail</button>
-        </td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table></div>`;
 }
 
 // ============================================================
@@ -3606,137 +3473,58 @@ async function loadAkademikRekap() {
   const s=document.getElementById('a-rekap-summary');
   c.innerHTML='<div class="loading-overlay"><div class="spinner"></div> Memuat rekap akademik...</div>';
   s.innerHTML='';
-  currentTaFilter='semua'; currentStatusFilter='semua';
   const res=await api('getAkademikRekap',{token:state.token});
   if (!res.success) return c.innerHTML=`<p style="color:var(--rose);padding:20px">${res.message}</p>`;
   rekapData=res;
-
-  // Populate dropdown Tahun Akademik dari data mahasiswa
-  const angkatanSet = new Set();
-  (res.mahasiswa||[]).forEach(m => {
-    const a = extractAngkatan(m.kode);
-    if (a) angkatanSet.add(a);
-  });
-  const sortedAngkatan = [...angkatanSet].sort((a,b) => b - a);
-  const sel = document.getElementById('ta-filter-select');
-  if (sel) {
-    sel.innerHTML = '<option value="semua">Semua Angkatan</option>' +
-      sortedAngkatan.map(a => `<option value="${a}">${labelTA(a)}</option>`).join('');
-  }
-
-  renderAkademikSummary(res.summary, res.mahasiswa);
-  renderAkademikTable(res.perDosen, 'semua', 'semua');
+  renderAkademikSummary(res.summary);
+  renderAkademikTable(res.perDosen, 'semua');
 }
 
-function onTaFilterChange() {
-  const sel = document.getElementById('ta-filter-select');
-  currentTaFilter = sel ? sel.value : 'semua';
-  // Reset status filter ke semua saat ganti TA
-  currentStatusFilter = 'semua';
-  document.querySelectorAll('#a-rekap-filter .filter-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-  if (rekapData) {
-    renderAkademikSummary(rekapData.summary, rekapData.mahasiswa);
-    renderAkademikTable(rekapData.perDosen, currentStatusFilter, currentTaFilter);
-  }
-}
-
-function renderAkademikSummary(sum, allMhs) {
+function renderAkademikSummary(sum) {
   const s=document.getElementById('a-rekap-summary');
-  // Hitung perpanjangan & tepat waktu dari data mahasiswa
-  let perpanjangan=0, tepatWaktu=0;
-  if (allMhs) {
-    // Filter sesuai TA jika ada
-    const mhsFiltered = currentTaFilter === 'semua' ? allMhs :
-      allMhs.filter(m => extractAngkatan(m.kode) === parseInt(currentTaFilter));
-    mhsFiltered.forEach(m => {
-      if (isPerpanjangan(m.kode, m.status||m.statusSkripsi)) perpanjangan++;
-      // Tepat waktu: lulus dan angkatan + 4 > sekarang (lulus dalam 4 tahun)
-      if ((m.status||m.statusSkripsi) === 'lulus') {
-        const angkatan = extractAngkatan(m.kode);
-        if (angkatan && new Date().getFullYear() < angkatan + 4) tepatWaktu++;
-        else if (angkatan) tepatWaktu++; // lulus walau sudah 4 tahun, tetap dihitung lulus
-      }
-    });
-  }
-  const taLabel = currentTaFilter === 'semua' ? '' : ` · TA ${labelTA(parseInt(currentTaFilter))}`;
   const items=[
-    {n:sum.total,l:'Total Mahasiswa'+taLabel,c:'var(--blue2)'},
+    {n:sum.total,l:'Total Mahasiswa',c:'var(--blue2)'},
     {n:sum.aktif_bimbingan,l:'Aktif Bimbingan',c:'var(--green)'},
     {n:sum.tidak_aktif,l:'Tidak Aktif',c:'var(--slate)'},
     {n:sum.revisi,l:'Revisi',c:'var(--amber)'},
     {n:sum.menunggu_sidang,l:'Menunggu Sidang',c:'var(--purple)'},
     {n:sum.lulus,l:'Lulus / Wisuda',c:'var(--sky)'},
-    {n:perpanjangan,l:'⚠ Perpanjangan',c:'#fb7185'},
   ];
   s.innerHTML=items.map(i=>`<div class="rekap-stat"><div class="num" style="color:${i.c}">${i.n||0}</div><div class="lbl">${i.l}</div></div>`).join('');
-
-  // Update info label TA
-  const info = document.getElementById('ta-filter-info');
-  if (info && currentTaFilter !== 'semua') {
-    const angkatan = parseInt(currentTaFilter);
-    const tahunBatas = angkatan + 4;
-    info.textContent = `TA ${labelTA(angkatan)} · Batas studi normal: ${tahunBatas}`;
-    info.style.color = 'var(--amber)';
-  } else if (info) {
-    info.textContent = '';
-  }
 }
 
-function renderAkademikTable(perDosen, filterStatus, taFilter) {
+function renderAkademikTable(perDosen, filterStatus) {
   const c=document.getElementById('a-rekap-container');
   if (!perDosen||!perDosen.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada data</p></div>'; return; }
-  const ta = (taFilter !== undefined ? taFilter : currentTaFilter) || 'semua';
-  const st = filterStatus || 'semua';
   let html='';
   perDosen.forEach(d=>{
-    // Filter TA terlebih dahulu
-    let mhsAll = ta==='semua' ? d.mhs : d.mhs.filter(m => extractAngkatan(m.kode)===parseInt(ta));
-    let mhsList = [...mhsAll];
-    // Filter status (termasuk pseudo: perpanjangan, tepat_waktu)
-    if (st==='perpanjangan') {
-      mhsList = mhsList.filter(m => isPerpanjangan(m.kode, m.status));
-    } else if (st==='tepat_waktu') {
-      mhsList = mhsList.filter(m => {
-        if (m.status!=='lulus') return false;
-        const ang = extractAngkatan(m.kode);
-        return ang && new Date().getFullYear() <= ang + 4;
-      });
-    } else if (st!=='semua') {
-      mhsList = mhsList.filter(m => m.status===st);
-    }
+    let mhsList=d.mhs;
+    if (filterStatus!=='semua') mhsList=mhsList.filter(m=>m.status===filterStatus);
     if (!mhsList.length) return;
-    const perpanjCount = mhsAll.filter(m => isPerpanjangan(m.kode, m.status)).length;
     html+=`<div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
         <div>
           <div style="font-weight:700;font-size:1rem">${d.nama||d.kode}</div>
-          <div style="font-size:0.82rem;color:var(--text2)">${d.prodi||''} · ${mhsList.length} mahasiswa</div>
+          <div style="font-size:0.82rem;color:var(--text2)">${d.prodi||''} · ${mhsList.length} mahasiswa (P1 / P2)</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-          ${['aktif_bimbingan','tidak_aktif','revisi','menunggu_sidang','lulus'].map(s=>{
-            const count=mhsAll.filter(m=>m.status===s).length;
-            return count>0?statusBadge(s).replace('</span>',` (${count})</span>`):'';
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${['aktif_bimbingan','tidak_aktif','revisi','menunggu_sidang','lulus'].map(st=>{
+            const count=d.mhs.filter(m=>m.status===st).length;
+            return count>0?statusBadge(st).replace('</span>',` (${count})</span>`):'';
           }).join('')}
-          ${perpanjCount>0?`<span class="badge-perpanjangan">⚠ Perpanjangan (${perpanjCount})</span>`:''}
         </div>
       </div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Nama</th><th>Angkatan</th><th>Kode</th><th>Status</th><th>Bimbingan</th><th>Terakhir Bimbingan</th><th>Terakhir Aktif</th></tr></thead>
+        <thead><tr><th>Nama</th><th>Kode</th><th>Status</th><th>Bimbingan</th><th>Terakhir Bimbingan</th><th>Terakhir Aktif</th></tr></thead>
         <tbody>${mhsList.map(m=>{
           const days=m.lastActivity?Math.floor((Date.now()-new Date(m.lastActivity).getTime())/86400000):999;
-          const angkatan = extractAngkatan(m.kode);
-          const perp = isPerpanjangan(m.kode, m.status);
-          const angkatanLabel = angkatan ? labelTA(angkatan) : '—';
-          const perpBadge = perp ? '<span class="badge-perpanjangan" style="font-size:0.6rem;padding:1px 6px;animation:none;margin-left:4px">⚠ Perpanj.</span>' : '';
-          return `<tr style="${perp?'background:rgba(239,68,68,0.04)':''}">
+          return `<tr>
             <td>
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:8px">
                 ${renderAvatar(m.foto, m.nama, 28)}
                 <span style="font-weight:600">${m.nama}</span>
-                ${perpBadge}
               </div>
             </td>
-            <td style="font-size:0.82rem;font-weight:600;color:${perp?'#fb7185':'var(--text2)'};white-space:nowrap">${angkatanLabel}${perp?' ⚠':''}</td>
             <td><code style="font-size:0.78rem;background:var(--card2);padding:2px 6px;border-radius:4px">${m.kode}</code></td>
             <td>${statusBadge(m.status)}</td>
             <td style="text-align:center">${m.bimbinganOk}</td>
@@ -3753,11 +3541,7 @@ function renderAkademikTable(perDosen, filterStatus, taFilter) {
 function filterRekap(status, btn) {
   document.querySelectorAll('#a-rekap-filter .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  currentStatusFilter = status;
-  if (rekapData) {
-    renderAkademikSummary(rekapData.summary, rekapData.mahasiswa);
-    renderAkademikTable(rekapData.perDosen, status, currentTaFilter);
-  }
+  if (rekapData) renderAkademikTable(rekapData.perDosen, status);
 }
 
 // ============================================================
@@ -3973,11 +3757,7 @@ async function testChatConnection() {
 
 async function exportAkademikCSV() {
   if (!rekapData) { toast('Muat data rekap dulu','error'); return; }
-  // Ambil filter TA yang aktif untuk label di CSV
-  const taLabel = currentTaFilter==='semua' ? 'Semua Angkatan' : 'TA ' + labelTA(parseInt(currentTaFilter));
-  const allMhs = currentTaFilter==='semua'
-    ? rekapData.mahasiswa
-    : rekapData.mahasiswa.filter(m => extractAngkatan(m.kode)===parseInt(currentTaFilter));
+  const allMhs=rekapData.mahasiswa;
   const dosenList=rekapData.perDosen;
   const dosenMap={};
   dosenList.forEach(d=>{ d.mhs.forEach(m=>dosenMap[m.kode]={dosenNama:d.nama,prodi:d.prodi}); });
@@ -3986,45 +3766,34 @@ async function exportAkademikCSV() {
   const dNameMap = {};
   if(dr.success) { dr.dosen.forEach(d => dNameMap[d.kode] = d.nama); }
 
-  const perpanjCount = allMhs.filter(m => isPerpanjangan(m.kode, m.status||m.statusSkripsi)).length;
-
   const rows=[
     ['REKAP AKADEMIK BIMBINGAN SKRIPSI — LYTANA'],
     ['Dicetak:',new Date(rekapData.generatedAt).toLocaleString('id-ID')],
-    ['Filter Angkatan:', taLabel],
     [],
     ['RINGKASAN'],
-    ['Total Mahasiswa',allMhs.length],
-    ['Aktif Bimbingan',allMhs.filter(m=>m.status==='aktif_bimbingan').length],
-    ['Tidak Aktif',allMhs.filter(m=>m.status==='tidak_aktif').length],
-    ['Revisi',allMhs.filter(m=>m.status==='revisi').length],
-    ['Menunggu Sidang',allMhs.filter(m=>m.status==='menunggu_sidang').length],
-    ['Lulus / Wisuda',allMhs.filter(m=>m.status==='lulus').length],
-    ['⚠ Perpanjangan (≥4 tahun belum lulus)',perpanjCount],
+    ['Total Mahasiswa',rekapData.summary.total],
+    ['Aktif Bimbingan',rekapData.summary.aktif_bimbingan],
+    ['Tidak Aktif',rekapData.summary.tidak_aktif],
+    ['Revisi',rekapData.summary.revisi],
+    ['Menunggu Sidang',rekapData.summary.menunggu_sidang],
+    ['Lulus / Wisuda',rekapData.summary.lulus],
     [],
     ['DETAIL MAHASISWA'],
-    ['No','Nama','Kode','Angkatan','TA','Perpanjangan?','Pembimbing 1','Pembimbing 2','Status Skripsi','Jumlah Bimbingan','Terakhir Bimbingan','Terakhir Aktif'],
-    ...allMhs.map((m,i)=>{
-      const angkatan = extractAngkatan(m.kode);
-      const perp = isPerpanjangan(m.kode, m.status||m.statusSkripsi);
-      return [
-        i+1, m.nama, m.kode,
-        angkatan || '—',
-        angkatan ? labelTA(angkatan) : '—',
-        perp ? 'Ya ⚠' : 'Tidak',
-        dNameMap[m.dosenKode1] || m.dosenKode1 || '—',
-        dNameMap[m.dosenKode2] || m.dosenKode2 || '—',
-        STATUS_CONFIG[m.status]?.label||m.status,
-        m.bimbinganOk,
-        m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
-        m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
-      ];
-    })
+    ['No','Nama','Kode','Pembimbing 1','Pembimbing 2','Status Skripsi','Jumlah Bimbingan','Terakhir Bimbingan','Terakhir Aktif'],
+    ...allMhs.map((m,i)=>[
+      i+1, m.nama, m.kode,
+      dNameMap[m.dosenKode1] || m.dosenKode1 || '—',
+      dNameMap[m.dosenKode2] || m.dosenKode2 || '—',
+      STATUS_CONFIG[m.status]?.label||m.status,
+      m.bimbinganOk,
+      m.lastBimbingan?fmtTgl(m.lastBimbingan.substring(0,10),{day:'numeric',month:'long',year:'numeric'}):'Belum ada',
+      m.lastActivity?new Date(m.lastActivity).toLocaleDateString('id-ID'):'—',
+    ])
   ];
   const csv=rows.map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='Rekap_Akademik_Lytana_'+taLabel.replace(/\//g,'-')+'_'+new Date().toISOString().substring(0,10)+'.csv';
+  const a=document.createElement('a'); a.href=url; a.download='Rekap_Akademik_Lytana_'+new Date().toISOString().substring(0,10)+'.csv';
   a.click(); URL.revokeObjectURL(url);
   toast('Rekap Akademik berhasil diexport!','success');
 }
