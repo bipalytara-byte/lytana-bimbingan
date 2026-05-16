@@ -1659,16 +1659,21 @@ function doLogout() {
 // ============================================================
 async function loadSlotPreviews() {
   // Fetch kedua tipe paralel, tanpa mengubah state.slots (itu khusus tipe yang sedang aktif)
-  const today = new Date().toISOString().substring(0, 10);
+  // Gunakan waktu lokal (bukan UTC) agar tanggal sesuai timezone Indonesia
+  const todayLocal = new Date();
+  const today = todayLocal.getFullYear() + '-' +
+    String(todayLocal.getMonth() + 1).padStart(2, '0') + '-' +
+    String(todayLocal.getDate()).padStart(2, '0');
 
   const render = (tipe, slots) => {
     const el = document.getElementById('preview-' + tipe);
     if (!el) return;
 
-    // Hanya slot yang belum lewat
+    // Hanya slot yang belum lewat (filter ketat: tanggal >= hari ini lokal)
     const valid = (slots || []).filter(s => s.tanggal >= today);
     const tersedia  = valid.filter(s => !s.bookedBy || s.bookedBy === '');
-    const sudahSaya = valid.find(s => s.bookedBy === state.user?.kode);
+    // sudahSaya: hanya tampilkan jika slotnya benar-benar di masa depan (bukan hari yang sudah lewat)
+    const sudahSaya = valid.find(s => s.bookedBy === state.user?.kode && s.tanggal >= today);
 
     if (!valid.length) {
       el.innerHTML = `<div class="type-card-stat">
@@ -1840,13 +1845,20 @@ async function loadMyHistory() {
     api('getMyBookings', {token: state.token})
   ]);
 
-  // ── Riwayat terselenggara: HANYA dari History sheet (deduplikasi by slotId) ──
+  // u2500u2500 Riwayat terselenggara: HANYA dari History sheet (deduplikasi berlapis) u2500u2500
+  // Deduplikasi lapisan 1: by slotId (mencegah duplikat karena validasi berulang)
+  // Deduplikasi lapisan 2: by tanggal+jam+dosenKode (mencegah duplikat sesi yang sama)
   const seenSlotIds = new Set();
+  const seenSessionKeys = new Set();
   const terselenggara = (hRes.history || [])
     .filter(h => h.status === 'terselenggara')
     .filter(h => {
       if (seenSlotIds.has(h.slotId)) return false;
       seenSlotIds.add(h.slotId);
+      const slot = h.slot || {};
+      const sessionKey = (h.tanggal || slot.tanggal || '') + '_' + (slot.jamMulai || '') + '_' + (slot.dosenKode || '');
+      if (sessionKey !== '__' && seenSessionKeys.has(sessionKey)) return false;
+      if (sessionKey !== '__') seenSessionKeys.add(sessionKey);
       return true;
     })
     .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
