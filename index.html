@@ -1669,11 +1669,18 @@ async function loadSlotPreviews() {
     const el = document.getElementById('preview-' + tipe);
     if (!el) return;
 
-    // Hanya slot yang belum lewat (filter ketat: tanggal >= hari ini lokal)
-    const valid = (slots || []).filter(s => s.tanggal >= today);
+    // Filter slot: hanya yang belum lewat berdasarkan DATETIME penuh (tanggal + jam mulai)
+    // Ini mencegah slot hari ini yang jamnya sudah lewat tetap terhitung
+    const now = new Date();
+    const valid = (slots || []).filter(s => {
+      if (!s.tanggal) return false;
+      // Gunakan jam mulai untuk menentukan apakah slot sudah lewat
+      const slotDateTime = new Date(s.tanggal + 'T' + (s.jamMulai || '23:59') + ':00');
+      return slotDateTime > now;
+    });
     const tersedia  = valid.filter(s => !s.bookedBy || s.bookedBy === '');
-    // sudahSaya: hanya tampilkan jika slotnya benar-benar di masa depan (bukan hari yang sudah lewat)
-    const sudahSaya = valid.find(s => s.bookedBy === state.user?.kode && s.tanggal >= today);
+    // sudahSaya: slot yang di-booking mahasiswa ini dan belum lewat jamnya
+    const sudahSaya = valid.find(s => s.bookedBy === state.user?.kode);
 
     if (!valid.length) {
       el.innerHTML = `<div class="type-card-stat">
