@@ -231,44 +231,82 @@ tr:hover td{background:var(--card2)}
 .chat-input-area textarea{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:0.88rem;resize:none;min-height:40px;max-height:100px;outline:none}
 .chat-input-area textarea:focus{border-color:var(--blue2)}
 @media(max-width:600px){.chat-sidebar{width:200px}.chat-bubble{max-width:85%}}
-  /* PASANG KODE LANGKAH 1 DI SINI (Sebelum penutup style) */
-  .info-bimbingan-panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 22px;
-  margin-bottom: 24px;
-  position: relative;
-}
-.info-bimbingan-panel .panel-title {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 14px;
-}
-.info-bimbingan-panel .panel-title h3 {
-  font-size: 1rem; color: var(--text);
-}
-.info-metode-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-.info-metode-item {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 14px;
-  border-radius: 9px;
-  font-size: 0.85rem; line-height: 1.5; color: var(--text);
-}
-.info-metode-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
-.info-catatan-list { display: flex; flex-direction: column; gap: 7px; }
-.info-catatan-item {
-  display: flex; align-items: flex-start; gap: 8px;
-  font-size: 0.82rem; color: var(--text2); line-height: 1.5;
-}
-.info-catatan-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue2); flex-shrink: 0; margin-top: 6px; }
-.info-edit-btn {
-  position: absolute; top: 16px; right: 16px;
-  background: var(--card2); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 5px 12px; font-size: 0.78rem;
-  font-weight: 600; color: var(--text2); cursor: pointer;
-  display: flex; align-items: center; gap: 5px; transition: all .2s;
-}
-.info-edit-btn:hover { color: var(--text); border-color: var(--blue2); }
+  /* ── PAPAN PENGUMUMAN ── */
+  .pengumuman-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 24px;
+  }
+  .pengumuman-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+  }
+  .pengumuman-panel-title {
+    display: flex; align-items: center; gap: 9px;
+  }
+  .pengumuman-panel-title h3 { font-size: 1rem; color: var(--text); }
+  .pengumuman-list { display: flex; flex-direction: column; gap: 10px; }
+  .pengumuman-empty {
+    text-align: center; padding: 28px 16px;
+    font-size: 0.85rem; color: var(--text3);
+  }
+  .pengumuman-card {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 15px; border-radius: 10px;
+    background: var(--card2); border: 1px solid var(--border2);
+    transition: all .18s;
+  }
+  .pengumuman-card-body { flex: 1; min-width: 0; }
+  .pengumuman-card-top {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px; flex-wrap: wrap;
+  }
+  .pengumuman-card-judul {
+    font-weight: 700; font-size: 0.9rem; color: var(--text);
+  }
+  .pengumuman-card-isi {
+    font-size: 0.84rem; color: var(--text2); line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .pengumuman-card-meta {
+    font-size: 0.73rem; color: var(--text3); margin-top: 6px;
+  }
+  .pengumuman-card-actions {
+    display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;
+  }
+  .pgm-act-btn {
+    background: none; border: 1px solid var(--border2); border-radius: 6px;
+    color: var(--text2); cursor: pointer; font-size: 0.75rem; padding: 3px 9px;
+    transition: all .15s; white-space: nowrap;
+  }
+  .pgm-act-btn:hover { color: var(--text); border-color: var(--blue2); }
+  .pgm-act-btn.del:hover { color: var(--rose); border-color: var(--rose); }
+  /* Priority badges */
+  .pgm-badge { padding: 2px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
+  .pgm-badge-info    { background: rgba(56,189,248,0.15); color: var(--sky); }
+  .pgm-badge-warning { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .pgm-badge-penting { background: rgba(244,63,94,0.15);  color: var(--rose); }
+  /* left accent bar per type */
+  .pengumuman-card.type-info    { border-left: 3px solid var(--sky); }
+  .pengumuman-card.type-warning { border-left: 3px solid var(--amber); }
+  .pengumuman-card.type-penting { border-left: 3px solid var(--rose); }
+  /* Ticker for mahasiswa — scrolling strip */
+  .pgm-ticker-wrap {
+    overflow: hidden; white-space: nowrap;
+    background: rgba(37,99,235,0.07); border: 1px solid rgba(37,99,235,0.18);
+    border-radius: 8px; padding: 8px 14px; margin-bottom: 16px;
+    font-size: 0.82rem; color: var(--text2);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pgm-ticker-label {
+    font-weight: 700; color: var(--blue2); flex-shrink: 0; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .pgm-ticker-text { overflow: hidden; flex: 1; }
+  .pgm-ticker-inner { display: inline-block; animation: pgm-scroll 30s linear infinite; }
+  @keyframes pgm-scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
 /* Date range filter */
 .date-range-wrap {
@@ -439,16 +477,8 @@ tr:hover td{background:var(--card2)}
       <div class="section-header">
         <div class="section-title"><h2>Reservasi Bimbingan</h2><p id="m-dosen-label">Pilih jenis sesi bimbingan</p></div>
       </div>
-      <!-- Panel Info Metode Bimbingan (read-only untuk mahasiswa) -->
-      <div class="info-bimbingan-panel" id="m-info-panel">
-        <div class="panel-title">
-          <span style="font-size:1.3rem">📋</span>
-          <h3>Informasi Metode Bimbingan</h3>
-        </div>
-        <div class="info-metode-list" id="m-info-metode-list"><!-- rendered by JS --></div>
-        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
-        <div class="info-catatan-list" id="m-info-catatan-list"><!-- rendered by JS --></div>
-      </div>
+      <!-- Papan Pengumuman (read-only untuk mahasiswa) -->
+      <div id="m-pgm-panel"></div>
 
       <div class="type-selector">
         <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
@@ -580,16 +610,8 @@ tr:hover td{background:var(--card2)}
         <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
       </div>
-      <!-- Panel Info Metode Bimbingan (read-only untuk dosen) -->
-      <div class="info-bimbingan-panel" id="d-info-panel">
-        <div class="panel-title">
-          <span style="font-size:1.3rem">📋</span>
-          <h3>Informasi Metode Bimbingan</h3>
-        </div>
-        <div class="info-metode-list" id="d-info-metode-list"><!-- rendered by JS --></div>
-        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
-        <div class="info-catatan-list" id="d-info-catatan-list"><!-- rendered by JS --></div>
-      </div>
+      <!-- Papan Pengumuman (read-only untuk dosen) -->
+      <div id="d-pgm-panel"></div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
         <div class="card stat-card"><div class="stat-label">Mahasiswa Bimbingan</div><div class="stat-number" id="d-stat-mhs" style="color:var(--blue2)">—</div></div>
@@ -782,17 +804,8 @@ tr:hover td{background:var(--card2)}
       <div class="section-header"><div class="section-title"><h2>Dashboard Admin</h2><p>Ringkasan seluruh sistem Lytana</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadAdminDashboard()">↻ Refresh</button></div>
 
-      <!-- Panel Info Metode Bimbingan (editable untuk admin) -->
-      <div class="info-bimbingan-panel" id="a-info-panel">
-        <button class="info-edit-btn" onclick="openInfoEdit()" title="Edit informasi bimbingan">✏️ Edit</button>
-        <div class="panel-title">
-          <span style="font-size:1.3rem">📋</span>
-          <h3>Informasi Metode Bimbingan</h3>
-        </div>
-        <div class="info-metode-list" id="a-info-metode-list"><!-- rendered by JS --></div>
-        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
-        <div class="info-catatan-list" id="a-info-catatan-list"><!-- rendered by JS --></div>
-      </div>
+      <!-- Papan Pengumuman (editable untuk admin) -->
+      <div id="a-pgm-panel"></div>
 
       <div class="grid-3" style="margin-bottom:16px">
         <div class="card stat-card"><div class="stat-label">Total Dosen</div><div class="stat-number" id="a-stat-dosen" style="color:var(--orange)">—</div></div>
@@ -1059,35 +1072,35 @@ tr:hover td{background:var(--card2)}
   </div>
 </div>
 
-<!-- ==================== MODAL EDIT INFO BIMBINGAN ==================== -->
-<div class="modal-overlay" id="modal-info-edit">
+<!-- ==================== MODAL PENGUMUMAN (Admin) ==================== -->
+<div class="modal-overlay" id="modal-pgm-form">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h3>✏️ Edit Informasi Bimbingan</h3>
-      <button class="modal-close" onclick="closeModal('modal-info-edit')">×</button>
+      <h3 id="modal-pgm-title">📢 Tambah Pengumuman</h3>
+      <button class="modal-close" onclick="closeModal('modal-pgm-form')">×</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:18px">
-      <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.2);border-radius:9px;padding:11px 14px;font-size:0.83rem;color:var(--text2)">
-        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman dosen maupun mahasiswa pada browser yang sama. Pastikan pengaturan dilakukan melalui akun Admin.
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="form-label">Judul Pengumuman</label>
+        <input id="pgm-judul" class="form-input" type="text" placeholder="Contoh: Dosen sedang keluar kota"/>
       </div>
-
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Metode Bimbingan</div>
-        <div id="modal-metode-fields" style="display:flex;flex-direction:column;gap:10px"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addMetodeField()">+ Tambah Metode</button>
+      <div class="form-group">
+        <label class="form-label">Isi Pengumuman</label>
+        <textarea id="pgm-isi" class="form-textarea" style="min-height:100px" placeholder="Tuliskan detail pengumuman di sini..."></textarea>
       </div>
-
-      <hr style="border:none;border-top:1px solid var(--border)"/>
-
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Catatan Penting</div>
-        <div id="modal-catatan-fields" style="display:flex;flex-direction:column;gap:10px"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addCatatanField()">+ Tambah Catatan</button>
+      <div class="form-group">
+        <label class="form-label">Tipe / Prioritas</label>
+        <select id="pgm-tipe" class="form-select">
+          <option value="info">ℹ️ Info — Informasi umum</option>
+          <option value="warning">⚠️ Peringatan — Perlu diperhatikan</option>
+          <option value="penting">🚨 Penting — Mendesak / kritis</option>
+        </select>
       </div>
+      <input type="hidden" id="pgm-edit-idx" value=""/>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-info-edit')">Batal</button>
-      <button class="btn btn-primary" onclick="saveInfoBimbingan()">💾 Simpan</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-pgm-form')">Batal</button>
+      <button class="btn btn-primary" onclick="savePengumuman()">💾 Simpan</button>
     </div>
   </div>
 </div>
@@ -1166,178 +1179,218 @@ let state = {
 };
 
 // ============================================================
-// INFO BIMBINGAN — Default data, render, edit, localStorage
+// PAPAN PENGUMUMAN — localStorage, render, CRUD
 // ============================================================
-const INFO_STORAGE_KEY = 'lytana_info_bimbingan';
+const PGM_KEY = 'lytana_pengumuman';
 
-const INFO_DEFAULT = {
-  metode: [
-    {
-      icon: '🏢',
-      bg: 'rgba(139,92,246,0.10)',
-      border: 'rgba(139,92,246,0.22)',
-      judul: 'Bimbingan Tatap Muka (Luring)',
-      isi: 'Dilaksanakan langsung di kampus sesuai kesepakatan reservasi LYTANA.'
-    },
-    {
-      icon: '💻',
-      bg: 'rgba(56,189,248,0.10)',
-      border: 'rgba(56,189,248,0.22)',
-      judul: 'Daring Real-Time',
-      isi: 'Melalui media konferensi video (Zoom/Google Meet) + Bitrix.'
-    },
-    {
-      icon: '📧',
-      bg: 'rgba(16,185,129,0.10)',
-      border: 'rgba(16,185,129,0.22)',
-      judul: 'Daring via Email',
-      isi: 'Dengan ketentuan kuota maksimal 40% dari keseluruhan proses bimbingan.'
-    },
-    {
-      icon: '📌',
-      bg: 'rgba(245,158,11,0.10)',
-      border: 'rgba(245,158,11,0.22)',
-      judul: 'Wajib',
-      isi: 'Menggunakan LYTANA untuk reservasi dan Bitrix24 untuk bimbingan Online.'
-    }
-  ],
-  catatan: [
-    'Bagi teman-teman yang akan melakukan bimbingan, mohon melakukan reservasi terlebih dahulu via LYTANA. Hal ini diperlukan untuk memastikan jadwal, mengingat agenda dapat berubah sewaktu-waktu.',
-    'Saya terbuka untuk janji temu mendadak, asalkan ada slot waktu yang kosong di jadwal saya di luar Reservasi LYTANA. Mohon cek ketersediaan saya terlebih dahulu.',
-    'Mohon untuk membawa berkas bimbingan sebelumnya yang telah dikoreksi sebagai bahan tindak lanjut diskusi kita.',
-    'Bagi mahasiswa yang memilih bimbingan daring, silahkan gunakan Bitrix dan memilih reservasi dahulu di sistem LYTANA atau menghubungi via WhatsApp untuk konfirmasi waktu di luar jadwal reservasi.'
-  ]
-};
-
-function loadInfoBimbingan() {
-  try {
-    const raw = localStorage.getItem(INFO_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return INFO_DEFAULT;
-}
-
-function saveInfoBimbinganData(data) {
-  try { localStorage.setItem(INFO_STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-}
-
-function renderInfoPanel(metodeId, catatanId) {
-  const info = loadInfoBimbingan();
-  const mEl = document.getElementById(metodeId);
-  const cEl = document.getElementById(catatanId);
-  if (!mEl || !cEl) return;
-
-  mEl.innerHTML = info.metode.map(m => `
-    <div class="info-metode-item" style="background:${m.bg};border:1px solid ${m.border}">
-      <span class="info-metode-icon">${m.icon}</span>
-      <div><b>${m.judul}:</b> ${m.isi}</div>
-    </div>`).join('');
-
-  cEl.innerHTML = info.catatan.map(c => `
-    <div class="info-catatan-item">
-      <div class="info-catatan-dot"></div>
-      <span>${c}</span>
-    </div>`).join('');
-}
-
-function renderAllInfoPanels() {
-  renderInfoPanel('a-info-metode-list', 'a-info-catatan-list');
-  renderInfoPanel('d-info-metode-list', 'd-info-catatan-list');
-  renderInfoPanel('m-info-metode-list', 'm-info-catatan-list');
-}
-
-// ── EDIT MODAL ────────────────────────────────────────────────
-const METODE_PRESETS = [
-  { icon:'🏢', bg:'rgba(139,92,246,0.10)', border:'rgba(139,92,246,0.22)' },
-  { icon:'💻', bg:'rgba(56,189,248,0.10)',  border:'rgba(56,189,248,0.22)' },
-  { icon:'📧', bg:'rgba(16,185,129,0.10)',  border:'rgba(16,185,129,0.22)' },
-  { icon:'📌', bg:'rgba(245,158,11,0.10)',  border:'rgba(245,158,11,0.22)' },
-  { icon:'📞', bg:'rgba(244,63,94,0.10)',   border:'rgba(244,63,94,0.22)'  },
-  { icon:'📝', bg:'rgba(37,99,235,0.10)',   border:'rgba(37,99,235,0.22)'  },
+const PGM_DEFAULT = [
+  {
+    id: Date.now(),
+    judul: 'Selamat datang di LYTANA!',
+    isi: 'Sistem reservasi bimbingan skripsi kini tersedia. Gunakan menu Reservasi untuk memesan sesi bimbingan dengan dosenmu.',
+    tipe: 'info',
+    createdAt: new Date().toISOString()
+  }
 ];
 
-function openInfoEdit() {
-  const info = loadInfoBimbingan();
-  buildMetodeFields(info.metode);
-  buildCatatanFields(info.catatan);
-  openModal('modal-info-edit');
+const PGM_CONFIG = {
+  info:    { label: 'Info',      icon: 'ℹ️',  badgeClass: 'pgm-badge-info',    cardClass: 'type-info'    },
+  warning: { label: 'Peringatan',icon: '⚠️',  badgeClass: 'pgm-badge-warning', cardClass: 'type-warning' },
+  penting: { label: 'Penting',   icon: '🚨',  badgeClass: 'pgm-badge-penting', cardClass: 'type-penting' },
+};
+
+function loadPengumuman() {
+  try {
+    const raw = localStorage.getItem(PGM_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return PGM_DEFAULT;
 }
 
-function buildMetodeFields(metodeArr) {
-  const c = document.getElementById('modal-metode-fields');
-  c.innerHTML = '';
-  metodeArr.forEach((m, i) => addMetodeField(m, i));
+function savePengumumanData(list) {
+  try { localStorage.setItem(PGM_KEY, JSON.stringify(list)); } catch(e) {}
 }
 
-function addMetodeField(m, idx) {
-  const c = document.getElementById('modal-metode-fields');
-  const i = idx !== undefined ? idx : c.children.length;
-  const preset = m || METODE_PRESETS[i % METODE_PRESETS.length];
-  const div = document.createElement('div');
-  div.className = 'metode-field-row';
-  div.dataset.idx = i;
-  div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:12px;';
-  div.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
-      <div style="display:flex;gap:8px">
-        <input class="form-input" style="width:52px;text-align:center;font-size:1.2rem;padding:6px;flex-shrink:0"
-               placeholder="🏢" value="${preset.icon||''}"/>
-        <input class="form-input" style="flex:1" placeholder="Judul metode" value="${(m&&m.judul)||''}"/>
+function fmtPgmDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  } catch(e) { return ''; }
+}
+
+// Render panel admin (editable — daftar + tombol + aksi per kartu)
+function renderPgmAdmin() {
+  const el = document.getElementById('a-pgm-panel');
+  if (!el) return;
+  const list = loadPengumuman();
+  const cards = list.length
+    ? list.map((p, i) => {
+        const cfg = PGM_CONFIG[p.tipe] || PGM_CONFIG.info;
+        return `
+        <div class="pengumuman-card ${cfg.cardClass}">
+          <div style="font-size:1.3rem;flex-shrink:0;margin-top:1px">${cfg.icon}</div>
+          <div class="pengumuman-card-body">
+            <div class="pengumuman-card-top">
+              <span class="pengumuman-card-judul">${p.judul}</span>
+              <span class="pgm-badge ${cfg.badgeClass}">${cfg.label}</span>
+            </div>
+            <div class="pengumuman-card-isi">${p.isi.replace(/</g,'&lt;')}</div>
+            <div class="pengumuman-card-meta">🕐 ${fmtPgmDate(p.createdAt)}</div>
+          </div>
+          <div class="pengumuman-card-actions">
+            <button class="pgm-act-btn" onclick="openEditPgm(${i})">✏️ Edit</button>
+            <button class="pgm-act-btn del" onclick="deletePgm(${i})">🗑 Hapus</button>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="pengumuman-empty">📭 Belum ada pengumuman. Klik "+ Tambah" untuk membuat.</div>';
+
+  el.innerHTML = `
+    <div class="pengumuman-panel">
+      <div class="pengumuman-panel-header">
+        <div class="pengumuman-panel-title">
+          <span style="font-size:1.3rem">📢</span>
+          <h3>Papan Pengumuman</h3>
+          <span style="font-size:0.78rem;color:var(--text3);font-weight:500">${list.length} pengumuman</span>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddPgm()">+ Tambah Pengumuman</button>
       </div>
-      <textarea class="form-textarea" style="min-height:56px;font-size:0.85rem" placeholder="Deskripsi metode...">${(m&&m.isi)||''}</textarea>
-    </div>
-    <button onclick="removeField(this.parentElement,'modal-metode-fields')"
-            style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:1.2rem;padding:4px;flex-shrink:0;margin-top:2px" title="Hapus">✕</button>`;
-  c.appendChild(div);
+      <div class="pengumuman-list">${cards}</div>
+    </div>`;
 }
 
-function buildCatatanFields(catatanArr) {
-  const c = document.getElementById('modal-catatan-fields');
-  c.innerHTML = '';
-  catatanArr.forEach(ct => addCatatanField(ct));
+// Render panel dosen (read-only — kartu tanpa aksi)
+function renderPgmDosen() {
+  const el = document.getElementById('d-pgm-panel');
+  if (!el) return;
+  const list = loadPengumuman();
+  if (!list.length) { el.innerHTML = ''; return; }
+  const cards = list.map(p => {
+    const cfg = PGM_CONFIG[p.tipe] || PGM_CONFIG.info;
+    return `
+    <div class="pengumuman-card ${cfg.cardClass}">
+      <div style="font-size:1.25rem;flex-shrink:0;margin-top:2px">${cfg.icon}</div>
+      <div class="pengumuman-card-body">
+        <div class="pengumuman-card-top">
+          <span class="pengumuman-card-judul">${p.judul}</span>
+          <span class="pgm-badge ${cfg.badgeClass}">${cfg.label}</span>
+        </div>
+        <div class="pengumuman-card-isi">${p.isi.replace(/</g,'&lt;')}</div>
+        <div class="pengumuman-card-meta">🕐 ${fmtPgmDate(p.createdAt)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="pengumuman-panel">
+      <div class="pengumuman-panel-header">
+        <div class="pengumuman-panel-title">
+          <span style="font-size:1.3rem">📢</span>
+          <h3>Papan Pengumuman</h3>
+        </div>
+      </div>
+      <div class="pengumuman-list">${cards}</div>
+    </div>`;
 }
 
-function addCatatanField(val) {
-  const c = document.getElementById('modal-catatan-fields');
-  const div = document.createElement('div');
-  div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
-  div.innerHTML = `
-    <textarea class="form-textarea" style="flex:1;min-height:54px;font-size:0.85rem" placeholder="Isi catatan...">${typeof val === 'string' ? val : ''}</textarea>
-    <button onclick="removeField(this.parentElement,'modal-catatan-fields')"
-            style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:1.2rem;padding:4px;flex-shrink:0;margin-top:6px" title="Hapus">✕</button>`;
-  c.appendChild(div);
+// Render panel mahasiswa (read-only — ticker + kartu ringkas)
+function renderPgmMahasiswa() {
+  const el = document.getElementById('m-pgm-panel');
+  if (!el) return;
+  const list = loadPengumuman();
+  if (!list.length) { el.innerHTML = ''; return; }
+
+  // Ticker text
+  const tickerText = list.map(p => `${PGM_CONFIG[p.tipe]?.icon||'📢'} ${p.judul}`).join('   •   ');
+
+  const cards = list.map(p => {
+    const cfg = PGM_CONFIG[p.tipe] || PGM_CONFIG.info;
+    return `
+    <div class="pengumuman-card ${cfg.cardClass}">
+      <div style="font-size:1.2rem;flex-shrink:0;margin-top:2px">${cfg.icon}</div>
+      <div class="pengumuman-card-body">
+        <div class="pengumuman-card-top">
+          <span class="pengumuman-card-judul">${p.judul}</span>
+          <span class="pgm-badge ${cfg.badgeClass}">${cfg.label}</span>
+        </div>
+        <div class="pengumuman-card-isi">${p.isi.replace(/</g,'&lt;')}</div>
+        <div class="pengumuman-card-meta">🕐 ${fmtPgmDate(p.createdAt)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="pengumuman-panel">
+      <div class="pengumuman-panel-header">
+        <div class="pengumuman-panel-title">
+          <span style="font-size:1.3rem">📢</span>
+          <h3>Papan Pengumuman</h3>
+        </div>
+      </div>
+      <div class="pgm-ticker-wrap">
+        <span class="pgm-ticker-label">📌 Info</span>
+        <div class="pgm-ticker-text"><span class="pgm-ticker-inner">${tickerText}</span></div>
+      </div>
+      <div class="pengumuman-list">${cards}</div>
+    </div>`;
 }
 
-function removeField(rowEl, containerId) {
-  document.getElementById(containerId).removeChild(rowEl);
+function renderAllPgm() {
+  renderPgmAdmin();
+  renderPgmDosen();
+  renderPgmMahasiswa();
 }
 
-function saveInfoBimbingan() {
-  // Kumpulkan metode
-  const metodeRows = document.querySelectorAll('#modal-metode-fields .metode-field-row');
-  const metode = Array.from(metodeRows).map((row, i) => {
-    const inputs   = row.querySelectorAll('input.form-input');
-    const textarea = row.querySelector('textarea');
-    const preset   = METODE_PRESETS[i % METODE_PRESETS.length];
-    return {
-      icon:   inputs[0]?.value.trim()    || preset.icon,
-      bg:     preset.bg,
-      border: preset.border,
-      judul:  inputs[1]?.value.trim()    || '',
-      isi:    textarea?.value.trim()      || ''
-    };
-  }).filter(m => m.judul || m.isi);
+// ── CRUD ──────────────────────────────────────────────────────
+function openAddPgm() {
+  document.getElementById('pgm-edit-idx').value = '';
+  document.getElementById('pgm-judul').value = '';
+  document.getElementById('pgm-isi').value = '';
+  document.getElementById('pgm-tipe').value = 'info';
+  document.getElementById('modal-pgm-title').textContent = '📢 Tambah Pengumuman';
+  openModal('modal-pgm-form');
+}
 
-  // Kumpulkan catatan
-  const catatanTextareas = document.querySelectorAll('#modal-catatan-fields textarea');
-  const catatan = Array.from(catatanTextareas)
-    .map(t => t.value.trim())
-    .filter(Boolean);
+function openEditPgm(idx) {
+  const list = loadPengumuman();
+  const p = list[idx];
+  if (!p) return;
+  document.getElementById('pgm-edit-idx').value = idx;
+  document.getElementById('pgm-judul').value = p.judul;
+  document.getElementById('pgm-isi').value = p.isi;
+  document.getElementById('pgm-tipe').value = p.tipe || 'info';
+  document.getElementById('modal-pgm-title').textContent = '✏️ Edit Pengumuman';
+  openModal('modal-pgm-form');
+}
 
-  saveInfoBimbinganData({ metode, catatan });
-  renderAllInfoPanels();
-  closeModal('modal-info-edit');
-  toast('Informasi bimbingan berhasil disimpan!', 'success');
+function savePengumuman() {
+  const judul = document.getElementById('pgm-judul').value.trim();
+  const isi   = document.getElementById('pgm-isi').value.trim();
+  const tipe  = document.getElementById('pgm-tipe').value || 'info';
+  if (!judul) { toast('Judul pengumuman tidak boleh kosong', 'error'); return; }
+  if (!isi)   { toast('Isi pengumuman tidak boleh kosong', 'error'); return; }
+
+  const list = loadPengumuman();
+  const idxStr = document.getElementById('pgm-edit-idx').value;
+  if (idxStr !== '') {
+    const idx = parseInt(idxStr);
+    list[idx] = { ...list[idx], judul, isi, tipe };
+    toast('Pengumuman berhasil diperbarui!', 'success');
+  } else {
+    list.unshift({ id: Date.now(), judul, isi, tipe, createdAt: new Date().toISOString() });
+    toast('Pengumuman berhasil ditambahkan!', 'success');
+  }
+  savePengumumanData(list);
+  renderAllPgm();
+  closeModal('modal-pgm-form');
+}
+
+function deletePgm(idx) {
+  const list = loadPengumuman();
+  if (!confirm(`Hapus pengumuman "${list[idx]?.judul}"?`)) return;
+  list.splice(idx, 1);
+  savePengumumanData(list);
+  renderAllPgm();
+  toast('Pengumuman dihapus.', 'info');
 }
 
 // ============================================================
@@ -1633,9 +1686,9 @@ function onLogin(token, user) {
   state.token=token; state.user=user;
   localStorage.setItem('lytana_token', token);
   localStorage.setItem('lytana_user', JSON.stringify(user));
-  if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); renderAllInfoPanels(); }
-  else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllInfoPanels(); }
-  else { updateMhsChip(); showPage('mahasiswa'); renderAllInfoPanels(); loadSlotPreviews(); }
+  if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); renderAllPgm(); }
+  else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllPgm(); }
+  else { updateMhsChip(); showPage('mahasiswa'); renderAllPgm(); loadSlotPreviews(); }
   toast('Selamat datang, '+user.nama+'!','success');
 }
 
