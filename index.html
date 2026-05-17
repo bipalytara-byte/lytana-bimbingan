@@ -580,9 +580,8 @@ tr:hover td{background:var(--card2)}
         <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
       </div>
-      <!-- Panel Info Metode Bimbingan (editable untuk dosen) -->
+      <!-- Panel Info Metode Bimbingan (read-only untuk dosen) -->
       <div class="info-bimbingan-panel" id="d-info-panel">
-        <button class="info-edit-btn" onclick="openInfoEdit()" title="Edit informasi bimbingan">✏️ Edit</button>
         <div class="panel-title">
           <span style="font-size:1.3rem">📋</span>
           <h3>Informasi Metode Bimbingan</h3>
@@ -782,6 +781,19 @@ tr:hover td{background:var(--card2)}
     <div id="a-dashboard" class="page-section active">
       <div class="section-header"><div class="section-title"><h2>Dashboard Admin</h2><p>Ringkasan seluruh sistem Lytana</p></div>
         <button class="btn btn-ghost btn-sm" onclick="loadAdminDashboard()">↻ Refresh</button></div>
+
+      <!-- Panel Info Metode Bimbingan (editable untuk admin) -->
+      <div class="info-bimbingan-panel" id="a-info-panel">
+        <button class="info-edit-btn" onclick="openInfoEdit()" title="Edit informasi bimbingan">✏️ Edit</button>
+        <div class="panel-title">
+          <span style="font-size:1.3rem">📋</span>
+          <h3>Informasi Metode Bimbingan</h3>
+        </div>
+        <div class="info-metode-list" id="a-info-metode-list"><!-- rendered by JS --></div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
+        <div class="info-catatan-list" id="a-info-catatan-list"><!-- rendered by JS --></div>
+      </div>
+
       <div class="grid-3" style="margin-bottom:16px">
         <div class="card stat-card"><div class="stat-label">Total Dosen</div><div class="stat-number" id="a-stat-dosen" style="color:var(--orange)">—</div></div>
         <div class="card stat-card"><div class="stat-label">Total Mahasiswa</div><div class="stat-number" id="a-stat-mhs" style="color:var(--blue2)">—</div></div>
@@ -1056,7 +1068,7 @@ tr:hover td{background:var(--card2)}
     </div>
     <div style="display:flex;flex-direction:column;gap:18px">
       <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.2);border-radius:9px;padding:11px 14px;font-size:0.83rem;color:var(--text2)">
-        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman home dosen maupun mahasiswa pada browser yang sama.
+        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman dosen maupun mahasiswa pada browser yang sama. Pastikan pengaturan dilakukan melalui akun Admin.
       </div>
 
       <div>
@@ -1229,6 +1241,7 @@ function renderInfoPanel(metodeId, catatanId) {
 }
 
 function renderAllInfoPanels() {
+  renderInfoPanel('a-info-metode-list', 'a-info-catatan-list');
   renderInfoPanel('d-info-metode-list', 'd-info-catatan-list');
   renderInfoPanel('m-info-metode-list', 'm-info-catatan-list');
 }
@@ -1620,7 +1633,7 @@ function onLogin(token, user) {
   state.token=token; state.user=user;
   localStorage.setItem('lytana_token', token);
   localStorage.setItem('lytana_user', JSON.stringify(user));
-  if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); }
+  if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); renderAllInfoPanels(); }
   else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllInfoPanels(); }
   else { updateMhsChip(); showPage('mahasiswa'); renderAllInfoPanels(); loadSlotPreviews(); }
   toast('Selamat datang, '+user.nama+'!','success');
