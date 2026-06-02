@@ -205,6 +205,16 @@ tr:hover td{background:var(--card2)}
 /* Inaktif warning pulse */
 @keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:0.6}}
 .inaktif-warn{animation:pulse-warn 2s ease-in-out infinite}
+/* NON-AKTIF LOCK */
+.nonaktif-overlay{position:relative;pointer-events:none;user-select:none;filter:blur(2px) grayscale(0.4);opacity:0.35}
+.nonaktif-banner{background:linear-gradient(135deg,rgba(244,63,94,0.12),rgba(239,68,68,0.08));border:1.5px solid rgba(244,63,94,0.35);border-radius:var(--radius);padding:28px 24px;text-align:center;margin-bottom:20px}
+.nonaktif-banner .nb-icon{font-size:2.8rem;margin-bottom:10px}
+.nonaktif-banner h3{font-family:var(--font2);font-size:1.15rem;color:var(--rose);margin-bottom:8px}
+.nonaktif-banner p{color:var(--text2);font-size:0.88rem;margin-bottom:16px;line-height:1.6}
+.nonaktif-banner .nb-info{background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:var(--radius2);padding:12px 14px;font-size:0.82rem;color:var(--text2);margin-bottom:0;text-align:left}
+.nonaktif-banner .nb-info b{color:var(--text)}
+.tab-locked{opacity:0.4!important;cursor:not-allowed!important;pointer-events:none!important;position:relative}
+.tab-locked::after{content:'🔒';font-size:0.6rem;position:absolute;top:3px;right:3px}
 /* KARTU MERAH */
 .kartu-merah{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:0.7rem;font-weight:800;background:linear-gradient(135deg,rgba(244,63,94,0.25),rgba(239,68,68,0.2));color:#fb7185;border:1px solid rgba(244,63,94,0.4);letter-spacing:0.04em;animation:kartu-pulse 1.5s ease-in-out infinite}
 @keyframes kartu-pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,0.3)}50%{box-shadow:0 0 0 4px rgba(244,63,94,0)}}
@@ -1162,6 +1172,32 @@ tr:hover td{background:var(--card2)}
   </div>
 </div>
 
+<!-- ==================== MODAL AKTIFKAN MAHASISWA (Dosen) ==================== -->
+<div class="modal-overlay" id="modal-aktifkan-mhs">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔓 Aktifkan Kembali Mahasiswa</h3>
+      <button class="modal-close" onclick="closeModal('modal-aktifkan-mhs')">×</button>
+    </div>
+    <div id="modal-aktifkan-content" style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.22);border-radius:10px;padding:14px 16px;font-size:0.88rem;color:var(--text2)">
+        <div id="aktifkan-mhs-info"></div>
+      </div>
+      <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 14px;font-size:0.85rem;color:var(--text2)">
+        ✅ Setelah diaktifkan, mahasiswa dapat kembali melihat dan membuat reservasi bimbingan.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan Aktivasi (opsional)</label>
+        <textarea id="aktifkan-catatan" class="form-textarea" rows="2" placeholder="Misal: sudah melanjutkan bimbingan, kendala sudah teratasi, dsb."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-aktifkan-mhs')">Batal</button>
+      <button class="btn btn-teal" id="aktifkan-confirm-btn" onclick="doAktifkanMahasiswa()">🔓 Aktifkan Kembali</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /#app -->
 <script>
 // ============================================================
@@ -1497,6 +1533,11 @@ function showPage(id) {
   document.getElementById('page-'+id).classList.add('active');
 }
 function mSwitch(s) {
+  // Blokir tab Reservasi jika mahasiswa tidak aktif
+  if (s === 'reservasi' && state.user?.role === 'mahasiswa' && state.user?.statusSkripsi === 'tidak_aktif') {
+    showNonAktifBanner();
+    return;
+  }
   document.querySelectorAll('#page-mahasiswa .page-section').forEach(x=>x.classList.remove('active'));
   document.getElementById('m-'+s).classList.add('active');
   document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t,i)=>t.classList.toggle('active',['reservasi','riwayat','progres','chat','profil'][i]===s));
@@ -1504,6 +1545,107 @@ function mSwitch(s) {
   if(s==='progres') loadMyProgress();
   if(s==='chat')    loadChatList();
   if(s==='profil')  fillProfil();
+}
+
+// ============================================================
+// NON-AKTIF GUARD — Mahasiswa tidak aktif
+// ============================================================
+function isMhsNonAktif() {
+  return state.user?.role === 'mahasiswa' && state.user?.statusSkripsi === 'tidak_aktif';
+}
+
+function applyNonAktifTabLock() {
+  // Kunci tab Reservasi secara visual
+  const tabs = document.querySelectorAll('#page-mahasiswa .nav-tab');
+  if (tabs.length > 0) {
+    if (isMhsNonAktif()) {
+      tabs[0].classList.add('tab-locked');
+      tabs[0].title = '🔒 Akun non-aktif — hubungi dosen pembimbing';
+    } else {
+      tabs[0].classList.remove('tab-locked');
+      tabs[0].title = '';
+    }
+  }
+}
+
+function showNonAktifBanner() {
+  // Tampilkan section reservasi dengan banner peringatan, tapi kontennya ter-overlay
+  document.querySelectorAll('#page-mahasiswa .page-section').forEach(x => x.classList.remove('active'));
+  document.getElementById('m-reservasi').classList.add('active');
+  document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+
+  const lastBimbingan = state.user?.lastBimbingan
+    ? new Date(state.user.lastBimbingan).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})
+    : null;
+
+  const dosBing = [];
+  if (state.user?.dosenNama1) dosBing.push(state.user.dosenNama1);
+  if (state.user?.dosenNama2) dosBing.push(state.user.dosenNama2);
+  const dosbingStr = dosBing.length ? dosBing.join(' atau ') : 'dosen pembimbing';
+
+  const pgmPanel = document.getElementById('m-pgm-panel');
+  const bannerHtml = `
+    <div class="nonaktif-banner">
+      <div class="nb-icon">🔒</div>
+      <h3>Akun Kamu Saat Ini Non-Aktif</h3>
+      <p>Kamu tidak dapat melihat atau membuat reservasi bimbingan selama status skripsimu adalah <b style="color:var(--rose)">Tidak Aktif</b>.<br>
+      Hubungi dosen pembimbingmu untuk mengaktifkan kembali akunmu.</p>
+      <div class="nb-info">
+        <div style="margin-bottom:6px"><b>Siapa yang bisa mengaktifkan?</b></div>
+        <div>👨‍🏫 <b>${dosbingStr}</b> (dosen pembimbing terakhir bimbinganmu)</div>
+        ${lastBimbingan ? `<div style="margin-top:6px;color:var(--text3)">📅 Terakhir bimbingan: ${lastBimbingan}</div>` : '<div style="margin-top:6px;color:var(--text3)">📅 Belum ada riwayat bimbingan</div>'}
+        <div style="margin-top:8px;font-size:0.8rem;color:var(--text3)">💬 Gunakan menu <b style="color:var(--text2)">Chat</b> untuk menghubungi dosenmu.</div>
+      </div>
+    </div>`;
+
+  // Simpan konten asli agar bisa di-restore, ganti dengan banner
+  const reservasiSection = document.getElementById('m-reservasi');
+  // Tandai supaya tidak di-overwrite loadSlotPreviews
+  reservasiSection.setAttribute('data-nonaktif', '1');
+
+  // Inject banner sebelum type-selector, blur konten asli
+  const typeSelector = reservasiSection.querySelector('.type-selector');
+  const slotsContainer = reservasiSection.querySelector('#slots-container');
+  if (typeSelector) typeSelector.classList.add('nonaktif-overlay');
+  if (slotsContainer) slotsContainer.classList.add('nonaktif-overlay');
+
+  // Hapus banner lama jika ada
+  const oldBanner = reservasiSection.querySelector('.nonaktif-banner');
+  if (oldBanner) oldBanner.remove();
+
+  // Insert banner setelah pgm-panel
+  const pgmPanelEl = document.getElementById('m-pgm-panel');
+  if (pgmPanelEl && pgmPanelEl.parentNode) {
+    pgmPanelEl.insertAdjacentHTML('afterend', bannerHtml);
+  } else if (typeSelector) {
+    typeSelector.insertAdjacentHTML('beforebegin', bannerHtml);
+  }
+}
+
+function clearNonAktifBanner() {
+  const reservasiSection = document.getElementById('m-reservasi');
+  if (!reservasiSection) return;
+  reservasiSection.removeAttribute('data-nonaktif');
+  const banner = reservasiSection.querySelector('.nonaktif-banner');
+  if (banner) banner.remove();
+  const typeSelector = reservasiSection.querySelector('.type-selector');
+  const slotsContainer = reservasiSection.querySelector('#slots-container');
+  if (typeSelector) typeSelector.classList.remove('nonaktif-overlay');
+  if (slotsContainer) slotsContainer.classList.remove('nonaktif-overlay');
+}
+
+// Perbarui state.user statusSkripsi dari server (untuk sinkronisasi)
+async function syncMhsStatus() {
+  if (state.user?.role !== 'mahasiswa') return;
+  const res = await api('getMyProfile', {token: state.token});
+  if (res.success && res.user) {
+    state.user.statusSkripsi = res.user.statusSkripsi;
+    state.user.lastBimbingan = res.user.lastBimbingan || state.user.lastBimbingan;
+    // Simpan nama dosen jika tersedia
+    if (res.user.dosenNama1) state.user.dosenNama1 = res.user.dosenNama1;
+    if (res.user.dosenNama2) state.user.dosenNama2 = res.user.dosenNama2;
+    localStorage.setItem('lytana_user', JSON.stringify(state.user));
+  }
 }
 function dSwitch(s) {
   document.querySelectorAll('#page-dosen .page-section').forEach(x=>x.classList.remove('active'));
@@ -1688,7 +1830,21 @@ function onLogin(token, user) {
   localStorage.setItem('lytana_user', JSON.stringify(user));
   if (user.role==='admin') { showPage('admin'); loadAdminDashboard(); renderAllPgm(); }
   else if (user.role==='dosen') { updateDosenChip(); showPage('dosen'); loadDosenDashboard(); renderAllPgm(); }
-  else { updateMhsChip(); showPage('mahasiswa'); renderAllPgm(); loadSlotPreviews(); }
+  else {
+    updateMhsChip();
+    showPage('mahasiswa');
+    renderAllPgm();
+    // Sync status terbaru dari server sebelum menampilkan halaman
+    syncMhsStatus().then(() => {
+      applyNonAktifTabLock();
+      if (isMhsNonAktif()) {
+        showNonAktifBanner();
+      } else {
+        clearNonAktifBanner();
+        loadSlotPreviews();
+      }
+    });
+  }
   toast('Selamat datang, '+user.nama+'!','success');
 }
 
@@ -1725,6 +1881,8 @@ function doLogout() {
 // SLOT PREVIEW — ringkasan di kartu Offline/Online
 // ============================================================
 async function loadSlotPreviews() {
+  // Jangan load preview jika mahasiswa tidak aktif
+  if (isMhsNonAktif()) return;
   // Fetch kedua tipe paralel, tanpa mengubah state.slots (itu khusus tipe yang sedang aktif)
   // Gunakan waktu lokal (bukan UTC) agar tanggal sesuai timezone Indonesia
   const todayLocal = new Date();
@@ -1805,6 +1963,8 @@ async function loadSlotPreviews() {
 }
 
 function selectType(type) {
+  // Blokir jika mahasiswa tidak aktif
+  if (isMhsNonAktif()) { showNonAktifBanner(); return; }
   state.selectedType=type;
   ['offline','online'].forEach(t=>{
     document.getElementById('type-'+t).classList.toggle('selected',t===type);
@@ -1895,6 +2055,7 @@ function openBookingModal(slot) {
 
 async function confirmBooking() {
   if (!state.pendingSlot) return;
+  if (isMhsNonAktif()) { toast('Akunmu non-aktif. Hubungi dosen pembimbing untuk mengaktifkan kembali.', 'error'); closeModal('modal-booking'); return; }
   const btn=document.getElementById('modal-booking-btn');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
   const res=await api('bookSlot',{slotId:state.pendingSlot.id,token:state.token},'POST');
@@ -2187,6 +2348,87 @@ async function confirmSetStatus(status) {
   toast('Status diperbarui: '+STATUS_CONFIG[status].label,'success');
   closeModal('modal-set-status');
   state.pendingSetStatus=null;
+  loadDosenStudents();
+}
+
+// ============================================================
+// DOSEN — AKTIFKAN KEMBALI MAHASISWA NON-AKTIF
+// ============================================================
+let _pendingAktifkanKode = null;
+let _pendingAktifkanStudent = null;
+
+function openAktifkanMhs(s) {
+  _pendingAktifkanKode = s.kode;
+  _pendingAktifkanStudent = s;
+
+  // Cek apakah dosen ini punya hak aktifkan
+  // Hak = dosen adalah pembimbing mahasiswa (dosenKode1 atau dosenKode2)
+  const myKode = state.user?.kode;
+  const isDosbing1 = s.dosenKode1 === myKode;
+  const isDosbing2 = s.dosenKode2 === myKode;
+  if (!isDosbing1 && !isDosbing2) {
+    toast('Kamu bukan pembimbing mahasiswa ini. Hanya dosen pembimbing yang dapat mengaktifkan.', 'error');
+    return;
+  }
+
+  // Tentukan apakah dosen ini adalah yang "relevan" berdasarkan lastBimbingan
+  // Jika hanya 1 dosen pembimbing, langsung boleh.
+  // Jika ada 2 pembimbing, cek dari lastBimbinganDosenKode (dosen terakhir bimbingan)
+  const lastDosenKode = s.lastBimbinganDosenKode || null;
+  if (lastDosenKode && lastDosenKode !== myKode && s.dosenKode1 && s.dosenKode2) {
+    // Ada 2 dosen, tapi ini bukan dosen terakhir bimbingan
+    const lastDosenNama = (lastDosenKode === s.dosenKode1 ? s.dosenNama1 : s.dosenNama2) || lastDosenKode;
+    toast(`Hak aktivasi ada pada ${lastDosenNama} (pembimbing terakhir bimbingan mahasiswa ini).`, 'error');
+    return;
+  }
+
+  const lastBimbingan = s.lastBimbingan
+    ? new Date(s.lastBimbingan).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})
+    : 'Belum ada';
+
+  document.getElementById('aktifkan-mhs-info').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      ${renderAvatar(s.foto, s.nama, 44)}
+      <div>
+        <div style="font-weight:700;font-size:0.95rem">${s.nama}</div>
+        <code style="font-size:0.75rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${s.kode}</code>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;font-size:0.83rem">
+      <div>📌 Status saat ini: ${statusBadge('tidak_aktif')}</div>
+      <div>📅 Terakhir bimbingan: <b>${lastBimbingan}</b></div>
+    </div>`;
+
+  document.getElementById('aktifkan-catatan').value = '';
+  const btn = document.getElementById('aktifkan-confirm-btn');
+  btn.disabled = false;
+  btn.textContent = '🔓 Aktifkan Kembali';
+  openModal('modal-aktifkan-mhs');
+}
+
+async function doAktifkanMahasiswa() {
+  if (!_pendingAktifkanKode) return;
+  const catatan = document.getElementById('aktifkan-catatan').value.trim();
+  const btn = document.getElementById('aktifkan-confirm-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Mengaktifkan...';
+
+  const res = await api('setStudentStatus', {
+    kode: _pendingAktifkanKode,
+    status: 'aktif_bimbingan',
+    catatan: catatan || 'Diaktifkan kembali oleh dosen pembimbing',
+    token: state.token
+  }, 'POST');
+
+  btn.disabled = false;
+  btn.textContent = '🔓 Aktifkan Kembali';
+
+  if (!res.success) return toast(res.message, 'error');
+
+  toast(`✅ ${_pendingAktifkanStudent?.nama || 'Mahasiswa'} berhasil diaktifkan kembali! Sekarang dapat melakukan reservasi.`, 'success');
+  closeModal('modal-aktifkan-mhs');
+  _pendingAktifkanKode = null;
+  _pendingAktifkanStudent = null;
   loadDosenStudents();
 }
 
@@ -2552,6 +2794,7 @@ function renderDosenStudents(students) {
         <button class="btn btn-sm" style="flex:1;background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g,"\'")}')">💬 Chat</button>
         <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g,"\'")}','${s.statusSkripsi}')">Set Status</button>
       </div>
+      ${s.statusSkripsi === 'tidak_aktif' ? `<div style="margin-top:8px"><button class="btn btn-teal btn-sm btn-full" onclick='openAktifkanMhs(${JSON.stringify(s).replace(/'/g,"\'")})'>🔓 Aktifkan Kembali</button></div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
