@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lytana v7 — Linkage of Your Technical Appointment & Network Assistance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- Library PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- CSS -->
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<body>
+<div id="app">
+<div id="toast-container"></div>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="page-login" class="page active">
+<div class="login-page"><div class="login-box">
+  <div class="login-logo">
+    <h1><span>Lytana</span></h1>
+    <p>Linkage of Your Technical Appointment & Network Assistance</p>
+  </div>
+  <div class="card">
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('login')">Masuk</button>
+      <button class="login-tab" onclick="switchLoginTab('register')">Daftar Baru</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-form" class="login-form-section active">
+      <div class="form-group">
+        <label class="form-label">Kode Login <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">(kode unik + NIM, contoh: budi2311033)</span></label>
+        <input id="login-kode" class="form-input" type="text" placeholder="Contoh: budi2311033" autocomplete="off"/>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()"><span id="login-btn-text">Masuk</span></button>
+      <p style="text-align:center;font-size:0.82rem;color:var(--text3)">Belum punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('register')">Daftar Baru</b></p>
+      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:4px">Lupa kode login? Hubungi <b>BAAK</b> untuk reset akun.</p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-form" class="login-form-section">
+      <div class="register-role-tabs">
+        <div class="role-tab active-mhs" id="rtab-mhs" onclick="switchRegisterRole('mahasiswa')">🎓 Mahasiswa</div>
+        <div class="role-tab" id="rtab-dosen" onclick="switchRegisterRole('dosen')">👨‍🏫 Dosen</div>
+      </div>
+      <!-- Form Mahasiswa -->
+      <div id="reg-mhs-form" style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+          🔐 Kode login = <b>kode unik kamu</b> + <b>NIM</b>. Contoh: jika kode unik <b>budi</b> dan NIM <b>2311033</b>, maka kode loginmu adalah <b>budi2311033</b>. Setiap mahasiswa hanya bisa memiliki <b>1 akun</b>. Jika lupa, hubungi <b>BAAK</b>.
+        </div>
+
+        <!-- Input kode unik dan NIM terpisah, digabung otomatis -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Kode Unik <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">min. 4 karakter</span></label>
+            <input id="reg-kode-unik" class="form-input" type="text" placeholder="Contoh: budi" maxlength="20" oninput="previewKodeLogin()"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NIM <span style="color:var(--text3);font-size:0.74rem;text-transform:none;letter-spacing:0">7 digit angka</span></label>
+            <input id="reg-nim" class="form-input" type="text" inputmode="numeric" placeholder="Contoh: 2311033" maxlength="7" oninput="previewKodeLogin()"/>
+          </div>
+        </div>
+
+        <!-- Preview kode login gabungan -->
+        <div id="kode-login-preview" style="display:none;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem">
+          <span style="color:var(--text2)">Kode login kamu: </span>
+          <b id="kode-login-gabungan" style="color:var(--blue2);font-family:monospace;font-size:1rem;letter-spacing:0.02em"></b>
+          <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">⚠️ Simpan kode ini baik-baik. Jika lupa, hubungi BAAK.</div>
+        </div>
+        <div id="warn-kode-login" style="display:none;font-size:0.78rem;color:var(--rose);margin-top:-6px"></div>
+
+        <div class="form-group"><label class="form-label">Nama Lengkap</label>
+          <input id="reg-nama" class="form-input" type="text" placeholder="Sesuai KTM"/></div>
+        <div class="form-group"><label class="form-label">Email</label>
+          <input id="reg-email" class="form-input" type="email" placeholder="email aktif kamu"/></div>
+
+        <!-- DROPDOWN DUAL PEMBIMBING -->
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">Pembimbing 1</label>
+            <select id="reg-dosen1" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
+          <div class="form-group"><label class="form-label">Pembimbing 2</label>
+            <select id="reg-dosen2" class="form-select" onchange="validatePembimbing()"><option value="">Memuat...</option></select></div>
+        </div>
+        <div id="warn-pembimbing" style="display:none;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:8px;padding:8px 12px;font-size:0.82rem;color:var(--rose)">
+          ⚠️ Pembimbing 1 dan Pembimbing 2 tidak boleh dosen yang sama
+        </div>
+
+        <button class="btn btn-primary btn-full" onclick="doRegister()"><span id="reg-btn-text">Buat Akun Mahasiswa</span></button>
+      </div>
+      
+      <!-- Form Dosen -->
+      <div id="reg-dosen-form" style="display:none;flex-direction:column;gap:12px">
+        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+          👨‍🏫 Akun dosen memungkinkan kamu mengelola sesi bimbingan dan melihat progress mahasiswamu.
+        </div>
+        
+        <!-- KOLOM TOKEN KEAMANAN -->
+        <div class="form-group">
+          <label class="form-label" style="color:var(--orange)">🔑 Token Keamanan</label>
+          <input id="dreg-token" class="form-input" type="password" placeholder="Masukkan token dari Admin" style="border-color:var(--orange)"/>
+        </div>
+        
+        <div class="form-group"><label class="form-label">Kode Unik</label>
+          <input id="dreg-kode" class="form-input" type="text" placeholder="Buat Kode Unik Untuk Login"/></div>
+        <div class="form-group"><label class="form-label">Nama Lengkap + Gelar</label>
+          <input id="dreg-nama" class="form-input" type="text" placeholder="Dr. Budi Santoso, M.Kom"/></div>
+        <div class="form-group"><label class="form-label">Email</label>
+          <input id="dreg-email" class="form-input" type="email" placeholder="dosen@kampus.ac.id"/></div>
+        <div class="form-group"><label class="form-label">Program Studi</label>
+          <select id="dreg-prodi" class="form-select">
+            <option value="">-- Pilih Program Studi --</option>
+            <option value="S1 Teknik Informatika">S1 Teknik Informatika</option>
+            <option value="S1 Sistem Informasi">S1 Sistem Informasi</option>
+            <option value="D3 Manajemen Informatika">D3 Manajemen Informatika</option>
+          </select></div>
+        <button class="btn btn-orange btn-full" onclick="doRegisterDosen()"><span id="dreg-btn-text">Buat Akun Dosen</span></button>
+      </div>
+      <p style="text-align:center;font-size:0.82rem;color:var(--text3);margin-top:4px">Sudah punya akun? <b style="color:var(--blue2);cursor:pointer" onclick="switchLoginTab('login')">Masuk</b></p>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text3)">© 2026 Lytana — Powered by Skuro Production</p>
+</div></div>
+</div>
+
+<!-- ==================== MAHASISWA PAGE ==================== -->
+<div id="page-mahasiswa" class="page">
+  <div class="topbar"><div class="topbar-inner">
+    <div class="logo">Lytana</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="mSwitch('reservasi')">Reservasi</button>
+      <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
+      <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
+      <button class="nav-tab" id="m-chat-tab" onclick="mSwitch('chat')">Chat <span id="m-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
+      <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip"><div id="m-avatar-wrap"></div><span id="m-nama-chip">—</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+    </div>
+  </div></div>
+  <div class="main-content">
+
+    <div id="m-reservasi" class="page-section active">
+      <div class="section-header">
+        <div class="section-title"><h2>Reservasi Bimbingan</h2><p id="m-dosen-label">Pilih jenis sesi bimbingan</p></div>
+      </div>
+      <!-- Panel Info Metode Bimbingan (read-only untuk mahasiswa) -->
+      <div class="info-bimbingan-panel" id="m-info-panel">
+        <div class="panel-title">
+          <span style="font-size:1.3rem">📋</span>
+          <h3>Informasi Metode Bimbingan</h3>
+        </div>
+        <div class="info-metode-list" id="m-info-metode-list"><!-- rendered by JS --></div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
+        <div class="info-catatan-list" id="m-info-catatan-list"><!-- rendered by JS --></div>
+      </div>
+
+      <div class="type-selector">
+        <div class="type-card offline" id="type-offline" onclick="selectType('offline')">
+          <div class="type-icon">🏢</div>
+          <div class="type-name">Offline</div>
+          <div class="type-desc">Tatap muka di kampus</div>
+          <div class="type-card-meta" id="preview-offline">
+            <div class="type-card-loading">⏳ Memuat info sesi...</div>
+          </div>
+        </div>
+        <div class="type-card online" id="type-online" onclick="selectType('online')">
+          <div class="type-icon">💻</div>
+          <div class="type-name">Online</div>
+          <div class="type-desc">Via Zoom / Google Meet</div>
+          <div class="type-card-meta" id="preview-online">
+            <div class="type-card-loading">⏳ Memuat info sesi...</div>
+          </div>
+        </div>
+      </div>
+      <div id="slots-container"><div class="empty-state"><div class="empty-icon">👆</div><p>Pilih jenis bimbingan di atas</p></div></div>
+    </div>
+
+    <div id="m-riwayat" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Riwayat Bimbingan</h2><p>Rekap semua aktivitas bimbingan</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadMyHistory()">↻ Refresh</button>
+      </div>
+      <div id="history-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+    </div>
+
+    <div id="m-progres" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Progres Skripsi</h2><p>Pantau kemajuan pengerjaan</p></div>
+        <button class="btn btn-primary btn-sm" onclick="openProgresModal()">+ Update Progres</button>
+      </div>
+      <div id="progres-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+    </div>
+
+    <div id="m-chat" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Chat dengan Dosen</h2><p>Kirim pesan atau tanya ke dosen pembimbing</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadChatList()">↻ Refresh</button>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>👨‍🏫 Dosen Pembimbing</span>
+            <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
+          </div>
+          <div class="chat-contact-list" id="m-chat-contact-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-main-header" id="m-chat-main-header">
+            <span style="color:var(--text3)">← Pilih dosen untuk memulai chat</span>
+          </div>
+          <div class="chat-messages" id="m-chat-messages">
+            <div class="chat-empty">Belum ada percakapan. Pilih dosen di kiri.</div>
+          </div>
+          <div class="chat-input-area" id="m-chat-input-area" style="display:none">
+            <textarea id="m-chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+            <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="m-profil" class="page-section">
+      <div class="section-header"><div class="section-title"><h2>Profil Saya</h2></div></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:16px">Informasi Akun</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-group"><label class="form-label">Kode Unik</label><input id="profil-kode" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="profil-nama" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="profil-email" class="form-input" readonly style="opacity:.7"/></div>
+            
+            <div class="grid-2">
+              <div class="form-group"><label class="form-label">Pembimbing 1</label><input id="profil-dosen1" class="form-input" readonly style="opacity:.7"/></div>
+              <div class="form-group"><label class="form-label">Pembimbing 2</label><input id="profil-dosen2" class="form-input" readonly style="opacity:.7"/></div>
+            </div>
+
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px">Foto Profil</h3>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div id="profil-foto-wrap"></div>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
+              <input type="file" id="foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewFoto(event)"/></label>
+            <div id="foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
+              <img id="foto-preview" src="" class="photo-preview"/>
+              <button class="btn btn-teal btn-sm" onclick="uploadFoto()">Upload Foto</button>
+            </div>
+            <small style="color:var(--text3);text-align:center">Maks 2MB. Foto dilihat oleh dosen.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DOSEN PAGE ==================== -->
+<div id="page-dosen" class="page">
+  <div class="topbar"><div class="topbar-inner">
+    <div class="logo">Lytana</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="dSwitch('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="dSwitch('sesi')">Sesi</button>
+      <button class="nav-tab" onclick="dSwitch('reservasi')">Reservasi</button>
+      <button class="nav-tab" onclick="dSwitch('mahasiswa')">Mahasiswa</button>
+      <button class="nav-tab" id="d-chat-tab" onclick="dSwitch('chat')">Chat <span id="d-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
+      <button class="nav-tab" onclick="dSwitch('profil')">Profil</button>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div id="d-avatar-wrap"></div>
+        <span id="d-nama-chip">—</span>
+        <span class="role-badge dosen">DOSEN</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+    </div>
+  </div></div>
+  <div class="main-content">
+
+    <div id="d-dashboard" class="page-section active">
+      <div class="section-header">
+        <div class="section-title"><h2>Dashboard Dosen</h2><p id="d-prodi-label">Program Studi</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadDosenDashboard()">↻ Refresh</button>
+      </div>
+      <!-- Panel Info Metode Bimbingan (editable untuk dosen) -->
+      <div class="info-bimbingan-panel" id="d-info-panel">
+        <button class="info-edit-btn" onclick="openInfoEdit()" title="Edit informasi bimbingan">✏️ Edit</button>
+        <div class="panel-title">
+          <span style="font-size:1.3rem">📋</span>
+          <h3>Informasi Metode Bimbingan</h3>
+        </div>
+        <div class="info-metode-list" id="d-info-metode-list"><!-- rendered by JS --></div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">📌 Catatan Penting</div>
+        <div class="info-catatan-list" id="d-info-catatan-list"><!-- rendered by JS --></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
+        <div class="card stat-card"><div class="stat-label">Mahasiswa Bimbingan</div><div class="stat-number" id="d-stat-mhs" style="color:var(--blue2)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Sesi Aktif</div><div class="stat-number" id="d-stat-sesi" style="color:var(--teal2)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Sesi Tersedia</div><div class="stat-number" id="d-stat-tersedia" style="color:var(--green)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Sesi Terisi</div><div class="stat-number" id="d-stat-terisi" style="color:var(--purple)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-number" id="d-stat-pending" style="color:var(--amber)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Terselenggara</div><div class="stat-number" id="d-stat-done" style="color:var(--green)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Sesi Hangus</div><div class="stat-number" id="d-stat-hangus" style="color:var(--rose)">—</div></div>
+      </div>
+      <div style="font-size:0.82rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Status Skripsi Mahasiswamu</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:24px">
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(16,185,129,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--green)" id="d-s-aktif">—</div><div style="font-size:0.72rem;color:var(--text2)">Aktif Bimbingan</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(148,163,184,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--slate)" id="d-s-inaktif">—</div><div style="font-size:0.72rem;color:var(--text2)">Tidak Aktif</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(245,158,11,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--amber)" id="d-s-revisi">—</div><div style="font-size:0.72rem;color:var(--text2)">Revisi</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(139,92,246,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--purple)" id="d-s-sidang">—</div><div style="font-size:0.72rem;color:var(--text2)">Menunggu Sidang</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(56,189,248,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--sky)" id="d-s-lulus">—</div><div style="font-size:0.72rem;color:var(--text2)">Lulus</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <h3>Reservasi Menunggu Konfirmasi</h3>
+        <button class="btn btn-orange btn-sm" onclick="doExportRekap()">📊 Export Rekap Bimbingan</button>
+      </div>
+      <div id="d-recent-bookings"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="d-sesi" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Manajemen Sesi</h2><p>Buat dan kelola sesi bimbinganmu</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-announce btn-sm" onclick="kirimNotifKeSemuaMhs(this)" style="margin-bottom:0;padding:10px 16px;font-size:0.85rem">📢 Kirim Notif ke Semua</button>
+          <button class="btn btn-orange" onclick="openSlotModal()">+ Tambah Sesi</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div class="filter-row" style="margin-bottom:0;flex-wrap:wrap">
+          <button class="filter-btn active" id="dslot-f-all"     onclick="filterDosenSlots('all',this)">Semua</button>
+          <button class="filter-btn"        id="dslot-f-offline"  onclick="filterDosenSlots('offline',this)">Offline</button>
+          <button class="filter-btn"        id="dslot-f-online"   onclick="filterDosenSlots('online',this)">Online</button>
+          <button class="filter-btn"        id="dslot-f-tersedia" onclick="filterDosenSlots('tersedia',this)">Tersedia</button>
+          <button class="filter-btn"        id="dslot-f-terisi"   onclick="filterDosenSlots('terisi',this)">Terisi</button>
+        </div>
+        <div class="date-range-wrap" id="dslot-date-wrap">
+          <label>📅 Dari</label>
+          <input type="date" id="dslot-date-from" class="date-range-input" onchange="applyDateRangeSlots()"/>
+          <span class="date-range-sep">—</span>
+          <label>Sampai</label>
+          <input type="date" id="dslot-date-to" class="date-range-input" onchange="applyDateRangeSlots()"/>
+          <button class="date-range-clear" onclick="clearDateRangeSlots()" title="Reset rentang tanggal">✕ Reset</button>
+        </div>
+      </div>
+      <div id="d-slots-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="d-reservasi" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Daftar Reservasi</h2><p>Validasi kehadiran bimbingan mahasiswamu</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadDosenBookings()">↻ Refresh</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterDosenBookings('all',this)">Semua</button>
+        <button class="filter-btn" onclick="filterDosenBookings('menunggu',this)">Menunggu ACC</button>
+        <button class="filter-btn" onclick="filterDosenBookings('disetujui',this)">Di-ACC</button>
+        <button class="filter-btn" onclick="filterDosenBookings('terselenggara',this)">Terselenggara</button>
+        <button class="filter-btn" onclick="filterDosenBookings('tidak_terselenggara',this)">Tidak Terjadi</button>
+      </div>
+      <div id="d-bookings-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="d-mahasiswa" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Mahasiswa Bimbingan</h2><p>Lihat progress dan data mahasiswamu</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="loadDosenStudents()">&#8635; Refresh</button>
+          <button class="btn btn-sm" style="background:rgba(37,99,235,0.15);color:var(--blue2);border:1px solid rgba(37,99,235,0.3);white-space:nowrap" onclick="exportArsipMahasiswa()">&#128196; Export Arsip PDF</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <div class="filter-row" style="margin-bottom:0">
+          <button class="filter-btn active" id="filter-mhs-semua" onclick="switchMhsFilter('semua',this)">Semua</button>
+          <button class="filter-btn" id="filter-mhs-belum" onclick="switchMhsFilter('belum',this)">&#128680; Belum Pernah Bimbingan</button>
+        </div>
+        <button class="btn btn-amber btn-sm" onclick="openMendadakModal()" style="white-space:nowrap">&#9889; Catat Bimbingan Mendadak</button>
+      </div>
+      <div id="d-belum-bimbingan-panel" style="display:none;margin-bottom:20px">
+        <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;color:var(--rose);margin-bottom:4px">&#9888;&#65039; Evaluasi: Belum Pernah Bimbingan</div>
+            <div style="font-size:0.82rem;color:var(--text2)">Daftar mahasiswamu yang <b>belum pernah</b> memiliki bimbingan terselenggara.</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.35);white-space:nowrap" onclick="exportBelumBimbingan()">&#128228; Export &amp; Kirim ke Grup</button>
+        </div>
+        <div id="d-belum-bimbingan-container"></div>
+      </div>
+      <div id="d-semua-mhs-panel">
+        <div class="search-wrap" style="margin-bottom:16px;max-width:320px">
+          <span class="search-icon">&#128269;</span>
+          <input class="form-input" id="d-search-mhs" type="text" placeholder="Cari nama atau kode..." oninput="filterDosenStudents(this.value)"/>
+        </div>
+        <div id="d-students-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <div id="d-chat" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Chat Personal</h2><p>Kirim pesan atau catatan ke mahasiswa bimbingan</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadChatList()">↻ Refresh</button>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-sidebar">
+        <div class="chat-sidebar-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>💬 Kontak</span>
+            <button onclick="testChatConnection()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:2px 6px" title="Test koneksi">🔄</button>
+          </div>
+          <div class="chat-contact-list" id="d-chat-contact-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-main-header" id="d-chat-main-header">
+            <span style="color:var(--text3)">← Pilih mahasiswa untuk memulai chat</span>
+          </div>
+          <div class="chat-messages" id="d-chat-messages">
+            <div class="chat-empty">Belum ada percakapan. Pilih kontak di kiri.</div>
+          </div>
+          <div class="chat-input-area" id="d-chat-input-area" style="display:none">
+            <textarea id="d-chat-input-text" placeholder="Ketik pesan..." rows="1" onkeydown="chatInputKeydown(event)"></textarea>
+            <button class="btn btn-primary" onclick="sendChatMsg()" style="padding:10px 16px">Kirim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="d-profil" class="page-section">
+      <div class="section-header"><div class="section-title"><h2>Profil Dosen</h2></div></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:16px">Informasi Akun</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Kode Dosen (Login)</label>
+              <input id="d-profil-kode" class="form-input"/>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:fit-content;margin-bottom:8px" onclick="updateKodeDosen(this)">Simpan Kode Baru</button>
+            <div class="form-group"><label class="form-label">Nama Lengkap</label><input id="d-profil-nama" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="d-profil-email" class="form-input" readonly style="opacity:.7"/></div>
+            <div class="form-group"><label class="form-label">Program Studi</label><input id="d-profil-prodi" class="form-input" readonly style="opacity:.7"/></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px">Foto Profil</h3>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div id="d-profil-foto-wrap"></div>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">📷 Pilih Foto
+              <input type="file" id="d-foto-input" accept="image/jpeg, image/png" style="display:none" onchange="previewDosenFoto(event)"/></label>
+            <div id="d-foto-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px">
+              <img id="d-foto-preview" src="" class="photo-preview"/>
+              <button class="btn btn-teal btn-sm" onclick="uploadDosenFoto()">Upload Foto</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== ADMIN PAGE ==================== -->
+<div id="page-admin" class="page">
+  <div class="topbar"><div class="topbar-inner">
+    <div class="logo">Lytana</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="aSwitch('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="aSwitch('dosen')">Dosen</button>
+      <button class="nav-tab" onclick="aSwitch('mahasiswa')">Mahasiswa</button>
+      <button class="nav-tab" onclick="aSwitch('bookings')">Reservasi</button>
+      <button class="nav-tab" onclick="aSwitch('slots')">Semua Sesi</button>
+      <button class="nav-tab" onclick="aSwitch('rekap')">Rekap Akademik</button>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar-ph" style="background:linear-gradient(135deg,var(--amber),var(--rose))">S</div>
+        <span>Super Admin</span><span class="role-badge admin">ADMIN</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Keluar</button>
+    </div>
+  </div></div>
+  <div class="main-content">
+
+    <div id="a-dashboard" class="page-section active">
+      <div class="section-header"><div class="section-title"><h2>Dashboard Admin</h2><p>Ringkasan seluruh sistem Lytana</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminDashboard()">↻ Refresh</button></div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card stat-card"><div class="stat-label">Total Dosen</div><div class="stat-number" id="a-stat-dosen" style="color:var(--orange)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Total Mahasiswa</div><div class="stat-number" id="a-stat-mhs" style="color:var(--blue2)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Total Sesi</div><div class="stat-number" id="a-stat-sesi" style="color:var(--teal2)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Total Reservasi</div><div class="stat-number" id="a-stat-book" style="color:var(--purple)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Menunggu</div><div class="stat-number" id="a-stat-pending" style="color:var(--amber)">—</div></div>
+        <div class="card stat-card"><div class="stat-label">Terselenggara</div><div class="stat-number" id="a-stat-done" style="color:var(--green)">—</div></div>
+      </div>
+      <div style="font-size:0.82rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Distribusi Status Skripsi</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:24px">
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(16,185,129,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--green)" id="a-s-aktif">—</div><div style="font-size:0.72rem;color:var(--text2)">Aktif Bimbingan</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(148,163,184,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--slate)" id="a-s-inaktif">—</div><div style="font-size:0.72rem;color:var(--text2)">Tidak Aktif</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(245,158,11,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--amber)" id="a-s-revisi">—</div><div style="font-size:0.72rem;color:var(--text2)">Revisi</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(139,92,246,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--purple)" id="a-s-sidang">—</div><div style="font-size:0.72rem;color:var(--text2)">Menunggu Sidang</div></div>
+        <div class="card" style="padding:12px;text-align:center;border-color:rgba(56,189,248,0.3)"><div style="font-size:1.5rem;font-weight:700;color:var(--sky)" id="a-s-lulus">—</div><div style="font-size:0.72rem;color:var(--text2)">Lulus</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <h3>Reservasi Menunggu Validasi</h3>
+        <button class="btn btn-amber btn-sm" onclick="aSwitch('rekap')">📋 Rekap Akademik</button>
+      </div>
+      <div id="a-recent-bookings"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="a-dosen" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Data Dosen</h2><p>Semua dosen yang terdaftar di Lytana</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminDosen()">↻ Refresh</button>
+      </div>
+      <div id="a-dosen-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="a-mahasiswa" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Data Mahasiswa</h2><p>Semua mahasiswa beserta info pembimbing</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminUsers()">↻ Refresh</button>
+      </div>
+      <div class="search-wrap" style="margin-bottom:16px;max-width:320px">
+        <span class="search-icon">🔍</span>
+        <input class="form-input" id="a-search-mhs" type="text" placeholder="Cari nama, kode, atau dosen..." oninput="filterAdminUsers(this.value)"/>
+      </div>
+      <div id="a-users-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="a-bookings" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Semua Reservasi</h2><p>Seluruh reservasi lintas dosen</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminBookings()">↻ Refresh</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterAdminBookings('all',this)">Semua</button>
+        <button class="filter-btn" onclick="filterAdminBookings('menunggu',this)">Menunggu ACC</button>
+        <button class="filter-btn" onclick="filterAdminBookings('disetujui',this)">Di-ACC</button>
+        <button class="filter-btn" onclick="filterAdminBookings('terselenggara',this)">Terselenggara</button>
+        <button class="filter-btn" onclick="filterAdminBookings('tidak_terselenggara',this)">Tidak Terjadi</button>
+        <button class="filter-btn" onclick="filterAdminBookings('dibatalkan',this)">Dibatalkan</button>
+      </div>
+      <div id="a-bookings-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <div id="a-slots" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Semua Sesi</h2><p>Sesi dari seluruh dosen</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminSlots()">↻ Refresh</button>
+      </div>
+      <div id="a-slots-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- REKAP AKADEMIK -->
+    <div id="a-rekap" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Rekap Akademik</h2><p>Data lengkap status bimbingan untuk pelaporan</p></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="loadAkademikRekap()">↻ Refresh</button>
+          <button class="btn btn-amber btn-sm" onclick="exportAkademikCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+      <!-- Summary bar -->
+      <div id="a-rekap-summary" class="rekap-summary"></div>
+      <!-- Status Filter -->
+      <div class="filter-row" id="a-rekap-filter">
+        <button class="filter-btn active" onclick="filterRekap('semua',this)">Semua</button>
+        <button class="filter-btn" onclick="filterRekap('aktif_bimbingan',this)">Aktif Bimbingan</button>
+        <button class="filter-btn" onclick="filterRekap('tidak_aktif',this)">Tidak Aktif</button>
+        <button class="filter-btn" onclick="filterRekap('revisi',this)">Revisi</button>
+        <button class="filter-btn" onclick="filterRekap('menunggu_sidang',this)">Menunggu Sidang</button>
+        <button class="filter-btn" onclick="filterRekap('lulus',this)">Lulus</button>
+      </div>
+      <!-- Per-dosen breakdown -->
+      <div id="a-rekap-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Modal Booking Konfirmasi -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-header"><h3>Konfirmasi Reservasi</h3><button class="modal-close" onclick="closeModal('modal-booking')">×</button></div>
+    <div id="modal-booking-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Batal</button>
+      <button class="btn btn-primary" id="modal-booking-btn" onclick="confirmBooking()">Konfirmasi Reservasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Progres -->
+<div class="modal-overlay" id="modal-progres">
+  <div class="modal">
+    <div class="modal-header"><h3>Update Progres Skripsi</h3><button class="modal-close" onclick="closeModal('modal-progres')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Bab / Bagian</label>
+        <select id="prog-bab" class="form-select">
+          <option value="Bab 1">Bab 1 — Pendahuluan</option><option value="Bab 2">Bab 2 — Tinjauan Pustaka</option>
+          <option value="Bab 3">Bab 3 — Metodologi</option><option value="Bab 4">Bab 4 — Hasil & Pembahasan</option>
+          <option value="Bab 5">Bab 5 — Kesimpulan</option><option value="Revisi">Revisi</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Persentase: <span id="prog-pct-label" style="color:var(--blue2)">50%</span></label>
+        <input type="range" id="prog-pct" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('prog-pct-label').textContent=this.value+'%'"/></div>
+      <div class="form-group"><label class="form-label">Catatan</label>
+        <textarea id="prog-catatan" class="form-textarea" placeholder="Progres, kendala, dsb."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-progres')">Batal</button>
+      <button class="btn btn-teal" onclick="saveProgress()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Sesi (Dosen) -->
+<div class="modal-overlay" id="modal-slot">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-slot-title">Tambah Sesi Baru</h3><button class="modal-close" onclick="closeModal('modal-slot')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Jenis Bimbingan</label>
+        <select id="slot-tipe" class="form-select"><option value="offline">🏢 Offline — Tatap muka</option><option value="online">💻 Online — Zoom / Meet</option></select></div>
+      <div class="form-group"><label class="form-label">Tanggal</label><input id="slot-tanggal" class="form-input" type="date"/></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Jam Mulai</label><input id="slot-jam-mulai" class="form-input" type="time"/></div>
+        <div class="form-group"><label class="form-label">Jam Selesai</label><input id="slot-jam-selesai" class="form-input" type="time"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Catatan / Link Meeting</label>
+        <input id="slot-catatan" class="form-input" type="text" placeholder="Ruang 301, https://zoom.us/..., dsb."/></div>
+      <input type="hidden" id="slot-edit-id"/>
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+        💡 Setiap sesi hanya bisa dipesan oleh <b style="color:var(--text)">1 mahasiswa</b>.
+      </div>
+      <!-- Pilihan publish -->
+      <div id="slot-publish-option" style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:12px 14px">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:8px">🔒 Status Sesi</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="radio" name="slot-publish" id="slot-publish-draft" value="draft" checked style="margin-top:3px;accent-color:var(--amber)"/>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--amber)">📝 Simpan sebagai Draft</div>
+              <div style="font-size:0.76rem;color:var(--text3);margin-top:2px">Sesi tersimpan tapi <b>belum tampil</b> ke mahasiswa. Publish kapan pun siap.</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="radio" name="slot-publish" id="slot-publish-aktif" value="aktif" style="margin-top:3px;accent-color:var(--green)"/>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--green)">🚀 Langsung Publish</div>
+              <div style="font-size:0.76rem;color:var(--text3);margin-top:2px">Sesi <b>langsung tampil</b> ke mahasiswa dan bisa dipesan sekarang.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Batal</button>
+      <button class="btn btn-orange" id="slot-save-btn" onclick="saveSlot()">Simpan Sesi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Validasi -->
+<div class="modal-overlay" id="modal-validasi">
+  <div class="modal">
+    <div class="modal-header"><h3>Verifikasi Selesai Bimbingan</h3><button class="modal-close" onclick="closeModal('modal-validasi')">×</button></div>
+    <div id="validasi-content"></div>
+    <div style="margin-top:16px"><div class="form-group"><label class="form-label">Catatan (opsional)</label>
+      <textarea id="validasi-catatan" class="form-textarea" placeholder="Topik yang dibahas, tindak lanjut, dsb."></textarea></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-validasi')">Batal</button>
+      <button class="btn btn-rose" onclick="doValidate('tidak_terselenggara')">Tidak Terjadi</button>
+      <button class="btn btn-teal" onclick="doValidate('terselenggara')">✓ Terselenggara</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detail Mahasiswa (Dosen) -->
+<div class="modal-overlay" id="modal-student-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h3 id="modal-student-title">Detail Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-student-detail')">×</button></div>
+    <div id="modal-student-content"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-student-detail')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- Modal Reset Kode (Admin) -->
+<div class="modal-overlay" id="modal-reset-kode">
+  <div class="modal">
+    <div class="modal-header"><h3>Reset Kode Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-reset-kode')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--text2)">
+        ⚠️ Mahasiswa harus login ulang menggunakan kode baru setelah direset.
+      </div>
+      <div class="form-group"><label class="form-label">Kode Lama</label><input id="reset-kode-lama" class="form-input" readonly style="opacity:.7"/></div>
+      <div class="form-group"><label class="form-label">Kode Baru</label><input id="reset-kode-baru" class="form-input" type="text" placeholder="Min. 4 karakter"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reset-kode')">Batal</button>
+      <button class="btn btn-amber" onclick="doResetKode()">Reset Kode</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Set Status Skripsi -->
+<div class="modal-overlay" id="modal-set-status">
+  <div class="modal">
+    <div class="modal-header"><h3>Ubah Status Skripsi</h3><button class="modal-close" onclick="closeModal('modal-set-status')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="modal-set-status-content"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)" onclick="confirmSetStatus('aktif_bimbingan')">✅ Aktif Bimbingan</button>
+      <button class="btn btn-sm" style="background:rgba(148,163,184,0.15);color:var(--slate);border:1px solid rgba(148,163,184,0.3)" onclick="confirmSetStatus('tidak_aktif')">⏸ Tidak Aktif</button>
+      <button class="btn btn-sm" style="background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)" onclick="confirmSetStatus('revisi')">✏️ Revisi</button>
+      <button class="btn btn-sm" style="background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)" onclick="confirmSetStatus('menunggu_sidang')">🏛 Menunggu Sidang</button>
+      <button class="btn btn-sm" style="background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.3);grid-column:1/-1" onclick="confirmSetStatus('lulus')">🎓 Lulus / Wisuda</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-set-status')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL CANCEL BOOKING DOSEN ==================== -->
+<div class="modal-overlay" id="modal-dosen-cancel">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🚫 Batalkan Reservasi</h3>
+      <button class="modal-close" onclick="closeModal('modal-dosen-cancel')">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:10px;padding:12px 14px">
+        <div id="dosen-cancel-info" style="font-size:0.88rem;color:var(--text)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alasan Pembatalan <span style="color:var(--rose)">*</span></label>
+        <textarea id="dosen-cancel-alasan" class="form-textarea" rows="3"
+          placeholder="Contoh: Ada agenda mendadak dari kampus, rapat jurusan, kondisi kesehatan, dsb..."></textarea>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Alasan akan tercatat di riwayat mahasiswa sebagai keterangan pembatalan.</div>
+      </div>
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 13px;font-size:0.82rem;color:var(--text2)">
+        ⚡ Setelah dibatalkan, slot bimbingan akan <b style="color:var(--green)">kembali terbuka</b> dan bisa dipesan mahasiswa lain.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dosen-cancel')">Kembali</button>
+      <button class="btn btn-rose" id="dosen-cancel-confirm-btn" onclick="confirmDosenCancel()">🚫 Ya, Batalkan Reservasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL EDIT INFO BIMBINGAN ==================== -->
+<div class="modal-overlay" id="modal-info-edit">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>✏️ Edit Informasi Bimbingan</h3>
+      <button class="modal-close" onclick="closeModal('modal-info-edit')">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.2);border-radius:9px;padding:11px 14px;font-size:0.83rem;color:var(--text2)">
+        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman home dosen maupun mahasiswa pada browser yang sama.
+      </div>
+
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Metode Bimbingan</div>
+        <div id="modal-metode-fields" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addMetodeField()">+ Tambah Metode</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border)"/>
+
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Catatan Penting</div>
+        <div id="modal-catatan-fields" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="addCatatanField()">+ Tambah Catatan</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-info-edit')">Batal</button>
+      <button class="btn btn-primary" onclick="saveInfoBimbingan()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL BIMBINGAN MENDADAK ==================== -->
+<div class="modal-overlay" id="modal-mendadak">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>⚡ Catat Bimbingan Mendadak</h3>
+      <button class="modal-close" onclick="closeModal('modal-mendadak')">×</button>
+    </div>
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 14px;font-size:0.84rem;color:var(--text2);margin-bottom:18px">
+      ⚡ Fitur ini untuk mencatat bimbingan yang terjadi di luar sistem reservasi (bimbingan mendadak/tatap muka spontan). Bimbingan akan langsung masuk ke riwayat mahasiswa.
+    </div>
+    <div id="modal-mendadak-content">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label class="form-label">Mahasiswa</label>
+          <select id="mendadak-mhs" class="form-select">
+            <option value="">-- Pilih Mahasiswa --</option>
+          </select>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Jenis Bimbingan</label>
+            <select id="mendadak-tipe" class="form-select">
+              <option value="offline">🏢 Offline (Tatap Muka)</option>
+              <option value="online">💻 Online</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Bimbingan</label>
+            <input id="mendadak-tanggal" class="form-input" type="date"/>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Jam Mulai</label>
+            <input id="mendadak-jam-mulai" class="form-input" type="time"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jam Selesai</label>
+            <input id="mendadak-jam-selesai" class="form-input" type="time"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan / Topik Bimbingan</label>
+          <textarea id="mendadak-catatan" class="form-textarea" placeholder="Misal: Revisi BAB 2, diskusi metodologi, dst..."></textarea>
+        </div>
+        <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 13px;font-size:0.82rem;color:var(--text2)">
+          ✅ Bimbingan mendadak akan langsung tercatat sebagai <b style="color:var(--green)">Terselenggara</b> di riwayat mahasiswa.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-mendadak')">Batal</button>
+      <button class="btn btn-amber" id="mendadak-save-btn" onclick="saveBimbinganMendadak()">⚡ Catat Bimbingan</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#app -->
+
+<!-- ==================== JAVASCRIPT (urutan load penting!) ==================== -->
+<!-- 1. Konfigurasi & state global -->
+<script src="js/config.js"></script>
+<!-- 2. Utilitas inti (api, toast, modal, helpers) -->
+<script src="js/helpers.js"></script>
+<!-- 3. Navigasi halaman -->
+<script src="js/nav.js"></script>
+<!-- 4. Info Bimbingan (localStorage panel) -->
+<script src="js/infoBimbingan.js"></script>
+<!-- 5. Autentikasi -->
+<script src="js/auth.js"></script>
+<!-- 6. Halaman Mahasiswa -->
+<script src="js/mahasiswa.js"></script>
+<!-- 7. Halaman Dosen -->
+<script src="js/dosen.js"></script>
+<!-- 8. Shared: booking table, validasi, cancel (dipakai Dosen & Admin) -->
+<script src="js/shared.js"></script>
+<!-- 9. Halaman Admin -->
+<script src="js/admin.js"></script>
+<!-- 10. Export PDF Arsip Mahasiswa -->
+<script src="js/export.js"></script>
+<!-- 11. Rekap Akademik & Export CSV -->
+<script src="js/rekap.js"></script>
+<!-- 12. Fitur Chat -->
+<script src="js/chat.js"></script>
+</body>
+</html>
