@@ -186,10 +186,10 @@ function showSplash(user, callback) {
 
   // Isi konten
   const avatar = document.getElementById('splash-avatar');
-  avatar.textContent         = user.nama.charAt(0).toUpperCase();
-  avatar.style.background    = cfg.gradient;
-  avatar.style.color         = '#fff';
-  avatar.style.borderColor   = cfg.ringColor.replace('0.35','0.6');
+  avatar.textContent      = user.nama.charAt(0).toUpperCase();
+  avatar.style.background = cfg.gradient;
+  avatar.style.color      = '#fff';
+  avatar.style.borderColor= cfg.ringColor.replace('0.35','0.5');
 
   document.getElementById('splash-rings').querySelectorAll('.splash-ring').forEach(r => {
     r.style.borderColor = cfg.ringColor;
@@ -203,25 +203,33 @@ function showSplash(user, callback) {
   document.getElementById('splash-msg').textContent      = cfg.msg;
 
   const badge = document.getElementById('splash-role-badge');
-  badge.textContent        = cfg.label;
-  badge.style.background   = cfg.badgeBg;
-  badge.style.color        = cfg.badgeColor;
-  badge.style.border       = `1px solid ${cfg.badgeBorder}`;
+  badge.textContent     = cfg.label;
+  badge.style.background  = cfg.badgeBg;
+  badge.style.color       = cfg.badgeColor;
+  badge.style.border      = `1px solid ${cfg.badgeBorder}`;
 
-  // Tampilkan
-  el.style.display    = 'flex';
-  el.style.animation  = 'none';
-  el.style.opacity    = '1';
+  // Reset class dulu agar animasi bisa trigger ulang
+  el.classList.remove('splash-screen-active', 'splash-screen-exit');
+  el.style.display   = 'flex';
+  el.style.opacity   = '1';
+  el.style.transform = 'scale(1)';
+  el.style.animation = 'none';
 
-  // Tutup setelah 1.8 detik lalu jalankan callback
+  // Trigger reflow agar browser reset animasi
+  void el.offsetWidth;
+
+  // Aktifkan animasi dengan class
+  el.classList.add('splash-screen-active');
+
+  // Tutup setelah 1.9 detik
   setTimeout(() => {
-    el.style.animation = 'splashOut 0.4s ease forwards';
+    el.classList.add('splash-screen-exit');
     setTimeout(() => {
       el.style.display = 'none';
-      el.style.animation = 'none';
+      el.classList.remove('splash-screen-active', 'splash-screen-exit');
       callback();
-    }, 380);
-  }, 1800);
+    }, 400);
+  }, 1900);
 }
 
 // ── onLogin ───────────────────────────────────────────────────

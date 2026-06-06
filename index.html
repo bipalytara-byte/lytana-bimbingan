@@ -10,10 +10,88 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- CSS -->
 <link rel="stylesheet" href="css/style.css"/>
+<!-- Splash Screen Animations (inline agar tidak terpengaruh cache) -->
+<style>
+@keyframes splashRingPulse {
+  0%   { opacity:.6; transform:translate(-50%,-50%) scale(1); }
+  100% { opacity:0;  transform:translate(-50%,-50%) scale(1.25); }
+}
+@keyframes splashAvatarPop {
+  0%   { opacity:0; transform:scale(0.3) rotate(-10deg); }
+  60%  { transform:scale(1.12) rotate(3deg); }
+  100% { opacity:1; transform:scale(1) rotate(0deg); }
+}
+@keyframes splashFadeUp {
+  0%   { opacity:0; transform:translateY(16px); }
+  100% { opacity:1; transform:translateY(0); }
+}
+@keyframes splashDotBounce {
+  0%,80%,100% { transform:scale(0.5); opacity:.35; }
+  40%         { transform:scale(1.15); opacity:1; }
+}
+@keyframes splashFadeOut {
+  0%   { opacity:1; transform:scale(1); }
+  100% { opacity:0; transform:scale(1.05); }
+}
+.splash-ring {
+  position:absolute;
+  border-radius:50%;
+  border:1.5px solid;
+  animation:splashRingPulse 2s ease-out infinite;
+}
+.splash-dot {
+  width:9px; height:9px; border-radius:50%;
+  animation:splashDotBounce 1.1s ease-in-out infinite;
+}
+.splash-avatar-el {
+  width:84px; height:84px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; font-weight:800; font-family:var(--font2);
+  border:3px solid rgba(255,255,255,0.2);
+  opacity:0;
+}
+.splash-fade-el {
+  opacity:0;
+}
+.splash-screen-active .splash-avatar-el {
+  animation:splashAvatarPop 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.05s both;
+}
+.splash-screen-active .splash-fade-el {
+  animation:splashFadeUp 0.5s ease both;
+}
+.splash-screen-exit {
+  animation:splashFadeOut 0.4s ease forwards !important;
+}
+</style>
 </head>
 <body>
 <body>
 <div id="app">
+
+<!-- ==================== SPLASH SCREEN LOGIN ==================== -->
+<div id="splash-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--navy);flex-direction:column;align-items:center;justify-content:center;gap:0">
+  <!-- Animated background rings -->
+  <div id="splash-rings" style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div class="splash-ring" style="width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+    <div class="splash-ring" style="width:420px;height:420px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:0.3s"></div>
+    <div class="splash-ring" style="width:260px;height:260px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:0.6s"></div>
+  </div>
+  <!-- Content -->
+  <div style="position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px">
+    <div id="splash-avatar" class="splash-avatar-el"></div>
+    <div>
+      <div id="splash-greeting" class="splash-fade-el" style="font-family:var(--font2);font-size:1.5rem;font-weight:700;margin-bottom:6px;animation-delay:0.15s"></div>
+      <div id="splash-name" class="splash-fade-el" style="font-size:1rem;color:var(--text2);animation-delay:0.25s"></div>
+    </div>
+    <div id="splash-role-badge" class="splash-fade-el" style="padding:5px 18px;border-radius:30px;font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;animation-delay:0.35s"></div>
+    <div class="splash-fade-el" style="display:flex;gap:6px;margin-top:8px;animation-delay:0.45s">
+      <div class="splash-dot" style="animation-delay:0s"></div>
+      <div class="splash-dot" style="animation-delay:0.18s"></div>
+      <div class="splash-dot" style="animation-delay:0.36s"></div>
+    </div>
+    <div id="splash-msg" class="splash-fade-el" style="font-size:0.82rem;color:var(--text3);animation-delay:0.5s">Memuat dashboard...</div>
+  </div>
+</div>
 <div id="toast-container"></div>
 
 <!-- ==================== LOGIN PAGE ==================== -->
