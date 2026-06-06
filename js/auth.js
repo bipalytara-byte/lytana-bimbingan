@@ -258,6 +258,8 @@ function onLogin(token, user) {
       if (user.statusSkripsi === 'tidak_aktif') {
         setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 600);
       }
+      // Isi dropdown dosen di modal izin bitrix
+      _fillIzinDosenDropdown(user);
       loadMahasiswaDeadlines().then(() => {
         renderDeadlineBannerMhs();
         const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
@@ -265,8 +267,22 @@ function onLogin(token, user) {
         if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
         loadSlotPreviews();
       });
+      // Load izin bitrix untuk badge
+      loadMahasiswaIzinBitrix();
     }
   });
+}
+
+// ── Isi dropdown dosen di modal izin bitrix ───────────────────
+function _fillIzinDosenDropdown(user) {
+  const sel = document.getElementById('izin-dosen-sel');
+  if (!sel) return;
+  const opts = [];
+  if (user.dosenKode1) opts.push({ kode: user.dosenKode1, nama: user.dosenNama1 || user.dosenKode1, label: 'Pembimbing 1' });
+  if (user.dosenKode2) opts.push({ kode: user.dosenKode2, nama: user.dosenNama2 || user.dosenKode2, label: 'Pembimbing 2' });
+  sel.innerHTML = '<option value="">-- Pilih Dosen --</option>' +
+    opts.map(o => `<option value="${o.kode}">${o.nama} (${o.label})</option>`).join('');
+  if (opts.length === 1) sel.value = opts[0].kode;
 }
 
 function updateMhsChip() {
@@ -316,6 +332,7 @@ function doLogout() {
       showPage('dosen');
       loadDosenDashboard();
       renderAllInfoPanels();
+      loadDosenIzinBitrix(); // badge izin dosen
     } else {
       updateMhsChip();
       showPage('mahasiswa');
@@ -323,6 +340,7 @@ function doLogout() {
       if (user.statusSkripsi === 'tidak_aktif') {
         setTimeout(() => toast('⚠️ Akunmu tidak aktif. Hubungi dosen pembimbingmu.', 'error'), 800);
       }
+      _fillIzinDosenDropdown(user);
       loadMahasiswaDeadlines().then(() => {
         renderDeadlineBannerMhs();
         const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
@@ -330,6 +348,7 @@ function doLogout() {
         if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
         loadSlotPreviews();
       });
+      loadMahasiswaIzinBitrix(); // badge izin mahasiswa
     }
   } catch (e) {}
 })();

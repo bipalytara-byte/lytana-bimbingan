@@ -212,6 +212,7 @@
       <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
       <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
       <button class="nav-tab" onclick="mSwitch('deadline')">Deadline <span id="m-deadline-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
+      <button class="nav-tab" onclick="mSwitch('izin')">Izin Bitrix <span id="m-izin-badge" style="display:none;background:var(--green);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" id="m-chat-tab" onclick="mSwitch('chat')">Chat <span id="m-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
     </div>
@@ -285,6 +286,18 @@
       <div id="m-deadline-container">
         <div class="loading-overlay"><div class="spinner"></div></div>
       </div>
+    </div>
+
+    <!-- ============ IZIN BITRIX MAHASISWA ============ -->
+    <div id="m-izin" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Izin Bimbingan via Bitrix</h2><p>Ajukan izin ke dosen sebelum mengirim file ke Bitrix24</p></div>
+        <button class="btn btn-primary" onclick="openAjukanIzinBitrix()">+ Ajukan Izin</button>
+      </div>
+      <div style="margin-bottom:14px;padding:12px 14px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:10px;font-size:0.82rem;color:var(--text2);line-height:1.6">
+        ℹ️ Fitur ini untuk bimbingan via Bitrix24 di luar jalur reservasi LYTANA. Ajukan permohonan terlebih dahulu, tunggu persetujuan dosen, baru kirim file ke Bitrix.
+      </div>
+      <div id="m-izin-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
 
     <div id="m-chat" class="page-section">
@@ -362,6 +375,7 @@
       <button class="nav-tab" onclick="dSwitch('reservasi')">Reservasi</button>
       <button class="nav-tab" onclick="dSwitch('mahasiswa')">Mahasiswa</button>
       <button class="nav-tab" onclick="dSwitch('deadline')">Deadline <span id="d-deadline-badge" style="display:none;background:var(--amber);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
+      <button class="nav-tab" onclick="dSwitch('izin')">Izin Bitrix <span id="d-izin-badge" style="display:none;background:var(--sky);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" id="d-chat-tab" onclick="dSwitch('chat')">Chat <span id="d-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="dSwitch('profil')">Profil</button>
     </div>
@@ -507,6 +521,23 @@
         <button class="filter-btn" onclick="filterDosenDeadlines('expired',this)">Kedaluwarsa</button>
       </div>
       <div id="d-deadline-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- ============ IZIN BITRIX DOSEN ============ -->
+    <div id="d-izin" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Izin Bimbingan via Bitrix</h2><p>Kelola pengajuan izin pengiriman file dari mahasiswamu</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadDosenIzinBitrix()">↻ Refresh</button>
+      </div>
+      <div class="filter-row" style="margin-bottom:16px">
+        <button class="filter-btn active" onclick="filterDosenIzinBitrix('all',this)">Semua</button>
+        <button class="filter-btn" onclick="filterDosenIzinBitrix('menunggu',this)">Menunggu ⏳</button>
+        <button class="filter-btn" onclick="filterDosenIzinBitrix('sudah_kirim',this)">Perlu Dicek 📨</button>
+        <button class="filter-btn" onclick="filterDosenIzinBitrix('disetujui',this)">Di-ACC</button>
+        <button class="filter-btn" onclick="filterDosenIzinBitrix('selesai',this)">Selesai</button>
+        <button class="filter-btn" onclick="filterDosenIzinBitrix('ditolak',this)">Ditolak</button>
+      </div>
+      <div id="d-izin-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
 
     <div id="d-chat" class="page-section">
@@ -933,6 +964,105 @@
   </div>
 </div>
 
+<!-- ==================== MODAL AJUKAN IZIN BITRIX (MAHASISWA) ==================== -->
+<div class="modal-overlay" id="modal-izin-bitrix">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3>📤 Ajukan Izin Bimbingan via Bitrix</h3>
+      <button class="modal-close" onclick="closeModal('modal-izin-bitrix')">×</button>
+    </div>
+    <div style="margin-bottom:14px;padding:10px 12px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:8px;font-size:0.8rem;color:var(--text2);line-height:1.5">
+      📌 Ajukan izin terlebih dahulu. Setelah disetujui dosen, kamu baru boleh mengirim file ke Bitrix24.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="form-label">Dosen Pembimbing</label>
+        <select id="izin-dosen-sel" class="form-input">
+          <option value="">-- Pilih Dosen --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Topik Bimbingan</label>
+        <input id="izin-topik" class="form-input" placeholder="Contoh: Review Bab 2 — Tinjauan Pustaka"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deskripsi <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <textarea id="izin-deskripsi" class="form-textarea" style="min-height:72px" placeholder="Jelaskan apa yang ingin dibahas / didiskusikan..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">File yang akan dikirim <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <input id="izin-file-desk" class="form-input" placeholder="Contoh: Draft Bab 2 revisi ke-3 (PDF)"/>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Deskripsikan file yang akan kamu kirim ke Bitrix</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-primary" id="izin-submit-btn" onclick="submitIzinBitrix()">📤 Ajukan Izin</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-izin-bitrix')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL KONFIRMASI SUDAH KIRIM BITRIX (MAHASISWA) ==================== -->
+<div class="modal-overlay" id="modal-konfirmasi-bitrix">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <h3>📨 Konfirmasi Sudah Kirim ke Bitrix</h3>
+      <button class="modal-close" onclick="closeModal('modal-konfirmasi-bitrix')">×</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.82rem;color:var(--text3);margin-bottom:4px">Topik:</div>
+      <div style="font-weight:700" id="konfirmasi-bitrix-topik">—</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="form-label">Link File di Bitrix24</label>
+        <input id="konfirmasi-bitrix-link" class="form-input" type="url" placeholder="https://bitrix24.com/..."/>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Tempel link file/folder yang sudah kamu upload</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <textarea id="konfirmasi-bitrix-catatan" class="form-textarea" style="min-height:60px" placeholder="Catatan tambahan untuk dosen..."></textarea>
+      </div>
+      <div style="padding:10px 12px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:0.8rem;color:var(--text2)">
+        ℹ️ Setelah konfirmasi, dosen akan mendapat notifikasi untuk segera mengecek file di Bitrix.
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-primary" id="konfirmasi-bitrix-btn" onclick="submitKonfirmasiKirimBitrix()">📨 Konfirmasi Sudah Kirim</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-konfirmasi-bitrix')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL TANDAI SELESAI BITRIX (DOSEN) ==================== -->
+<div class="modal-overlay" id="modal-selesai-bitrix">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h3>🎯 Tandai Sudah Dicek</h3>
+      <button class="modal-close" onclick="closeModal('modal-selesai-bitrix')">×</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.82rem;color:var(--text3);margin-bottom:4px">Topik:</div>
+      <div style="font-weight:700" id="selesai-bitrix-topik">—</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Catatan / Feedback <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <textarea id="selesai-bitrix-catatan" class="form-textarea" style="min-height:80px"
+          placeholder="Contoh: Bab 2 sudah oke, silakan lanjut ke Bab 3. Ada beberapa perbaikan minor di halaman 15."></textarea>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Catatan ini akan dikirim ke mahasiswa</div>
+      </div>
+      <div style="padding:10px 12px;background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:8px;font-size:0.8rem;color:var(--text2)">
+        ✅ Menandai selesai akan mengirim notifikasi ke mahasiswa dan mencatat aktivitas bimbingan.
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-primary" id="selesai-bitrix-btn" onclick="submitSelesaiIzinBitrix()" style="background:var(--purple);border-color:var(--purple)">🎯 Tandai Selesai</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-selesai-bitrix')">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== MODAL CANCEL BOOKING DOSEN ==================== -->
 <div class="modal-overlay" id="modal-dosen-cancel">
   <div class="modal">
@@ -1078,7 +1208,9 @@
 <script src="js/rekap.js"></script>
 <!-- 12. Fitur Deadline Skripsi -->
 <script src="js/deadline.js"></script>
-<!-- 13. Fitur Chat -->
+<!-- 13. Fitur Izin Bimbingan via Bitrix -->
+<script src="js/izinBitrix.js"></script>
+<!-- 14. Fitur Chat -->
 <script src="js/chat.js"></script>
 </body>
 </html>
