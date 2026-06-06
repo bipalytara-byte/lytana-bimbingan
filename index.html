@@ -892,7 +892,7 @@
     </div>
     <div style="display:flex;flex-direction:column;gap:18px">
       <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.2);border-radius:9px;padding:11px 14px;font-size:0.83rem;color:var(--text2)">
-        ℹ️ Perubahan akan disimpan di perangkat ini dan langsung muncul di halaman home dosen maupun mahasiswa pada browser yang sama.
+        ℹ️ Informasi ini disimpan di server dan tampil khusus untuk kamu — setiap dosen punya informasi bimbingan yang berbeda. Mahasiswa bimbinganmu akan melihat info ini di halaman Reservasi mereka.
       </div>
 
       <div>
@@ -911,7 +911,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-info-edit')">Batal</button>
-      <button class="btn btn-primary" onclick="saveInfoBimbingan()">💾 Simpan</button>
+      <button class="btn btn-primary" id="info-save-btn" onclick="saveInfoBimbingan()">💾 Simpan</button>
     </div>
   </div>
 </div>
