@@ -292,3 +292,35 @@ tr:hover td{background:var(--card2)}
   .btn-announce:hover { transform: scale(1.02); filter: brightness(1.1); }
 
 
+
+/* ── Splash Screen ────────────────────────────────────────────── */
+@keyframes splashRingPulse {
+  0%   { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(1.18); }
+}
+@keyframes splashAvatarPop {
+  0%   { opacity:0; transform:scale(0.4); }
+  100% { opacity:1; transform:scale(1); }
+}
+@keyframes splashFadeUp {
+  0%   { opacity:0; transform:translateY(12px); }
+  100% { opacity:1; transform:translateY(0); }
+}
+@keyframes splashDotBounce {
+  0%,80%,100% { transform:scale(0.6); opacity:0.4; }
+  40%         { transform:scale(1.1); opacity:1;   }
+}
+@keyframes splashOut {
+  0%   { opacity:1; transform:scale(1); }
+  100% { opacity:0; transform:scale(1.04); }
+}
+.splash-ring {
+  position:absolute;
+  border-radius:50%;
+  border:1.5px solid;
+  animation: splashRingPulse 1.8s ease-out infinite;
+}
+.splash-dot {
+  width:8px; height:8px; border-radius:50%;
+  animation: splashDotBounce 1.2s ease-in-out infinite;
+}

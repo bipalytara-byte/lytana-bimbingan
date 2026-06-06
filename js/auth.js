@@ -141,39 +141,124 @@ async function doRegisterDosen() {
 }
 
 // ── onLogin & Logout ──────────────────────────────────────────
+// ── Konfigurasi splash per role ───────────────────────────────
+const SPLASH_CONFIG = {
+  mahasiswa: {
+    gradient : 'linear-gradient(135deg,#0d9488,#06b6d4)',
+    ringColor: 'rgba(20,184,166,0.35)',
+    dotColor : 'var(--teal2)',
+    badgeBg  : 'rgba(20,184,166,0.15)',
+    badgeColor:'var(--teal2)',
+    badgeBorder:'rgba(20,184,166,0.4)',
+    label    : 'MAHASISWA',
+    greeting : (nama) => `Halo, ${nama.split(' ')[0]}! 👋`,
+    msg      : 'Memuat jadwal bimbingan...',
+  },
+  dosen: {
+    gradient : 'linear-gradient(135deg,#2563eb,#7c3aed)',
+    ringColor: 'rgba(99,102,241,0.35)',
+    dotColor : 'var(--blue2)',
+    badgeBg  : 'rgba(37,99,235,0.15)',
+    badgeColor:'var(--blue2)',
+    badgeBorder:'rgba(37,99,235,0.4)',
+    label    : 'DOSEN',
+    greeting : (nama) => `Selamat datang, ${nama.split(' ')[0]}! 🎓`,
+    msg      : 'Memuat dashboard dosen...',
+  },
+  admin: {
+    gradient : 'linear-gradient(135deg,#b45309,#f97316)',
+    ringColor: 'rgba(249,115,22,0.35)',
+    dotColor : 'var(--orange)',
+    badgeBg  : 'rgba(249,115,22,0.15)',
+    badgeColor:'var(--orange)',
+    badgeBorder:'rgba(249,115,22,0.4)',
+    label    : 'ADMIN',
+    greeting : (nama) => `Dashboard Admin 🔑`,
+    msg      : 'Memuat data sistem...',
+  }
+};
+
+// ── Tampilkan splash screen ───────────────────────────────────
+function showSplash(user, callback) {
+  const cfg = SPLASH_CONFIG[user.role] || SPLASH_CONFIG.admin;
+  const el  = document.getElementById('splash-screen');
+  if (!el) { callback(); return; }
+
+  // Isi konten
+  const avatar = document.getElementById('splash-avatar');
+  avatar.textContent         = user.nama.charAt(0).toUpperCase();
+  avatar.style.background    = cfg.gradient;
+  avatar.style.color         = '#fff';
+  avatar.style.borderColor   = cfg.ringColor.replace('0.35','0.6');
+
+  document.getElementById('splash-rings').querySelectorAll('.splash-ring').forEach(r => {
+    r.style.borderColor = cfg.ringColor;
+  });
+  document.querySelectorAll('.splash-dot').forEach(d => {
+    d.style.background = cfg.dotColor;
+  });
+
+  document.getElementById('splash-greeting').textContent = cfg.greeting(user.nama);
+  document.getElementById('splash-name').textContent     = user.nama;
+  document.getElementById('splash-msg').textContent      = cfg.msg;
+
+  const badge = document.getElementById('splash-role-badge');
+  badge.textContent        = cfg.label;
+  badge.style.background   = cfg.badgeBg;
+  badge.style.color        = cfg.badgeColor;
+  badge.style.border       = `1px solid ${cfg.badgeBorder}`;
+
+  // Tampilkan
+  el.style.display    = 'flex';
+  el.style.animation  = 'none';
+  el.style.opacity    = '1';
+
+  // Tutup setelah 1.8 detik lalu jalankan callback
+  setTimeout(() => {
+    el.style.animation = 'splashOut 0.4s ease forwards';
+    setTimeout(() => {
+      el.style.display = 'none';
+      el.style.animation = 'none';
+      callback();
+    }, 380);
+  }, 1800);
+}
+
+// ── onLogin ───────────────────────────────────────────────────
 function onLogin(token, user) {
   state.token = token;
   state.user  = user;
   localStorage.setItem('lytana_token', token);
   localStorage.setItem('lytana_user', JSON.stringify(user));
 
-  if (user.role === 'admin') {
-    showPage('admin');
-    loadAdminDashboard();
-  } else if (user.role === 'dosen') {
-    updateDosenChip();
-    showPage('dosen');
-    loadDosenDashboard();
-    renderAllInfoPanels();
-  } else {
-    updateMhsChip();
-    showPage('mahasiswa');
-    renderAllInfoPanels();
-    // Status skripsi sudah dihitung GAS (computeStatus) saat login/auto-login.
-    if (user.statusSkripsi === 'tidak_aktif') {
-      setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 800);
+  // Tampilkan splash dulu, baru masuk halaman
+  showSplash(user, () => {
+    if (user.role === 'admin') {
+      showPage('admin');
+      loadAdminDashboard();
+
+    } else if (user.role === 'dosen') {
+      updateDosenChip();
+      showPage('dosen');
+      loadDosenDashboard();
+      renderAllInfoPanels();
+
+    } else {
+      updateMhsChip();
+      showPage('mahasiswa');
+      renderAllInfoPanels();
+      if (user.statusSkripsi === 'tidak_aktif') {
+        setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 600);
+      }
+      loadMahasiswaDeadlines().then(() => {
+        renderDeadlineBannerMhs();
+        const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
+        const badge = document.getElementById('m-deadline-badge');
+        if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
+        loadSlotPreviews();
+      });
     }
-    // Load deadline lalu baru render slot (deadline mempengaruhi blokir)
-    loadMahasiswaDeadlines().then(() => {
-      renderDeadlineBannerMhs();
-      // Update badge nav
-      const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
-      const badge = document.getElementById('m-deadline-badge');
-      if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
-      loadSlotPreviews();
-    });
-  }
-  toast('Selamat datang, ' + user.nama + '!', 'success');
+  });
 }
 
 function updateMhsChip() {
@@ -205,9 +290,38 @@ function doLogout() {
   toast('Kamu telah keluar', 'info');
 }
 
-// ── Auto-login dari localStorage ─────────────────────────────
+// ── Auto-login dari localStorage (tanpa splash) ───────────────
 (function () {
   const t = localStorage.getItem('lytana_token');
   const u = localStorage.getItem('lytana_user');
-  if (t && u) try { onLogin(t, JSON.parse(u)); } catch (e) {}
+  if (!t || !u) return;
+  try {
+    const user  = JSON.parse(u);
+    state.token = t;
+    state.user  = user;
+    // Langsung masuk tanpa splash
+    if (user.role === 'admin') {
+      showPage('admin');
+      loadAdminDashboard();
+    } else if (user.role === 'dosen') {
+      updateDosenChip();
+      showPage('dosen');
+      loadDosenDashboard();
+      renderAllInfoPanels();
+    } else {
+      updateMhsChip();
+      showPage('mahasiswa');
+      renderAllInfoPanels();
+      if (user.statusSkripsi === 'tidak_aktif') {
+        setTimeout(() => toast('⚠️ Akunmu tidak aktif. Hubungi dosen pembimbingmu.', 'error'), 800);
+      }
+      loadMahasiswaDeadlines().then(() => {
+        renderDeadlineBannerMhs();
+        const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
+        const badge = document.getElementById('m-deadline-badge');
+        if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
+        loadSlotPreviews();
+      });
+    }
+  } catch (e) {}
 })();
