@@ -159,6 +159,11 @@ function onLogin(token, user) {
     updateMhsChip();
     showPage('mahasiswa');
     renderAllInfoPanels();
+    // Status skripsi sudah dihitung GAS (computeStatus) saat login/auto-login.
+    // Tampilkan toast jika status tidak_aktif agar mahasiswa langsung tahu.
+    if (user.statusSkripsi === 'tidak_aktif') {
+      setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 800);
+    }
     loadSlotPreviews();
   }
   toast('Selamat datang, ' + user.nama + '!', 'success');

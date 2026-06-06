@@ -727,6 +727,23 @@
   </div>
 </div>
 
+<!-- ==================== MODAL REAKTIVASI MAHASISWA ==================== -->
+<div class="modal-overlay" id="modal-reaktivasi">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h3>✅ Aktifkan Kembali Mahasiswa</h3><button class="modal-close" onclick="closeModal('modal-reaktivasi')">×</button></div>
+    <div id="modal-reaktivasi-content" style="padding:0 0 4px"></div>
+    <div style="margin-top:14px;font-size:0.82rem;color:var(--text3);line-height:1.5">
+      ⚠️ Pastikan kamu sudah <b>bertemu langsung</b> dengan mahasiswa ini dan memverifikasi perkembangan skripsinya sebelum mengaktifkan kembali.
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn" id="reaktivasi-confirm-btn"
+              style="background:var(--green);color:white;border:none;font-weight:700"
+              onclick="confirmReaktivasi()">✅ Ya, Aktifkan Kembali</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-reaktivasi')">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== MODAL CANCEL BOOKING DOSEN ==================== -->
 <div class="modal-overlay" id="modal-dosen-cancel">
   <div class="modal">

@@ -294,8 +294,12 @@ function renderDosenStudents(students) {
   if (!students.length) { c.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Belum ada mahasiswa bimbingan</p></div>'; return; }
   c.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">${students.map(s => {
     const daysSince  = s.lastActivity ? Math.floor((Date.now() - new Date(s.lastActivity).getTime()) / 86400000) : 999;
+    const isInaktif  = s.statusSkripsi === 'tidak_aktif';
     const warnClass  = daysSince >= 10 && s.statusSkripsi === 'aktif_bimbingan' ? 'inaktif-warn' : '';
-    return `<div class="student-card" style="position:relative">
+    // Indikator visual: border merah jika tidak aktif
+    const cardBorderStyle = isInaktif ? 'border:1.5px solid rgba(244,63,94,0.45);background:rgba(244,63,94,0.03)' : '';
+    return `<div class="student-card" style="position:relative;${cardBorderStyle}">
+      ${isInaktif ? `<div style="position:absolute;top:10px;right:10px;background:rgba(244,63,94,0.15);color:var(--rose);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.03em">⏸ TIDAK AKTIF</div>` : ''}
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
         ${renderAvatar(s.foto, s.nama, 48)}
         <div style="flex:1;min-width:0">
@@ -304,7 +308,8 @@ function renderDosenStudents(students) {
         </div>
       </div>
       <div style="margin-bottom:10px">${statusBadge(s.statusSkripsi)}</div>
-      ${daysSince >= 10 && s.statusSkripsi === 'aktif_bimbingan' ? `<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari</div>` : ''}
+      ${daysSince >= 10 && s.statusSkripsi === 'aktif_bimbingan' ? `<div class="${warnClass}" style="font-size:0.75rem;color:var(--amber);margin-bottom:8px">⚠️ Tidak aktif ${daysSince} hari — akan auto-nonaktif di hari ke-14</div>` : ''}
+      ${isInaktif ? `<div style="font-size:0.75rem;color:var(--rose);margin-bottom:8px;line-height:1.4">🚫 Mahasiswa ini tidak dapat reservasi.<br>Aktifkan kembali setelah pertemuan langsung.</div>` : ''}
       ${s.kartuMerahCount > 0 ? `<div style="margin-bottom:8px"><span class="kartu-merah">🔴 KARTU MERAH ×${s.kartuMerahCount}</span>${s.kartuMerahLastAt ? `<span style="font-size:0.7rem;color:var(--text3);margin-left:6px">${daysSinceStr(s.kartuMerahLastAt)}</span>` : ''}</div>` : ''}
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
@@ -314,10 +319,13 @@ function renderDosenStudents(students) {
         <div class="prog-bar"><div class="prog-fill" style="width:${s.avgProgress}%"></div></div>
       </div>
       <div style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">✓ ${s.bimbinganCount}x terselenggara · Aktif ${daysSinceStr(s.lastActivity)}</div>
-      <div style="display:flex;gap:6px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" style="flex:1" onclick='openStudentDetail(${JSON.stringify(s).replace(/'/g, "\\'")})'>Detail</button>
         <button class="btn btn-sm" style="flex:1;background:rgba(56,189,248,0.1);color:var(--sky);border:1px solid rgba(56,189,248,0.25)" onclick="openChatWith('${s.kode}','${s.nama.replace(/'/g, "\\'")}')">💬 Chat</button>
-        <button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g, "\\'")}','${s.statusSkripsi}')">Set Status</button>
+        ${isInaktif
+          ? `<button class="btn btn-sm" style="flex:1;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);font-weight:700" onclick="openReaktivasiModal('${s.kode}','${s.nama.replace(/'/g, "\\'")}')">✅ Aktifkan</button>`
+          : `<button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g, "\\'")}','${s.statusSkripsi}')">Set Status</button>`
+        }
       </div>
     </div>`;
   }).join('')}</div>`;
@@ -481,4 +489,35 @@ async function updateKodeDosen(btn) {
   if (!res.success) return toast(res.message, 'error');
   toast('Kode berhasil diupdate! Silakan login kembali.', 'success');
   setTimeout(() => doLogout(), 2500);
+}
+
+// ── Reaktivasi Mahasiswa Tidak Aktif ──────────────────────────
+function openReaktivasiModal(kode, nama) {
+  state.pendingSetStatus = kode;
+  document.getElementById('modal-reaktivasi-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+      ${renderAvatar('', nama, 44)}
+      <div>
+        <div style="font-weight:700;font-size:1rem">${nama}</div>
+        <code style="font-size:0.78rem;color:var(--text3);background:var(--card2);padding:1px 6px;border-radius:4px">${kode}</code>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:0.83rem;color:var(--text2);line-height:1.6;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 12px">
+      ✅ Mengaktifkan kembali mahasiswa ini berarti kamu telah bertemu langsung dan memverifikasi progress mereka.<br>
+      Status akan diubah ke <b style="color:var(--green)">Aktif Bimbingan</b> dan mahasiswa dapat reservasi kembali.
+    </div>`;
+  openModal('modal-reaktivasi');
+}
+
+async function confirmReaktivasi() {
+  if (!state.pendingSetStatus) return;
+  const btn = document.getElementById('reaktivasi-confirm-btn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Mengaktifkan...';
+  const res = await api('reaktivasiMahasiswa', { kode: state.pendingSetStatus, token: state.token }, 'POST');
+  btn.disabled = false; btn.textContent = '✅ Ya, Aktifkan Kembali';
+  if (!res.success) return toast(res.message, 'error');
+  toast('✅ ' + (res.nama || 'Mahasiswa') + ' berhasil diaktifkan kembali!', 'success');
+  closeModal('modal-reaktivasi');
+  state.pendingSetStatus = null;
+  loadDosenStudents();
 }

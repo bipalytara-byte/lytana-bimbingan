@@ -25,6 +25,11 @@ async function loadSlotPreviews() {
       el.innerHTML = `<div class="type-card-stat"><span style="color:var(--text3);font-size:0.76rem">Belum ada sesi terjadwal</span></div>`;
       return;
     }
+    // Blokir tampilan slot jika tidak aktif
+    if (state.user?.statusSkripsi === 'tidak_aktif') {
+      el.innerHTML = `<div class="type-card-stat"><span style="color:var(--rose);font-size:0.78rem">⏸ Akun tidak aktif — reservasi dinonaktifkan</span></div>`;
+      return;
+    }
     const nearest = tersedia.sort((a, b) => (a.tanggal + a.jamMulai).localeCompare(b.tanggal + b.jamMulai))[0];
     let html = '';
     if (sudahSaya) {
@@ -57,8 +62,47 @@ async function loadSlotPreviews() {
   }
 }
 
+// ── Cek & render banner status tidak aktif ────────────────────
+function renderInaktifBanner(container) {
+  const u = state.user;
+  if (!u || u.statusSkripsi !== 'tidak_aktif') return false;
+  const lastB = u.lastBimbingan || null;
+  const days  = lastB ? Math.floor((Date.now() - new Date(lastB).getTime()) / 86400000) : null;
+  container.innerHTML = `
+    <div style="background:rgba(244,63,94,0.07);border:1.5px solid rgba(244,63,94,0.35);border-radius:14px;padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.8rem">⏸</span>
+        <div>
+          <div style="font-weight:700;font-size:1rem;color:var(--rose)">Akun Tidak Aktif</div>
+          <div style="font-size:0.82rem;color:var(--text2);margin-top:2px">
+            ${days !== null ? `Tidak ada bimbingan selama <b>${days} hari</b>.` : 'Status akunmu saat ini tidak aktif.'}
+          </div>
+        </div>
+      </div>
+      <div style="font-size:0.83rem;color:var(--text2);line-height:1.6;background:rgba(244,63,94,0.05);border-radius:8px;padding:10px 12px">
+        🚫 Kamu <b>tidak dapat melakukan reservasi bimbingan</b> selama status ini aktif.<br>
+        📋 Silakan <b>temui Dosen Pembimbing 1 atau 2</b>-mu secara langsung untuk melaporkan progress.<br>
+        ✅ Dosen pembimbingmu yang akan mengaktifkan kembali akunmu setelah pertemuan berlangsung.
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text3)">
+        <span>💬 Gunakan fitur</span>
+        <button class="btn btn-sm" style="background:rgba(56,189,248,0.12);color:var(--sky);border:1px solid rgba(56,189,248,0.25);padding:3px 10px"
+                onclick="mSwitch('chat')">Chat</button>
+        <span>untuk menghubungi dosbingmu.</span>
+      </div>
+    </div>`;
+  return true;
+}
+
 // ── Pilih Jenis Bimbingan & Load Slot ────────────────────────
 function selectType(type) {
+  // Blokir jika status tidak_aktif
+  if (state.user?.statusSkripsi === 'tidak_aktif') {
+    const c = document.getElementById('slots-container');
+    if (c) renderInaktifBanner(c);
+    toast('Akunmu tidak aktif. Hubungi dosen pembimbing untuk aktivasi ulang.', 'error');
+    return;
+  }
   state.selectedType = type;
   ['offline', 'online'].forEach(t => {
     document.getElementById('type-' + t).classList.toggle('selected', t === type);
@@ -69,6 +113,11 @@ function selectType(type) {
 
 async function loadSlots(tipe) {
   const c = document.getElementById('slots-container');
+  // Blokir jika tidak aktif
+  if (state.user?.statusSkripsi === 'tidak_aktif') {
+    renderInaktifBanner(c);
+    return;
+  }
   c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat sesi dari dosen pembimbing...</div>';
   const res = await api('getSlots', { tipe, token: state.token });
   if (!res.success) return c.innerHTML = `<p style="color:var(--rose);padding:20px">${res.message}</p>`;
@@ -127,6 +176,10 @@ function renderSlotCard(s) {
 
 // ── Booking Modal ─────────────────────────────────────────────
 function openBookingModal(slot) {
+  if (state.user?.statusSkripsi === 'tidak_aktif') {
+    toast('Akunmu tidak aktif. Hubungi dosen pembimbing untuk aktivasi ulang.', 'error');
+    return;
+  }
   state.pendingSlot = slot;
   document.getElementById('modal-booking-content').innerHTML = `
     <div class="card" style="margin-bottom:0;background:var(--card2)">
