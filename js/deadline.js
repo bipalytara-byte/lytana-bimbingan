@@ -427,3 +427,141 @@ function renderDeadlineBlokirBanner(container) {
     </div>`;
   return true;
 }
+
+// ============================================================
+// HALAMAN DEADLINE MAHASISWA (tab penuh)
+// ============================================================
+
+function renderDeadlinePageMhs() {
+  const c = document.getElementById('m-deadline-container');
+  if (!c) return;
+
+  const deadlines = state.myDeadlines || [];
+  const now       = Date.now();
+
+  // Update badge di nav
+  const aktifCount = deadlines.filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
+  const badge = document.getElementById('m-deadline-badge');
+  if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
+
+  if (!deadlines.length) {
+    c.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <p style="font-weight:600">Tidak ada deadline aktif</p>
+      <p style="font-size:0.82rem;color:var(--text3);margin-top:4px">Dosen pembimbingmu belum menetapkan deadline apapun saat ini.</p>
+    </div>`;
+    return;
+  }
+
+  // Pisah per status
+  const groups = [
+    { key: 'aktif_lewat',       label: '🚫 Deadline Terlewat — Perlu Dikonfirmasi', color: 'var(--rose)',   bg: 'rgba(244,63,94,0.06)',   border: 'rgba(244,63,94,0.3)'   },
+    { key: 'selesai_menunggu',  label: '⏳ Sudah Dikonfirmasi — Menunggu Verifikasi Dosen', color: 'var(--sky)', bg: 'rgba(56,189,248,0.05)', border: 'rgba(56,189,248,0.25)' },
+    { key: 'aktif_belum_lewat', label: '📋 Deadline Aktif',                         color: 'var(--amber)',  bg: 'rgba(245,158,11,0.05)',  border: 'rgba(245,158,11,0.25)' },
+    { key: 'verified',          label: '✅ Sudah Terverifikasi',                     color: 'var(--green)',  bg: 'rgba(16,185,129,0.05)',  border: 'rgba(16,185,129,0.2)'  },
+    { key: 'expired',           label: '🕒 Kedaluwarsa',                             color: 'var(--slate)',  bg: 'rgba(148,163,184,0.05)', border: 'rgba(148,163,184,0.2)' },
+  ];
+
+  // Klasifikasi tiap deadline
+  function getGroupKey(d) {
+    if (d.status === 'verified')          return 'verified';
+    if (d.status === 'expired')           return 'expired';
+    if (d.status === 'selesai_menunggu')  return 'selesai_menunggu';
+    const lewat = now > new Date(d.deadlineMahasiswa).getTime();
+    return lewat ? 'aktif_lewat' : 'aktif_belum_lewat';
+  }
+
+  const grouped = {};
+  deadlines.forEach(d => {
+    const k = getGroupKey(d);
+    if (!grouped[k]) grouped[k] = [];
+    grouped[k].push(d);
+  });
+
+  let html = '';
+
+  groups.forEach(g => {
+    const items = grouped[g.key];
+    if (!items || !items.length) return;
+
+    html += `<div style="margin-bottom:24px">
+      <div style="font-size:0.78rem;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">${g.label} (${items.length})</div>
+      <div style="display:flex;flex-direction:column;gap:10px">`;
+
+    items.forEach(d => {
+      const dl        = new Date(d.deadlineMahasiswa);
+      const dlDosen   = d.deadlineDosen ? new Date(d.deadlineDosen) : null;
+      const lewat     = now > dl.getTime();
+      const sisaHari  = Math.ceil((dl.getTime() - now) / 86400000);
+      const groupKey  = getGroupKey(d);
+
+      // Progress bar visual sisa waktu
+      let progressBar = '';
+      if (groupKey === 'aktif_belum_lewat' && d.createdAt) {
+        const total   = dl.getTime() - new Date(d.createdAt).getTime();
+        const elapsed = now - new Date(d.createdAt).getTime();
+        const pct     = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+        const barColor = pct >= 80 ? 'var(--rose)' : pct >= 60 ? 'var(--amber)' : 'var(--green)';
+        progressBar = `<div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text3);margin-bottom:3px">
+            <span>Waktu terpakai</span><span>${pct}%</span>
+          </div>
+          <div style="height:4px;background:var(--border2);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width 0.4s"></div>
+          </div>
+        </div>`;
+      }
+
+      // Tombol aksi
+      let aksiHTML = '';
+      if (groupKey === 'aktif_lewat' || groupKey === 'aktif_belum_lewat') {
+        aksiHTML = `<button class="btn btn-sm" style="margin-top:12px;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);font-weight:700"
+          onclick="openKonfirmasiDeadline('${d.id}','${(d.judul||'').replace(/'/g,"\\'")}')">
+          ✅ Konfirmasi Sudah Selesai & Upload Bukti
+        </button>`;
+      } else if (groupKey === 'selesai_menunggu') {
+        aksiHTML = `<div style="margin-top:10px;padding:8px 10px;background:rgba(56,189,248,0.08);border-radius:7px;font-size:0.8rem;color:var(--sky)">
+          ✅ Konfirmasimu sudah diterima. Menunggu verifikasi dosen.
+        </div>`;
+        if (d.linkBitrix) {
+          aksiHTML += `<div style="margin-top:6px;font-size:0.78rem;color:var(--text3)">
+            🔗 Link yang dikirim: <a href="${d.linkBitrix}" target="_blank" style="color:var(--blue2)">${d.linkBitrix.length > 50 ? d.linkBitrix.substring(0,50)+'…' : d.linkBitrix}</a>
+          </div>`;
+        }
+      } else if (groupKey === 'verified') {
+        aksiHTML = `<div style="margin-top:10px;font-size:0.78rem;color:var(--green)">
+          ✅ Terverifikasi pada ${d.verifikasiAt ? new Date(d.verifikasiAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '—'}
+        </div>`;
+      }
+
+      html += `<div style="border:1px solid ${g.border};background:${g.bg};border-radius:12px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-weight:700;font-size:0.95rem">${d.judul}</div>
+            <div style="font-size:0.8rem;color:var(--text2);margin-top:3px">Dari: <b>${d.dosenNama || 'Dosen Pembimbing'}</b></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-weight:700;font-size:0.88rem;color:${lewat && groupKey !== 'verified' ? 'var(--rose)' : 'var(--text1)'}">
+              ${fmtTgl(d.deadlineMahasiswa.substring(0,10),{day:'numeric',month:'long',year:'numeric'})}
+            </div>
+            <div style="font-size:0.72rem;margin-top:2px;color:${lewat ? 'var(--rose)' : sisaHari <= 3 ? 'var(--amber)' : 'var(--text3)'}">
+              ${groupKey === 'verified' ? '✅ Selesai' : groupKey === 'expired' ? 'Kedaluwarsa' : lewat ? '⚠️ Sudah lewat' : `Sisa ${sisaHari} hari`}
+            </div>
+          </div>
+        </div>
+        ${d.deskripsi ? `<div style="font-size:0.83rem;color:var(--text2);margin-bottom:6px;line-height:1.5">${d.deskripsi}</div>` : ''}
+        ${d.konsekuensi ? `<div style="font-size:0.78rem;color:var(--rose);margin-bottom:4px">🚫 Konsekuensi: ${d.konsekuensi}</div>` : ''}
+        ${dlDosen ? `<div style="font-size:0.75rem;color:var(--text3)">📅 Deadline review dosen: ${fmtTgl(d.deadlineDosen.substring(0,10),{day:'numeric',month:'long',year:'numeric'})}</div>` : ''}
+        ${progressBar}
+        ${aksiHTML}
+        ${d.catatanTolak ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(244,63,94,0.08);border-radius:7px;font-size:0.8rem;color:var(--rose)">
+          ⚠️ Catatan dosen: ${d.catatanTolak}
+        </div>` : ''}
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  c.innerHTML = html;
+}

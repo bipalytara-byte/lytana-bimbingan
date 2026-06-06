@@ -11,12 +11,13 @@ function mSwitch(s) {
   document.querySelectorAll('#page-mahasiswa .page-section').forEach(x => x.classList.remove('active'));
   document.getElementById('m-' + s).classList.add('active');
   document.querySelectorAll('#page-mahasiswa .nav-tab').forEach((t, i) =>
-    t.classList.toggle('active', ['reservasi', 'riwayat', 'progres', 'chat', 'profil'][i] === s)
+    t.classList.toggle('active', ['reservasi', 'riwayat', 'progres', 'deadline', 'chat', 'profil'][i] === s)
   );
-  if (s === 'riwayat') loadMyHistory();
-  if (s === 'progres') loadMyProgress();
-  if (s === 'chat')    loadChatList();
-  if (s === 'profil')  fillProfil();
+  if (s === 'riwayat')  loadMyHistory();
+  if (s === 'progres')  loadMyProgress();
+  if (s === 'deadline') loadMahasiswaDeadlines().then(renderDeadlinePageMhs);
+  if (s === 'chat')     loadChatList();
+  if (s === 'profil')   fillProfil();
 }
 
 function dSwitch(s) {

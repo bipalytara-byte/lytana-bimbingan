@@ -133,6 +133,7 @@
       <button class="nav-tab active" onclick="mSwitch('reservasi')">Reservasi</button>
       <button class="nav-tab" onclick="mSwitch('riwayat')">Riwayat</button>
       <button class="nav-tab" onclick="mSwitch('progres')">Progres</button>
+      <button class="nav-tab" onclick="mSwitch('deadline')">Deadline <span id="m-deadline-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" id="m-chat-tab" onclick="mSwitch('chat')">Chat <span id="m-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="mSwitch('profil')">Profil</button>
     </div>
@@ -195,6 +196,17 @@
         <button class="btn btn-primary btn-sm" onclick="openProgresModal()">+ Update Progres</button>
       </div>
       <div id="progres-container"><div class="loading-overlay"><div class="spinner"></div> Memuat...</div></div>
+    </div>
+
+    <!-- ============ DEADLINE MAHASISWA ============ -->
+    <div id="m-deadline" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Deadline Skripsi</h2><p>Tugas & deadline dari dosen pembimbingmu</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadMahasiswaDeadlines().then(renderDeadlinePageMhs)">↻ Refresh</button>
+      </div>
+      <div id="m-deadline-container">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
     </div>
 
     <div id="m-chat" class="page-section">

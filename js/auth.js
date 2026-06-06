@@ -164,7 +164,14 @@ function onLogin(token, user) {
       setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 800);
     }
     // Load deadline lalu baru render slot (deadline mempengaruhi blokir)
-    loadMahasiswaDeadlines().then(() => loadSlotPreviews());
+    loadMahasiswaDeadlines().then(() => {
+      renderDeadlineBannerMhs();
+      // Update badge nav
+      const aktifCount = (state.myDeadlines || []).filter(d => d.status === 'aktif' || d.status === 'selesai_menunggu').length;
+      const badge = document.getElementById('m-deadline-badge');
+      if (badge) { badge.textContent = aktifCount; badge.style.display = aktifCount > 0 ? 'inline' : 'none'; }
+      loadSlotPreviews();
+    });
   }
   toast('Selamat datang, ' + user.nama + '!', 'success');
 }
