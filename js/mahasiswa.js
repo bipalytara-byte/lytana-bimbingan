@@ -25,9 +25,13 @@ async function loadSlotPreviews() {
       el.innerHTML = `<div class="type-card-stat"><span style="color:var(--text3);font-size:0.76rem">Belum ada sesi terjadwal</span></div>`;
       return;
     }
-    // Blokir tampilan slot jika tidak aktif
+    // Blokir tampilan slot jika tidak aktif atau ada deadline terlewat
     if (state.user?.statusSkripsi === 'tidak_aktif') {
       el.innerHTML = `<div class="type-card-stat"><span style="color:var(--rose);font-size:0.78rem">⏸ Akun tidak aktif — reservasi dinonaktifkan</span></div>`;
+      return;
+    }
+    if (hasDeadlineBlokir()) {
+      el.innerHTML = `<div class="type-card-stat"><span style="color:var(--rose);font-size:0.78rem">🚫 Ada deadline terlewat — reservasi diblokir</span></div>`;
       return;
     }
     const nearest = tersedia.sort((a, b) => (a.tanggal + a.jamMulai).localeCompare(b.tanggal + b.jamMulai))[0];
@@ -60,6 +64,20 @@ async function loadSlotPreviews() {
       if (el) el.innerHTML = '';
     });
   }
+}
+
+// ── Cek blokir gabungan: tidak_aktif ATAU deadline terlewat ──
+function renderBlokirBanner(container) {
+  // Prioritas 1: tidak_aktif
+  if (state.user?.statusSkripsi === 'tidak_aktif') {
+    renderInaktifBanner(container);
+    return true;
+  }
+  // Prioritas 2: deadline terlewat
+  if (hasDeadlineBlokir()) {
+    return renderDeadlineBlokirBanner(container);
+  }
+  return false;
 }
 
 // ── Cek & render banner status tidak aktif ────────────────────
@@ -96,11 +114,14 @@ function renderInaktifBanner(container) {
 
 // ── Pilih Jenis Bimbingan & Load Slot ────────────────────────
 function selectType(type) {
-  // Blokir jika status tidak_aktif
-  if (state.user?.statusSkripsi === 'tidak_aktif') {
+  // Blokir jika status tidak_aktif atau ada deadline terlewat
+  if (state.user?.statusSkripsi === 'tidak_aktif' || hasDeadlineBlokir()) {
     const c = document.getElementById('slots-container');
-    if (c) renderInaktifBanner(c);
-    toast('Akunmu tidak aktif. Hubungi dosen pembimbing untuk aktivasi ulang.', 'error');
+    if (c) renderBlokirBanner(c);
+    if (state.user?.statusSkripsi === 'tidak_aktif')
+      toast('Akunmu tidak aktif. Hubungi dosen pembimbing untuk aktivasi ulang.', 'error');
+    else
+      toast('Ada deadline yang belum diselesaikan. Konfirmasi ke dosen pembimbing terlebih dahulu.', 'error');
     return;
   }
   state.selectedType = type;
@@ -113,9 +134,9 @@ function selectType(type) {
 
 async function loadSlots(tipe) {
   const c = document.getElementById('slots-container');
-  // Blokir jika tidak aktif
-  if (state.user?.statusSkripsi === 'tidak_aktif') {
-    renderInaktifBanner(c);
+  // Blokir jika tidak aktif atau ada deadline terlewat
+  if (state.user?.statusSkripsi === 'tidak_aktif' || hasDeadlineBlokir()) {
+    renderBlokirBanner(c);
     return;
   }
   c.innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Memuat sesi dari dosen pembimbing...</div>';
@@ -178,6 +199,10 @@ function renderSlotCard(s) {
 function openBookingModal(slot) {
   if (state.user?.statusSkripsi === 'tidak_aktif') {
     toast('Akunmu tidak aktif. Hubungi dosen pembimbing untuk aktivasi ulang.', 'error');
+    return;
+  }
+  if (hasDeadlineBlokir()) {
+    toast('Ada deadline yang belum diselesaikan. Konfirmasi terlebih dahulu.', 'error');
     return;
   }
   state.pendingSlot = slot;

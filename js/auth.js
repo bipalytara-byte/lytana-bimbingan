@@ -160,11 +160,11 @@ function onLogin(token, user) {
     showPage('mahasiswa');
     renderAllInfoPanels();
     // Status skripsi sudah dihitung GAS (computeStatus) saat login/auto-login.
-    // Tampilkan toast jika status tidak_aktif agar mahasiswa langsung tahu.
     if (user.statusSkripsi === 'tidak_aktif') {
       setTimeout(() => toast('⚠️ Akunmu tidak aktif karena lebih dari 14 hari tidak bimbingan. Hubungi dosen pembimbingmu.', 'error'), 800);
     }
-    loadSlotPreviews();
+    // Load deadline lalu baru render slot (deadline mempengaruhi blokir)
+    loadMahasiswaDeadlines().then(() => loadSlotPreviews());
   }
   toast('Selamat datang, ' + user.nama + '!', 'success');
 }

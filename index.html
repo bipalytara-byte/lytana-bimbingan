@@ -147,6 +147,8 @@
       <div class="section-header">
         <div class="section-title"><h2>Reservasi Bimbingan</h2><p id="m-dosen-label">Pilih jenis sesi bimbingan</p></div>
       </div>
+      <!-- Banner Deadline Mahasiswa -->
+      <div id="m-deadline-banner" style="margin-bottom:12px;display:none"></div>
       <!-- Panel Info Metode Bimbingan (read-only untuk mahasiswa) -->
       <div class="info-bimbingan-panel" id="m-info-panel">
         <div class="panel-title">
@@ -269,6 +271,7 @@
       <button class="nav-tab" onclick="dSwitch('sesi')">Sesi</button>
       <button class="nav-tab" onclick="dSwitch('reservasi')">Reservasi</button>
       <button class="nav-tab" onclick="dSwitch('mahasiswa')">Mahasiswa</button>
+      <button class="nav-tab" onclick="dSwitch('deadline')">Deadline <span id="d-deadline-badge" style="display:none;background:var(--amber);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" id="d-chat-tab" onclick="dSwitch('chat')">Chat <span id="d-chat-badge" style="display:none;background:var(--rose);color:white;border-radius:20px;padding:1px 6px;font-size:0.68rem;font-weight:800;margin-left:2px"></span></button>
       <button class="nav-tab" onclick="dSwitch('profil')">Profil</button>
     </div>
@@ -399,6 +402,21 @@
         </div>
         <div id="d-students-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
       </div>
+    </div>
+
+    <div id="d-deadline" class="page-section">
+      <div class="section-header">
+        <div class="section-title"><h2>Deadline Mahasiswa</h2><p>Atur dan pantau deadline tugas skripsi mahasiswa bimbinganmu</p></div>
+        <button class="btn btn-primary" onclick="openSetDeadlineModal()">+ Set Deadline Baru</button>
+      </div>
+      <div class="filter-row" style="margin-bottom:16px">
+        <button class="filter-btn active" onclick="filterDosenDeadlines('all',this)">Semua</button>
+        <button class="filter-btn" onclick="filterDosenDeadlines('aktif',this)">Aktif</button>
+        <button class="filter-btn" onclick="filterDosenDeadlines('selesai_menunggu',this)">Menunggu Verif ⏳</button>
+        <button class="filter-btn" onclick="filterDosenDeadlines('verified',this)">Terverifikasi</button>
+        <button class="filter-btn" onclick="filterDosenDeadlines('expired',this)">Kedaluwarsa</button>
+      </div>
+      <div id="d-deadline-container"><div class="loading-overlay"><div class="spinner"></div></div></div>
     </div>
 
     <div id="d-chat" class="page-section">
@@ -740,6 +758,87 @@
               style="background:var(--green);color:white;border:none;font-weight:700"
               onclick="confirmReaktivasi()">✅ Ya, Aktifkan Kembali</button>
       <button class="btn btn-ghost" onclick="closeModal('modal-reaktivasi')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL SET DEADLINE (DOSEN) ==================== -->
+<div class="modal-overlay" id="modal-deadline">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h3 id="modal-deadline-title">📋 Set Deadline Mahasiswa</h3>
+      <button class="modal-close" onclick="closeModal('modal-deadline')">×</button>
+    </div>
+    <input type="hidden" id="deadline-id-edit"/>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="form-label">Mahasiswa</label>
+        <select id="deadline-mhs-sel" class="form-input"><option value="">-- Pilih Mahasiswa --</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Judul Tugas / Deadline</label>
+        <input id="deadline-judul" class="form-input" placeholder="Contoh: Selesaikan Bab 3 dan kirim ke Bitrix"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deskripsi <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <textarea id="deadline-deskripsi" class="form-textarea" style="min-height:64px" placeholder="Jelaskan detail tugas yang harus diselesaikan..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Konsekuensi jika tidak selesai <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+        <input id="deadline-konsekuensi" class="form-input" placeholder="Contoh: Tidak dapat melakukan reservasi bimbingan"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">⏰ Deadline Mahasiswa</label>
+          <input type="date" id="deadline-tgl-mhs" class="form-input"/>
+          <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Kapan mahasiswa harus selesai & konfirmasi</div>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">📅 Deadline Review Dosen</label>
+          <input type="date" id="deadline-tgl-dosen" class="form-input"/>
+          <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Kapan dosen harus selesai mengecek file di Bitrix</div>
+        </div>
+      </div>
+      <div style="padding:10px 12px;background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:8px;font-size:0.8rem;color:var(--text2);line-height:1.5">
+        📌 Mahasiswa akan mendapat notifikasi deadline ini saat login. Setelah upload ke Bitrix24, mereka konfirmasi di LYTANA dan kamu verifikasi untuk membuka kembali akses reservasinya.
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-primary" id="deadline-save-btn" onclick="saveDeadline()">Simpan Deadline</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-deadline')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL KONFIRMASI DEADLINE (MAHASISWA) ==================== -->
+<div class="modal-overlay" id="modal-konfirmasi-deadline">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3>✅ Konfirmasi Selesai</h3>
+      <button class="modal-close" onclick="closeModal('modal-konfirmasi-deadline')">×</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.82rem;color:var(--text3);margin-bottom:4px">Deadline:</div>
+      <div style="font-weight:700;font-size:0.95rem" id="konfirmasi-deadline-judul">—</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="form-label">Pernyataan Penyelesaian</label>
+        <textarea id="konfirmasi-deadline-pernyataan" class="form-textarea" style="min-height:80px"
+                  placeholder="Contoh: Saya telah menyelesaikan Bab 3 dan mengunggah file ke Bitrix24 pada tanggal ... Dokumen telah saya kirim ke folder bimbingan sesuai petunjuk."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link Bitrix24</label>
+        <input id="konfirmasi-deadline-link" class="form-input" type="url" placeholder="https://bitrix24.com/..."/>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">Tempel link file/folder yang sudah kamu upload di Bitrix24</div>
+      </div>
+      <div style="padding:10px 12px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:8px;font-size:0.8rem;color:var(--text2);line-height:1.5">
+        ℹ️ Setelah mengirim konfirmasi ini, dosen pembimbingmu akan mendapat notifikasi dan memverifikasi. Akses reservasi akan terbuka setelah dosen melakukan verifikasi.
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-primary" id="konfirmasi-deadline-btn" onclick="submitKonfirmasiDeadline()">✅ Kirim Konfirmasi</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-konfirmasi-deadline')">Batal</button>
     </div>
   </div>
 </div>

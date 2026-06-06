@@ -28,6 +28,8 @@ async function loadDosenDashboard() {
   const pending = (bRes.bookings || []).filter(b => b.status === 'menunggu' || b.status === 'disetujui').slice(0, 5);
   if (!pending.length) { c.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada reservasi yang menunggu tindakan</p></div>'; return; }
   c.innerHTML = bookingTable(pending, false);
+  // Update badge deadline pending
+  loadDosenDeadlines();
 }
 
 // ── Sesi ──────────────────────────────────────────────────────
@@ -326,6 +328,7 @@ function renderDosenStudents(students) {
           ? `<button class="btn btn-sm" style="flex:1;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);font-weight:700" onclick="openReaktivasiModal('${s.kode}','${s.nama.replace(/'/g, "\\'")}')">✅ Aktifkan</button>`
           : `<button class="btn btn-sm" style="flex:1;background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.25)" onclick="openSetStatus('${s.kode}','${s.nama.replace(/'/g, "\\'")}','${s.statusSkripsi}')">Set Status</button>`
         }
+        <button class="btn btn-sm" style="flex:1;background:rgba(139,92,246,0.12);color:var(--purple);border:1px solid rgba(139,92,246,0.25)" onclick="openSetDeadlineModal('${s.kode}')">📋 Deadline</button>
       </div>
     </div>`;
   }).join('')}</div>`;

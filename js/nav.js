@@ -23,12 +23,13 @@ function dSwitch(s) {
   document.querySelectorAll('#page-dosen .page-section').forEach(x => x.classList.remove('active'));
   document.getElementById('d-' + s).classList.add('active');
   document.querySelectorAll('#page-dosen .nav-tab').forEach((t, i) =>
-    t.classList.toggle('active', ['dashboard', 'sesi', 'reservasi', 'mahasiswa', 'chat', 'profil'][i] === s)
+    t.classList.toggle('active', ['dashboard', 'sesi', 'reservasi', 'mahasiswa', 'deadline', 'chat', 'profil'][i] === s)
   );
   if (s === 'dashboard') loadDosenDashboard();
   if (s === 'sesi')      loadDosenSlots();
   if (s === 'reservasi') loadDosenBookings();
   if (s === 'mahasiswa') loadDosenStudents();
+  if (s === 'deadline')  loadDosenDeadlines();
   if (s === 'chat')      loadChatList();
   if (s === 'profil')    fillDosenProfil();
 }
