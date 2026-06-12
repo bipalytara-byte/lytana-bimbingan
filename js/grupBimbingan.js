@@ -341,26 +341,34 @@ async function deleteGrupConfirm(grupId, nama) {
 // ── Manajemen Anggota ─────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────
 
-function openTambahAnggota(grupId) {
+async function openTambahAnggota(grupId) {
   _selectedGrupId = grupId;
   const grup = _grupList.find(g => g.id === grupId);
   if (!grup) return;
 
-  // Ambil kode mahasiswa yang sudah ada di grup
-  const sudahAda = (grup.anggotaKode || []);
+  const sel = document.getElementById('tambah-anggota-select');
+  document.getElementById('modal-tambah-anggota-grupnama').textContent = grup.nama;
+  sel.innerHTML = '<option value="">⏳ Memuat daftar mahasiswa...</option>';
+  openModal('modal-tambah-anggota');
 
-  // Filter mahasiswa yang belum masuk grup ini
+  // Selalu fetch anggota terkini dari GAS agar tidak stale
+  const detailRes = await api('getGrupDetail', { grupId, token: state.token });
+  const sudahAda  = (detailRes.anggota || []).map(a => a.kode);
+
+  // Pastikan state.dosenStudents terisi
+  if (!state.dosenStudents || !state.dosenStudents.length) {
+    const sRes = await api('getMyStudents', { token: state.token });
+    if (sRes.success) state.dosenStudents = sRes.students;
+  }
+
   const tersedia = (state.dosenStudents || []).filter(s => !sudahAda.includes(s.kode));
 
-  const sel = document.getElementById('tambah-anggota-select');
   if (!tersedia.length) {
     sel.innerHTML = '<option value="">Semua mahasiswa sudah ada di grup ini</option>';
   } else {
     sel.innerHTML = '<option value="">-- Pilih Mahasiswa --</option>' +
       tersedia.map(s => `<option value="${s.kode}">${s.nama} (${s.kode}) — ${STATUS_CONFIG[s.statusSkripsi]?.label || s.statusSkripsi}</option>`).join('');
   }
-  document.getElementById('modal-tambah-anggota-grupnama').textContent = grup.nama;
-  openModal('modal-tambah-anggota');
 }
 
 async function confirmTambahAnggota() {
