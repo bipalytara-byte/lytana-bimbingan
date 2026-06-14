@@ -1,3 +1,18 @@
+// ── Helper: parse tanggal deadline dengan aman ───────────────
+// Menangani format YYYY-MM-DD maupun dd/mm/yyyy dari GAS
+function parseDeadlineTgl(str) {
+  if (!str) return new Date(NaN);
+  const s = String(str).trim().substring(0, 10);
+  // Format YYYY-MM-DD (ISO) — langsung parse dengan append T00:00:00
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s + 'T00:00:00');
+  // Format DD/MM/YYYY — balik jadi YYYY-MM-DD dulu
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+    const [dd, mm, yyyy] = s.split('/');
+    return new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+  }
+  return new Date(str);
+}
+
 // ============================================================
 // deadline.js — Fitur Deadline Skripsi
 // Dosen set deadline per mahasiswa, mahasiswa konfirmasi selesai
@@ -61,8 +76,8 @@ function renderDosenDeadlines(deadlines) {
 
 function renderDeadlineCardDosen(d, highlight) {
   const now        = Date.now();
-  const dlMhs      = new Date(d.deadlineMahasiswa);
-  const dlDosen    = new Date(d.deadlineDosen);
+  const dlMhs      = parseDeadlineTgl(d.deadlineMahasiswa);
+  const dlDosen    = parseDeadlineTgl(d.deadlineDosen);
   const mhsLewat  = now > dlMhs.getTime();
   const dosenLewat = now > dlDosen.getTime();
   const sisaMhsHari  = Math.ceil((dlMhs.getTime() - now) / 86400000);
@@ -286,7 +301,7 @@ function renderDeadlineBannerMhs() {
   const now = Date.now();
 
   container.innerHTML = aktif.map(d => {
-    const dl       = new Date(d.deadlineMahasiswa);
+    const dl       = parseDeadlineTgl(d.deadlineMahasiswa);
     const lewat    = now > dl.getTime();
     const sisaHari = Math.ceil((dl.getTime() - now) / 86400000);
     const menunggu = d.status === 'selesai_menunggu';
@@ -378,7 +393,7 @@ function hasDeadlineBlokir() {
   const now       = Date.now();
   return deadlines.some(d => {
     if (d.status === 'verified' || d.status === 'expired') return false;
-    const lewat = now > new Date(d.deadlineMahasiswa).getTime();
+    const lewat = now > parseDeadlineTgl(d.deadlineMahasiswa).getTime();
     // Blokir jika: deadline sudah lewat & belum dikonfirmasi
     //           ATAU sudah dikonfirmasi tapi belum diverifikasi dosen & deadline lewat
     if (d.status === 'aktif' && lewat)             return true;
@@ -393,7 +408,7 @@ function renderDeadlineBlokirBanner(container) {
   const now        = Date.now();
   const blokirList = deadlines.filter(d => {
     if (d.status === 'verified' || d.status === 'expired') return false;
-    const lewat = now > new Date(d.deadlineMahasiswa).getTime();
+    const lewat = now > parseDeadlineTgl(d.deadlineMahasiswa).getTime();
     return (d.status === 'aktif' && lewat) || (d.status === 'selesai_menunggu' && lewat);
   });
 
@@ -467,7 +482,7 @@ function renderDeadlinePageMhs() {
     if (d.status === 'verified')          return 'verified';
     if (d.status === 'expired')           return 'expired';
     if (d.status === 'selesai_menunggu')  return 'selesai_menunggu';
-    const lewat = now > new Date(d.deadlineMahasiswa).getTime();
+    const lewat = now > parseDeadlineTgl(d.deadlineMahasiswa).getTime();
     return lewat ? 'aktif_lewat' : 'aktif_belum_lewat';
   }
 
@@ -489,8 +504,8 @@ function renderDeadlinePageMhs() {
       <div style="display:flex;flex-direction:column;gap:10px">`;
 
     items.forEach(d => {
-      const dl        = new Date(d.deadlineMahasiswa);
-      const dlDosen   = d.deadlineDosen ? new Date(d.deadlineDosen) : null;
+      const dl        = parseDeadlineTgl(d.deadlineMahasiswa);
+      const dlDosen   = d.deadlineDosen ? parseDeadlineTgl(d.deadlineDosen) : null;
       const lewat     = now > dl.getTime();
       const sisaHari  = Math.ceil((dl.getTime() - now) / 86400000);
       const groupKey  = getGroupKey(d);
@@ -498,8 +513,8 @@ function renderDeadlinePageMhs() {
       // Progress bar visual sisa waktu
       let progressBar = '';
       if (groupKey === 'aktif_belum_lewat' && d.createdAt) {
-        const total   = dl.getTime() - new Date(d.createdAt).getTime();
-        const elapsed = now - new Date(d.createdAt).getTime();
+        const total   = dl.getTime() - parseDeadlineTgl(d.createdAt).getTime();
+        const elapsed = now - parseDeadlineTgl(d.createdAt).getTime();
         const pct     = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
         const barColor = pct >= 80 ? 'var(--rose)' : pct >= 60 ? 'var(--amber)' : 'var(--green)';
         progressBar = `<div style="margin-top:8px">
