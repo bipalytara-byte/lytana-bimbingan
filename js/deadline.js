@@ -1,15 +1,17 @@
 // ── Helper: parse tanggal deadline dengan aman ───────────────
-// Menangani format YYYY-MM-DD maupun dd/mm/yyyy dari GAS
+// GAS mengirim format dd/mm/yyyy — JavaScript salah baca sebagai bulan
+// Fungsi ini menangani dd/mm/yyyy dan yyyy-mm-dd sekaligus
 function parseDeadlineTgl(str) {
   if (!str) return new Date(NaN);
   const s = String(str).trim().substring(0, 10);
-  // Format YYYY-MM-DD (ISO) — langsung parse dengan append T00:00:00
+  // Format YYYY-MM-DD (ISO)
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s + 'T00:00:00');
-  // Format DD/MM/YYYY — balik jadi YYYY-MM-DD dulu
+  // Format DD/MM/YYYY — balik jadi YYYY-MM-DD
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
     const [dd, mm, yyyy] = s.split('/');
     return new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
   }
+  // Fallback
   return new Date(str);
 }
 
@@ -105,7 +107,7 @@ function renderDeadlineCardDosen(d, highlight) {
           <span style="color:var(--text3);font-size:0.78rem">🔗 Link Bitrix:</span>
           <a href="${d.linkBitrix}" target="_blank" style="color:var(--blue2);font-size:0.82rem;word-break:break-all">${d.linkBitrix}</a>
         </div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Dikonfirmasi: ${d.konfirmasiAt ? new Date(d.konfirmasiAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '—'}</div>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Dikonfirmasi: ${d.konfirmasiAt ? parseDeadlineTgl(d.konfirmasiAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '—'}</div>
       </div>`;
   }
 
@@ -545,7 +547,7 @@ function renderDeadlinePageMhs() {
         }
       } else if (groupKey === 'verified') {
         aksiHTML = `<div style="margin-top:10px;font-size:0.78rem;color:var(--green)">
-          ✅ Terverifikasi pada ${d.verifikasiAt ? new Date(d.verifikasiAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '—'}
+          ✅ Terverifikasi pada ${d.verifikasiAt ? parseDeadlineTgl(d.verifikasiAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '—'}
         </div>`;
       }
 
